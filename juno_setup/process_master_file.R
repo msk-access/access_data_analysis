@@ -16,5 +16,5 @@ master.ref = fread(paste0(repo.dir,'/data/example_master_file_raw.csv')) %>% row
   setnames(c('CMO patient ID','CMO sample ID.plasma','BAM_path.plasma.duplex','BAM_path.plasma.simplex','CMO sample ID.normal',
              'BAM_path.normal','Paired','Sex','collection_date','DMP_ID','maf_path','cna_path','sv_path'),
            c('cmo_patient_id','cmo_sample_id_plasma','bam_path_plasma_duplex','bam_path_plasma_simplex','cmo_sample_id_normal',
-             'bam_path_normal','paired','sex','collection_date','dmp_sample_id','maf_path','cna_path','sv_path'))
+             'bam_path_normal','paired','sex','collection_date','dmp_patient_id','maf_path','cna_path','sv_path'))
 write.csv(master.ref,paste0(repo.dir,'/data/example_master_file.csv'),quote = F,row.names = F)

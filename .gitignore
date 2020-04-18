@@ -10,6 +10,7 @@
 
 # Example code in package build process
 *-Ex.R
+._*.R
 
 # Output files from R CMD build
 /*.tar.gz
@@ -34,6 +35,7 @@ vignettes/*.pdf
 # Temporary files created by R markdown
 *.utf8.md
 *.knit.md
+._*.md
 
 # R Environment Variables
 .Renviron

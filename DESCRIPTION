@@ -1,0 +1,13 @@
+Package: access_data_analysis
+Title: ACCESS data analysis 
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Peter",
+           family = "Zheng",
+           role = c("aut", "cre"),
+           email = "youyunzheng@gmail.com",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: Process various ACCESS pipeline data.
+License: What license it uses
+Encoding: UTF-8
+LazyData: true
