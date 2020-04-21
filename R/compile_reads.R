@@ -60,11 +60,11 @@ compile_reads = function(
     sample.sheet = master.ref[cmo_patient_id == x,
                               # plasma bams -- duplex and simplex bam
                               .(Sample_Barcode = cmo_sample_id_plasma,duplex_bam = bam_path_plasma_duplex,
-                                simplex_bam = bam_path_plasma_simplex,cmo_patient_id,Sample_Type = 'plasma',dmp_patient_id)] %>%
+                                simplex_bam = bam_path_plasma_simplex,cmo_patient_id,Sample_Type = 'duplex',dmp_patient_id)] %>%
       merge(rbind(unique(master.ref[cmo_patient_id == x,
                                     # buffy coat + DMP bams -- standard bam only
                                     .(Sample_Barcode = cmo_sample_id_normal,standard_bam = bam_path_normal,
-                                      cmo_patient_id,Sample_Type = 'Normal',dmp_patient_id)]),
+                                      cmo_patient_id,Sample_Type = 'unfilterednormal',dmp_patient_id)]),
                   dmp.sample.sheet),all = T)
     write.table(sample.sheet,paste0(results.dir,'/',x,'/',x,'_sample_sheet.tsv'),sep = '\t',quote = F,row.names = F)
     # piece together all unique calls -----------------------------------------
