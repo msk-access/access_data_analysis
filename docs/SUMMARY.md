@@ -1,3 +1,22 @@
 # Table of contents
 
-* [ACCESS Data Analysis](README.md)
+* [Home](README.md)
+* [Github codebase](https://github.com/msk-access/access_data_analysis)
+
+## Setup
+
+* [Installation](setup/installation.md)
+* [Setup for Running Analysis](setup/setup-for-running-analysis.md)
+* [Resources](setup/resources.md)
+* [CNA Result Processing](setup/cna-result-processing.md)
+
+## Analysis
+
+* [Overview of Analysis Workflow](analysis/untitled.md)
+* [Compile Reads](analysis/compile-reads.md)
+* [Filter Calls](analysis/filter-calls.md)
+* [SV Incorporation](analysis/sv-incorporation.md)
+* [CNA Processing](analysis/cna-processing.md)
+* [Plot All Events](analysis/plot-all-events.md)
+* [Intermediate File Organization](analysis/intermediate-file-organization.md)
+
