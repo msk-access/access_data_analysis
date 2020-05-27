@@ -8,6 +8,12 @@ Scripts for downstream analysis plotting of ACCESS variant calling pipeline outp
 
 This gitbook will walk you through:
 
-1. Setup -- installation, master file creation, resource files
-2. Analysis -- running each step, documentation of code, and intermediate file structure
+* [Setup](setup/setup-for-running-analysis.md)
+  * [Installation](setup/installation.md)
+  * [Master file creation](setup/setup-for-running-analysis.md#master-reference-file)
+  * [Resource files](setup/resources.md)
+* [Analysis](analysis/untitled.md)
+  * Running each step
+  * Documentation of code
+  * [Intermediate file structure](analysis/intermediate-file-organization.md)
 
