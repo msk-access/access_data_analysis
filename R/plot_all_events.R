@@ -1,9 +1,9 @@
-library(data.table)
-library(stringr)
-library(tidyr)
-library(dplyr)
-library(ggplot2)
-library(RColorBrewer)
+# library(data.table)
+# library(stringr)
+# library(tidyr)
+# library(dplyr)
+# library(ggplot2)
+# library(RColorBrewer)
 
 
 # helper methods ----------------------------------------------------------
@@ -142,10 +142,10 @@ plot_all_events = function(
   # results.dir = paste0('/juno/work/bergerm1/MSK-ACCESS/ACCESS-Projects/test_access/access_data_analysis/output_042020/')
   # # criteria <- 'permissive'
   # criteria <- 'stringent'
-  # output.dir = paste0(results.dir,'/plots/')
-  # dir.create(output.dir)
   # 
   # graph by patient --------------------------------------------------------
+  output.dir = paste0(results.dir,'/plots/')
+  dir.create(output.dir)
   # for plotting consistency
   status_id = c('Called' = 19, 'Not Called' =  4, 'Signed out' = 15,
                 'Not Signed out' = 13, 'Not Covered' = 8, 'Genotyped' = 17)

@@ -89,7 +89,11 @@ SV_incorporation = function(
       }
       # only for plasma sample -- '.called' column
       if(y[which(colnames(sample.sheet) == 'Sample_Type')] == 'duplex'){
-        SV.table[,paste0(y[which(colnames(sample.sheet) == 'Sample_Barcode')],'___duplex.called') := NA]
+        SV.table[,paste0(y[which(colnames(sample.sheet) == 'Sample_Barcode')],'___duplex.called') := case_when(
+          is.na(get(paste0(y[which(colnames(sample.sheet) == 'Sample_Barcode')],'___total'))) ~ 'Not Called',
+          is.na(all(!str_split(Hugo_Symbol,'__') %in% access.gene.list)) ~ 'Not Covered',
+          T ~ 'Called'
+        )]
       }
       # edit DMP signout column
       if(y[which(colnames(sample.sheet) == 'Sample_Type')] == 'DMP_Tumor'){
