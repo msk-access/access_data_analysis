@@ -167,9 +167,15 @@ plot_all_events = function(
     }))
     
     # transform sample IDs into times
-    transform.vector = structure(as.character(master.ref[cmo_patient_id == x]$collection_date),
-                                 names = master.ref[cmo_patient_id == x]$cmo_sample_id_plasma)
-    print(transform.vector)
+    if(all(!is.na(as.Date(master.ref[cmo_patient_id == x]$collection_date,'%m/%d/%y')))){
+      transform.vector = structure(as.Date(master.ref[cmo_patient_id == x]$collection_date,'%m/%d/%y')),
+                                   names = master.ref[cmo_patient_id == x]$cmo_sample_id_plasma)
+      print(transform.vector)      
+    }else{
+      transform.vector = structure(as.character(master.ref[cmo_patient_id == x]$collection_date),
+                                   names = master.ref[cmo_patient_id == x]$cmo_sample_id_plasma)
+      print(transform.vector)
+    }
     tmp.table$Tumor_Sample_Barcode = transform.vector[tmp.table$Tumor_Sample_Barcode]
     
     if(nrow(tmp.table) == 0 | all(tmp.table$t_alt_count == 0)){

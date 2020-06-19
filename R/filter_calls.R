@@ -35,7 +35,7 @@ filter_calls = function(
     fread(paste0(results.dir,'/pooled/all_all_unique.maf')) %>% mutate(Tumor_Sample_Barcode = paste0(Tumor_Sample_Barcode,'___pooled')) %>%
     select(Hugo_Symbol,Tumor_Sample_Barcode,Chromosome,Start_Position,End_Position,Variant_Classification,HGVSp_Short,Reference_Allele,Tumor_Seq_Allele2,t_alt_count) %>% 
     group_by(Hugo_Symbol,Chromosome,Start_Position,End_Position,Variant_Classification,Reference_Allele,Tumor_Seq_Allele2) %>% 
-    summarise(duplex_support_num = length(which(t_alt_count >= 2))) %>% filter(duplex_support_num >= 2,.preserve = T) %>% data.table()
+    summarise(duplex_support_num = length(which(t_alt_count >= 2))) %>% filter(duplex_support_num > 0,.preserve = T) %>% data.table()
   
   # for each patient produce the correct results ----------------------------
   # x <- unique(master.ref$cmo_patient_id)[1]
@@ -92,8 +92,7 @@ filter_calls = function(
       # Identifying signed out calls
       merge(dmp.maf,by = c('Hugo_Symbol','Chromosome','Start_Position','End_Position','Variant_Classification','Reference_Allele','Tumor_Seq_Allele2'),all.x = T) %>%
       # pooled normal for systemic artifacts
-      merge(pooled.normal.mafs,by = c('Hugo_Symbol','Chromosome','Start_Position','End_Position','Variant_Classification','Reference_Allele','Tumor_Seq_Allele2'),all.x = T) %>%
-      filter(is.na(duplex_support_num) | !is.na(DMP)) %>% data.table()
+      merge(pooled.normal.mafs,by = c('Hugo_Symbol','Chromosome','Start_Position','End_Position','Variant_Classification','Reference_Allele','Tumor_Seq_Allele2'),all.x = T) %>% data.table()
     # Interesting cases where DMP signed out calls are artifacets
     if(any(!is.na(fillouts.dt$DMP) & !is.na(fillouts.dt$duplex_support_num))){
       print(paste0('Look at ',x,' for DMP signed out plasma artifacts...'))

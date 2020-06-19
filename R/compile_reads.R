@@ -77,6 +77,8 @@ compile_reads = function(
                                     .(Sample_Barcode = cmo_sample_id_normal,standard_bam = bam_path_normal,
                                       cmo_patient_id,Sample_Type = 'unfilterednormal',dmp_patient_id)]),
                   dmp.sample.sheet),all = T)
+    # catch '' or NA for empty cells for some cmo_sample_id_normal
+    sample.sheet = sample.sheet[-which(is.na(Sample_Barcode) | Sample_Barcode == '')]
     write.table(sample.sheet,paste0(results.dir,'/',x,'/',x,'_sample_sheet.tsv'),sep = '\t',quote = F,row.names = F)
     # piece together all unique calls -----------------------------------------
     # get duplex calls
