@@ -64,7 +64,7 @@ compile_reads = function(
       all.dmp.bam.ids = DMP.key[grepl(paste0(dmp_id,'-T..-IM.'),V1)]$V2
       bam.sub.dir = unlist(lapply(strsplit(substr(all.dmp.bam.ids,1,2),''),function(x){paste0(x,collapse = '/')}))
       dmp.sample.sheet = data.frame(Sample_Barcode = all.dmp.ids,
-                                    standard_bam = paste0(mirror.bam.dir,'/',bam.sub.dir,'/',all.dmp.bam.ids) %>%
+                                    standard_bam = paste0(mirror.bam.dir,'/',bam.sub.dir,'/',all.dmp.bam.ids,'.bam') %>%
         mutate(cmo_patient_id = x,Sample_Type = ifelse(grepl('-T',Sample_Barcode),'DMP_Tumor','DMP_Normal'),dmp_patient_id = dmp_id)
     }else{dmp.sample.sheet = NULL}
     # total sample sheet
