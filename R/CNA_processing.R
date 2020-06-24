@@ -6,7 +6,7 @@
 #' @export
 CNA_processing = function(
   master.ref,results.dir,
-  dmp.dir = '/ifs/work/bergerm1/zhengy1/dmp-2020/mskimpact/'
+  dmp.dir = '/juno/work/access/production/resources/cbioportal/current/mskimpact'
 ){
   # # test input section -----------------------------------------------------------
   # master.ref = fread('/juno/work/bergerm1/bergerlab/zhengy1/access_data_analysis/data/example_master_file.csv')

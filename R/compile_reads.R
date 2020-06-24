@@ -6,11 +6,11 @@
 
 #' @export
 compile_reads = function(
-  master.ref,results.dir,project.ID,pooled.bam.dir = '/ifs/work/bergerm1/ACCESS-Projects/novaseq_curated_duplex_v2/',
-  fasta.path = '/work/access/production/resources/reference/current/Homo_sapiens_assembly19.fasta',
+  master.ref,results.dir,project.ID,pooled.bam.dir = '/juno/work/access/production/resources/msk-access/current/novaseq_curated_duplex_bams_dmp/current/',
+  fasta.path = '/juno/work/access/production/resources/reference/current/Homo_sapiens_assembly19.fasta',
   genotyper.path = '/ifs/work/bergerm1/Innovation/software/maysun/GetBaseCountsMultiSample/GetBaseCountsMultiSample',
-  dmp.dir = '/ifs/work/bergerm1/zhengy1/dmp/mskimpact/',mirror.bam.dir = '/ifs/dmpshare/share/irb12_245/',
-  dmp.key.path = '/ifs/dmprequest/12-245/key.txt'
+  dmp.dir = '/juno/work/access/production/resources/cbioportal/current/mskimpact',mirror.bam.dir = '/juno/res/dmpcollab/dmpshare/share/irb12_245',
+  dmp.key.path = '/juno/res/dmpcollab/dmprequest/12-245/key.txt'
 ){
   # # test input section -----------------------------------------------------------
   # master.ref = fread('/juno/work/bergerm1/bergerlab/zhengy1/access_data_analysis/data/example_master_file.csv')
@@ -34,10 +34,11 @@ compile_reads = function(
   
   # data from DMP -----------------------------------------------------------
   DMP.key = fread(dmp.key.path)
-  if(any(!master.ref[grepl('^P-',dmp_patient_id)]$dmp_patient_id %in% gsub('-T..-IM.','',DMP.key$V1))){
+  if(any(!master.ref[grepl('^P-',dmp_patient_id)]$dmp_patient_id %in% gsub('-T..-IM.','',DMP.key[grepl('IM',V1)]$V1))){
     stop(paste0(
       'These DMP IDs are not found in DMP key file: ',
-      paste0(master.ref[grepl('^P-',dmp_patient_id)]$dmp_patient_id[which(!master.ref[grepl('^P-',dmp_patient_id)]$dmp_patient_id %in% gsub('-T..-IM.','',DMP.key$V1))],collapse = ' ,')
+      paste0(master.ref[grepl('^P-',dmp_patient_id)]$dmp_patient_id[which(!master.ref[grepl('^P-',dmp_patient_id)]$dmp_patient_id %in% 
+                                                                            gsub('-T..-IM.','',DMP.key[grepl('IM',V1)]$V1))],collapse = ' ,')
     ))
   }
   DMP.maf = fread(paste0(dmp.dir,'/data_mutations_extended.txt')) %>% filter(Mutation_Status != 'GERMLINE') %>% data.table()
@@ -59,8 +60,11 @@ compile_reads = function(
     # need to get DMP tumor, DMP normal, plasma, plasma normal (if there is any), pooled normal
     # DMP sample sheet
     if(!is.na(dmp_id)){
-      dmp.sample.sheet = data.frame(Sample_Barcode = DMP.key[grepl(dmp_id,V1)]$V1,
-                                    standard_bam = paste0(mirror.bam.dir,DMP.key[grepl(dmp_id,V1)]$V2,'.bam')) %>%
+      all.dmp.ids = DMP.key[grepl(paste0(dmp_id,'-T..-IM.'),V1)]$V1
+      all.dmp.bam.ids = DMP.key[grepl(paste0(dmp_id,'-T..-IM.'),V1)]$V2
+      bam.sub.dir = unlist(lapply(strsplit(substr(all.dmp.bam.ids,1,2),''),function(x){paste0(x,collapse = '/')}))
+      dmp.sample.sheet = data.frame(Sample_Barcode = all.dmp.ids,
+                                    standard_bam = paste0(mirror.bam.dir,'/',bam.sub.dir,'/',all.dmp.bam.ids,'.bam') %>%
         mutate(cmo_patient_id = x,Sample_Type = ifelse(grepl('-T',Sample_Barcode),'DMP_Tumor','DMP_Normal'),dmp_patient_id = dmp_id)
     }else{dmp.sample.sheet = NULL}
     # total sample sheet
@@ -73,6 +77,8 @@ compile_reads = function(
                                     .(Sample_Barcode = cmo_sample_id_normal,standard_bam = bam_path_normal,
                                       cmo_patient_id,Sample_Type = 'unfilterednormal',dmp_patient_id)]),
                   dmp.sample.sheet),all = T)
+    # catch '' or NA for empty cells for some cmo_sample_id_normal
+    sample.sheet = sample.sheet[-which(is.na(Sample_Barcode) | Sample_Barcode == '')]
     write.table(sample.sheet,paste0(results.dir,'/',x,'/',x,'_sample_sheet.tsv'),sep = '\t',quote = F,row.names = F)
     # piece together all unique calls -----------------------------------------
     # get duplex calls

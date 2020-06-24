@@ -6,7 +6,7 @@
 #' @export
 SV_incorporation = function(
   master.ref,results.dir,
-  dmp.dir = '/ifs/work/bergerm1/zhengy1/dmp/mskimpact/',
+  dmp.dir = '/juno/work/access/production/resources/cbioportal/current/mskimpact',
   criteria = 'stringent'
 ){
   # # test input section -----------------------------------------------------------
