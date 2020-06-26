@@ -130,7 +130,7 @@ if (!interactive()) {
   parser=ArgumentParser()
   parser$add_argument('-m', '--masterref', type='character', help='File path to master reference file')
   parser$add_argument('-o', '--resultsdir', type='character', help='Output directory')
-  parser$add_argument('-dmp', '--dmpdir', type='character', default = '/ifs/work/bergerm1/zhengy1/dmp/mskimpact/',
+  parser$add_argument('-dmp', '--dmpdir', type='character', default = '/juno/work/access/production/resources/cbioportal/current/mskimpact',
                       help='Directory of clinical DMP IMPACT repository [default]')
   parser$add_argument('-c', '--criteria', type='character', default = 'stringent',
                       help='Calling criteria [default]')
