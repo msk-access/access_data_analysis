@@ -101,9 +101,10 @@ compile_reads <- function(
     # get duplex calls
     duplex.calls <- do.call(rbind, lapply(master.ref[cmo_patient_id == x]$maf_path, function(x) {
       # fread(x) %>% filter(as.numeric(D_t_alt_count_fragment) > 0) %>% data.table()
-      fread(x) %>%
-        filter(as.numeric(t_alt_count) > 0) %>%
-        data.table()
+      fread(x) 
+        #%>%
+        #filter(as.numeric(t_alt_count) > 0) %>%
+        #data.table()
     }))
     # get impact calls
     impact.calls <- DMP.RET.maf[Tumor_Sample_Barcode %in% sample.sheet$Sample_Barcode]
