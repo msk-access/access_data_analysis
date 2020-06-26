@@ -206,11 +206,11 @@ if (!interactive()) {
     help = "Project ID for submitted jobs involved in this run"
   )
   parser$add_argument("-pb", "--pooledbamdir",
-    type = "character", default = "/ifs/work/bergerm1/ACCESS-Projects/novaseq_curated_duplex_v2/",
+    type = "character", default = "/juno/work/access/production/resources/msk-access/current/novaseq_curated_duplex_bams_dmp/current/",
     help = "Directory for all pooled bams [default]"
   )
   parser$add_argument("-fa", "--fastapath",
-    type = "character", default = "/work/access/production/resources/reference/current/Homo_sapiens_assembly19.fasta",
+    type = "character", default = "/juno/work/access/production/resources/reference/current/Homo_sapiens_assembly19.fasta",
     help = "Reference fasta path [default]"
   )
   parser$add_argument("-gt", "--genotyperpath",
@@ -218,15 +218,15 @@ if (!interactive()) {
     help = "Genotyper executable path [default]"
   )
   parser$add_argument("-dmp", "--dmpdir",
-    type = "character", default = "/ifs/work/bergerm1/zhengy1/dmp/mskimpact/",
+    type = "character", default = "/juno/work/access/production/resources/cbioportal/current/mskimpact",
     help = "Directory of clinical DMP IMPACT repository [default]"
   )
   parser$add_argument("-mb", "--mirrorbamdir",
-    type = "character", default = "/ifs/dmpshare/share/irb12_245/",
+    type = "character", default = "/juno/res/dmpcollab/dmpshare/share/irb12_245",
     help = "Mirror BAM file directory [default]"
   )
   parser$add_argument("-dmpk", "--dmpkeypath",
-    type = "character", default = "/ifs/dmprequest/12-245/key.txt",
+    type = "character", default = "/juno/res/dmpcollab/dmprequest/12-245/key.txt",
     help = "DMP mirror BAM key file [default]"
   )
   args <- parser$parse_args()
