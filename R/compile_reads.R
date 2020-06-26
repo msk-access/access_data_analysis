@@ -68,9 +68,9 @@ compile_reads <- function(
       }))
       dmp.sample.sheet <- data.frame(
         Sample_Barcode = all.dmp.ids,
-        standard_bam = paste0(mirror.bam.dir, "/", bam.sub.dir, "/", all.dmp.bam.ids, ".bam") %>%
-          mutate(cmo_patient_id = x, Sample_Type = ifelse(grepl("-T", Sample_Barcode), "DMP_Tumor", "DMP_Normal"), dmp_patient_id = dmp_id)
-      )
+        standard_bam = paste0(mirror.bam.dir, "/", bam.sub.dir, "/", all.dmp.bam.ids, ".bam")
+      ) %>%
+        mutate(cmo_patient_id = x, Sample_Type = ifelse(grepl("-T", Sample_Barcode), "DMP_Tumor", "DMP_Normal"), dmp_patient_id = dmp_id)
     } else {
       dmp.sample.sheet <- NULL
     }
