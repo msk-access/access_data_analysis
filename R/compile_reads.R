@@ -119,7 +119,7 @@ compile_reads <- function(
     )
     # getting rid of duplicate calls and take the first occurence of all events
     all.calls <- all.calls[which(!duplicated(all.calls[, .(Hugo_Symbol, Chromosome, Start_Position, End_Position, Variant_Classification, HGVSp_Short, Reference_Allele, Tumor_Seq_Allele2)])), ] %>%
-      mutate(t_ref_count="", t_alt_count="", n_ref_count="", n_alt_count="") %>%
+      mutate(t_ref_count=0, t_alt_count=0, n_ref_count=0, n_alt_count=0) %>%
       filter(Variant_Classification != "Silent" & !grepl("RP11-", Hugo_Symbol) & !grepl("Intron", Variant_Classification))
     write.table(all.calls, paste0(results.dir, "/", x, "/", x, "_all_unique_calls.maf"), sep = "\t", quote = F, row.names = F)
     # tagging hotspots
