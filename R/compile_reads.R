@@ -95,16 +95,16 @@ compile_reads <- function(
         dmp.sample.sheet
       ), all = T)
     # catch '' or NA for empty cells for some cmo_sample_id_normal
-    sample.sheet <- sample.sheet[-which(is.na(Sample_Barcode) | Sample_Barcode == "")]
+    sample.sheet <- sample.sheet[!is.na(Sample_Barcode) | Sample_Barcode != ""]
     write.table(sample.sheet, paste0(results.dir, "/", x, "/", x, "_sample_sheet.tsv"), sep = "\t", quote = F, row.names = F)
     # piece together all unique calls -----------------------------------------
     # get duplex calls
     duplex.calls <- do.call(rbind, lapply(master.ref[cmo_patient_id == x]$maf_path, function(x) {
       # fread(x) %>% filter(as.numeric(D_t_alt_count_fragment) > 0) %>% data.table()
-      fread(x) 
-        #%>%
-        #filter(as.numeric(t_alt_count) > 0) %>%
-        #data.table()
+      fread(x)
+      # %>%
+      # filter(as.numeric(t_alt_count) > 0) %>%
+      # data.table()
     }))
     # get impact calls
     impact.calls <- DMP.RET.maf[Tumor_Sample_Barcode %in% sample.sheet$Sample_Barcode]
