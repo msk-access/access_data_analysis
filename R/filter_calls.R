@@ -52,7 +52,7 @@ filter_calls = function(
       sample.name = gsub('.*./|-ORG.*.','',y)
       sample.type = sample.sheet[Sample_Barcode == sample.name]$Sample_Type
       # t_alt_count,t_ref_count,t_depth these columns are useless, have to use duplex/simplex/standard columms
-      maf.file <- fread(y)
+      maf.file <- fread(y) %>% select(-c(t_alt_count,t_ref_count)) %>% data.table()
       # fragment counts replacing actual allele counts
       if(grepl('SIMPLEX-DUPLEX_genotyped',y)){
         melt.id.vars = colnames(maf.file)[!grepl('fragment',colnames(maf.file))]
