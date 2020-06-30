@@ -45,3 +45,6 @@ vignettes/*.pdf
 
 # gitbook
 docs/*
+
+# MAC
+.DS_Store

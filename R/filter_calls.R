@@ -194,7 +194,7 @@ if (!interactive()) {
   parser=ArgumentParser()
   parser$add_argument('-m', '--masterref', type='character', help='File path to master reference file')
   parser$add_argument('-o', '--resultsdir', type='character', help='Output directory')
-  parser$add_argument('-ch', '--chlist', type='character', default = '/ifs/work/bergerm1/zhengy1/RET_all/Original_files/signedout_CH.txt',
+  parser$add_argument('-ch', '--chlist', type='character', default = '/juno/work/access/production/resources/dmp_signedout_CH/current/signedout_CH.txt',
                       help='List of signed out CH calls [default]')
   parser$add_argument('-c', '--criteria', type='character', default = 'stringent',
                       help='Calling criteria [default]')
