@@ -73,7 +73,7 @@ if (!interactive()) {
   
   master.ref = args$masterref
   results.dir = args$resultsdir
-  dmpdir = args$dmpdir
+  dmp.dir = args$dmpdir
   
   CNA_processing(master.ref,results.dir,dmp.dir)  
 }
