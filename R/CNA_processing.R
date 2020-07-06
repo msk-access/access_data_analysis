@@ -43,7 +43,7 @@ CNA_processing = function(
     TRUE ~ ''
   )) %>% filter(CNA != '') %>% data.table() -> access.call.set
   
-  if(any(access.final.call.set$CNA_tumor != access.final.call.set$CNA))  warning('Tumor and plasma have conflicting CNA detected!')
+  if(any(access.call.set$CNA_tumor != access.call.set$CNA))  warning('Tumor and plasma have conflicting CNA detected!')
   
   dir.create(paste0(results.dir,'/CNA_final_call_set'))
   lapply(unique(master.ref$cmo_sample_id_plasma),function(x){
