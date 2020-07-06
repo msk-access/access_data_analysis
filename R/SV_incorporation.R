@@ -144,16 +144,17 @@ if (!interactive()) {
   master.ref = args$masterref
   results.dir = args$resultsdir
   dmpdir = args$dmpdir
+  access.genes=args.genelist
   criteria = args$criteria
   
-  cat(paste0(paste0(c(paste0(rep('-',15),collapse = ''),'Arguments input: ',master.ref,results.dir,dmpdir,criteria,
+  cat(paste0(paste0(c(paste0(rep('-',15),collapse = ''),'Arguments input: ',master.ref,results.dir,dmpdir,access.genes,criteria,
                       paste0(rep('-',15),collapse = '')),collapse = "\n"),'\n'))
   
   if(!criteria %in% c('stringent','permissive')){
     stop('Criteria argument should be either stringent or permissive')
   }
   
-  suppressWarnings(SV_incorporation(fread(master.ref),results.dir,dmpdir,criteria))
+  suppressWarnings(SV_incorporation(fread(master.ref),results.dir,dmpdir,access.genes,criteria))
   
 }
 
