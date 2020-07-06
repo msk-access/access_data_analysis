@@ -21,6 +21,8 @@ optional arguments:
                         Output directory
   -dmp DMPDIR, --dmpdir DMPDIR
                         Directory of clinical DMP IMPACT repository [default]
+  -genes GENELIST, --genelist GENELIST
+                        File path to genes covered by ACCESS [default]
   -c CRITERIA, --criteria CRITERIA
                         Calling criteria [default]
 ```
