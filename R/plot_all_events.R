@@ -232,6 +232,8 @@ suppressPackageStartupMessages({
   library(stringr)
   library(dplyr)
   library(argparse)
+  library(ggplot2)
+  library(RColorBrewer
 })
 
 if (!interactive()) {
