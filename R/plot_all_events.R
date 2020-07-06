@@ -3,6 +3,7 @@
 # library(tidyr)
 # library(dplyr)
 # library(ggplot2)
+# library(ggpubr)
 # library(RColorBrewer)
 
 
@@ -233,6 +234,7 @@ suppressPackageStartupMessages({
   library(dplyr)
   library(argparse)
   library(ggplot2)
+  library(ggpubr)
   library(RColorBrewer)
 })
 
