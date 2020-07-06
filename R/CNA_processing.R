@@ -75,5 +75,5 @@ if (!interactive()) {
   results.dir = args$resultsdir
   dmp.dir = args$dmpdir
   
-  CNA_processing(master.ref,results.dir,dmp.dir)  
+  CNA_processing(fread(master.ref),results.dir,dmp.dir)  
 }
