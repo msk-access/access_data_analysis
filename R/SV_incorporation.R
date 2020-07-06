@@ -7,7 +7,7 @@
 SV_incorporation = function(
   master.ref,results.dir,
   dmp.dir = '/juno/work/access/production/resources/cbioportal/current/mskimpact',
-  access.genes = '/work/access/production/resources/msk-access/current/regions_of_interest/current/MSK-ACCESS-v1_0-target_genes.list'
+  access.genes = '/work/access/production/resources/msk-access/current/regions_of_interest/current/MSK-ACCESS-v1_0-target_genes.list',
   criteria = 'stringent'
 ){
   # # test input section -----------------------------------------------------------
