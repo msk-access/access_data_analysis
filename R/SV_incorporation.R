@@ -7,6 +7,7 @@
 SV_incorporation = function(
   master.ref,results.dir,
   dmp.dir = '/juno/work/access/production/resources/cbioportal/current/mskimpact',
+  access.genes = '/work/access/production/resources/msk-access/current/regions_of_interest/current/MSK-ACCESS-v1_0-target_genes.list'
   criteria = 'stringent'
 ){
   # # test input section -----------------------------------------------------------
@@ -26,6 +27,8 @@ SV_incorporation = function(
   
   dir.create(paste0(results.dir,'/results_',criteria,'_combined'))
   gene.list <- c('ALK','BRAF','ERBB2','EGFR','FGFR1','FGFR2','FGFR3','KIT','MET','NTRK1','NTRK2','NTRK3','PDGFRA','RET','ROS1')
+  access.genes.info <- fread(access.genes,header=F)
+  access.gene.list <- access.genes.info$V1
   # x <- unique(master.ref$cmo_patient_id)[1]
   lapply(unique(master.ref$cmo_patient_id),function(x){
     # get sample sheet --------------------------------------------------------
@@ -132,6 +135,8 @@ if (!interactive()) {
   parser$add_argument('-o', '--resultsdir', type='character', help='Output directory')
   parser$add_argument('-dmp', '--dmpdir', type='character', default = '/juno/work/access/production/resources/cbioportal/current/mskimpact',
                       help='Directory of clinical DMP IMPACT repository [default]')
+  parser$add_argument('-genes', '--genelist', type='character', default = '/work/access/production/resources/msk-access/current/regions_of_interest/current/MSK-ACCESS-v1_0-target_genes.list',
+                      help='File path to genes covered by ACCESS [default]')
   parser$add_argument('-c', '--criteria', type='character', default = 'stringent',
                       help='Calling criteria [default]')
   args=parser$parse_args()
