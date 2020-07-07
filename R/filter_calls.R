@@ -137,16 +137,16 @@ filter_calls = function(
     if(all(!c('unfilterednormal','normal_DMP') %in% sample.sheet$Sample_Type)){
       tmp.col.name <- plasma.samples[1]
       lapply(plasma.samples,function(tmp.col.name){
-        fillouts.dt[as.numeric(gsub("\\(|\\)",'',str_extract(get(tmp.col.name),"\\(.*.\\)"))) >= 0.3 | ExAC_AF >= 0.0001,eval(paste0(tmp.col.name,'.called')) := 'Not Called']
+        #fillouts.dt[as.numeric(gsub("\\(|\\)",'',str_extract(get(tmp.col.name),"\\(.*.\\)"))) >= 0.3 | ExAC_AF >= 0.0001,eval(paste0(tmp.col.name,'.called')) := 'Not Called']
         fillouts.dt[get(tmp.col.name)  == '0/0(NaN)',eval(paste0(tmp.col.name,'.called')) := 'Not Covered']
       })
     }else{
       lapply(plasma.samples,function(tmp.col.name){
         lapply(normal.samples,function(tmp.col.name.normal){
           # duplex tvar/nvar > 5
-          fillouts.dt[(as.numeric(gsub("\\(|\\)",'',str_extract(get(tmp.col.name),"\\(.*.\\)")))/as.numeric(gsub("\\(|\\)",'',str_extract(get(tmp.col.name.normal),"\\(.*.\\)"))) < 5) |
+          fillouts.dt[(as.numeric(gsub("\\(|\\)",'',str_extract(get(tmp.col.name),"\\(.*.\\)")))/as.numeric(gsub("\\(|\\)",'',str_extract(get(tmp.col.name.normal),"\\(.*.\\)"))) < 2) |
                         # if duplex have no reads, use simplex tvar
-                        (as.numeric(gsub("\\(|\\)",'',str_extract(get(gsub('duplex','simplex',tmp.col.name)),"\\(.*.\\)")))/as.numeric(gsub("\\(|\\)",'',str_extract(get(tmp.col.name.normal),"\\(.*.\\)"))) < 5 &
+                        (as.numeric(gsub("\\(|\\)",'',str_extract(get(gsub('duplex','simplex',tmp.col.name)),"\\(.*.\\)")))/as.numeric(gsub("\\(|\\)",'',str_extract(get(tmp.col.name.normal),"\\(.*.\\)"))) < 2 &
                            as.numeric(gsub("/.*.$",'',get(tmp.col.name)))  == 0),
                       eval(paste0(tmp.col.name,'.called')) := 'Not Called']
           fillouts.dt[get(tmp.col.name)  == '0/0(NaN)',eval(paste0(tmp.col.name,'.called')) := 'Not Covered']
