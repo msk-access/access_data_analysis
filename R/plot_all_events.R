@@ -178,6 +178,8 @@ plot_all_events = function(
       print(transform.vector)
     }
     tmp.table$Tumor_Sample_Barcode = transform.vector[tmp.table$Tumor_Sample_Barcode]
+    factor.levels = sort(tmp.table$Tumor_Sample_Barcode) 
+    tmp.table$Tumor_Sample_Barcode = factor(as.character(tmp.table$Tumor_Sample_Barcode),levels = factor.levels)
     
     if(nrow(tmp.table) == 0 | all(tmp.table$t_alt_count == 0)){
       print('skiping to the next')
@@ -204,7 +206,9 @@ plot_all_events = function(
         # expand table on all empty samples without any calls
         data.table() %>% dcast.data.table(Hugo_Symbol + CNA ~ Tumor_Sample_Barcode,drop = c(TRUE, FALSE),fill = 0,value.var = 'fc') %>%
         melt.data.table(id.vars = c('Hugo_Symbol','CNA'),variable.name = 'Tumor_Sample_Barcode',value.name = 'fc') %>% data.table()
-      tmp.cna$Tumor_Sample_Barcode = transform.vector[tmp.cna$Tumor_Sample_Barcode]
+      tmp.table$Tumor_Sample_Barcode = transform.vector[tmp.table$Tumor_Sample_Barcode]
+      factor.levels = sort(tmp.table$Tumor_Sample_Barcode) 
+      tmp.table$Tumor_Sample_Barcode = factor(as.character(tmp.table$Tumor_Sample_Barcode),levels = factor.levels)
       
       colourCount = nrow(unique(tmp.cna[,.(Hugo_Symbol,CNA)]))
       getPalette = colorRampPalette(brewer.pal(8, "Set2"))
