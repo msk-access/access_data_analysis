@@ -156,6 +156,8 @@ filter_calls = function(
     
     # final processing --------------------------------------------------------
     # Save only the useful column
+    print(fillouts.dt)
+    print("#######")
     fillouts.dt <-  fillouts.dt[DMP == 'Signed out' | fillouts.dt[,apply(.SD,1,function(x){any(x == 'Called')})]] 
     print(fillouts.dt)
     # combining duplex and simplex counts
