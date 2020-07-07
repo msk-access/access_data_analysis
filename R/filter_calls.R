@@ -39,7 +39,7 @@ filter_calls = function(
   
   # for each patient produce the correct results ----------------------------
   # x <- unique(master.ref$cmo_patient_id)[1]
-  all.fillout.dim <- lapply(unique(master.ref$cmo_patient_id),function(x){
+  all.fillout.dim <- lapply(unique(master.ref[cmo_patient_id=='C-PXVUM9']$cmo_patient_id),function(x){
     print(paste0('Processing patient ',x))
     # Inputs and sanity checks ------------------------------------------------
     fillouts.filenames <- list.files(paste0(results.dir,'/',x,'/'),'ORG-STD_genotyped.maf|ORG-SIMPLEX-DUPLEX_genotyped.maf',full.names = T)
@@ -156,7 +156,8 @@ filter_calls = function(
     
     # final processing --------------------------------------------------------
     # Save only the useful column
-    fillouts.dt <-  fillouts.dt[DMP == 'Signed out' | fillouts.dt[,apply(.SD,1,function(x){any(x == 'Called')})]]  
+    fillouts.dt <-  fillouts.dt[DMP == 'Signed out' | fillouts.dt[,apply(.SD,1,function(x){any(x == 'Called')})]] 
+    print(fillout.dt)
     # combining duplex and simplex counts
     lapply(plasma.samples,function(tmp.col.name){
       # hotspot reads
