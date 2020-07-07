@@ -6,7 +6,7 @@
 #' @export
 CNA_processing = function(
   master.ref,results.dir,
-  dmp.dir = '/juno/work/access/production/resources/cbioportal/current/mskimpact'
+  dmp.dir = '/juno/work/access/production/resources/cbioportal/current/mskimpact/'
 ){
   # # test input section -----------------------------------------------------------
   # master.ref = fread('/juno/work/bergerm1/bergerlab/zhengy1/access_data_analysis/data/example_master_file.csv')
@@ -14,7 +14,7 @@ CNA_processing = function(
   # dmp.dir = '/ifs/work/bergerm1/zhengy1/dmp-2020/mskimpact/'
   # 
   # DMP CNA calls --------------------------------------------------------
-  DMP.cna <- fread(paste0(dmp.dir,'data_CNA.txt'))
+  DMP.cna <- fread(paste0(dmp.dir,'/data_CNA.txt'))
   
   DMP.cna.edited = DMP.cna[!Hugo_Symbol %in% c('CDKN2Ap14ARF','CDKN2Ap16INK4A'),c(
     'Hugo_Symbol',grep(paste0(master.ref$dmp_patient_id,collapse = '|'),colnames(DMP.cna),value = T)
@@ -43,7 +43,7 @@ CNA_processing = function(
     TRUE ~ ''
   )) %>% filter(CNA != '') %>% data.table() -> access.call.set
   
-  if(any(access.final.call.set$CNA_tumor != access.final.call.set$CNA))  warning('Tumor and plasma have conflicting CNA detected!')
+  if(any(access.call.set$CNA_tumor != access.call.set$CNA))  warning('Tumor and plasma have conflicting CNA detected!')
   
   dir.create(paste0(results.dir,'/CNA_final_call_set'))
   lapply(unique(master.ref$cmo_sample_id_plasma),function(x){
@@ -67,13 +67,13 @@ if (!interactive()) {
   parser=ArgumentParser()
   parser$add_argument('-m', '--masterref', type='character', help='File path to master reference file')
   parser$add_argument('-o', '--resultsdir', type='character', help='Output directory')
-  parser$add_argument('-dmp', '--dmpdir', type='character', default = '/juno/work/access/production/resources/cbioportal/current/mskimpact',
+  parser$add_argument('-dmp', '--dmpdir', type='character', default = '/juno/work/access/production/resources/cbioportal/current/mskimpact/',
                       help='Directory of clinical DMP IMPACT repository [default]')
   args=parser$parse_args()
   
   master.ref = args$masterref
   results.dir = args$resultsdir
-  dmpdir = args$dmpdir
+  dmp.dir = args$dmpdir
   
-  CNA_processing(master.ref,results.dir,dmp.dir)  
+  CNA_processing(fread(master.ref),results.dir,dmp.dir)  
 }

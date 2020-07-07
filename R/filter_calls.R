@@ -52,7 +52,7 @@ filter_calls = function(
       sample.name = gsub('.*./|-ORG.*.','',y)
       sample.type = sample.sheet[Sample_Barcode == sample.name]$Sample_Type
       # t_alt_count,t_ref_count,t_depth these columns are useless, have to use duplex/simplex/standard columms
-      maf.file <- fread(y) %>% select(-c(t_alt_count,t_ref_count,t_depth)) %>% data.table()
+      maf.file <- fread(y) %>% select(-c(t_alt_count,t_ref_count)) %>% data.table()
       # fragment counts replacing actual allele counts
       if(grepl('SIMPLEX-DUPLEX_genotyped',y)){
         melt.id.vars = colnames(maf.file)[!grepl('fragment',colnames(maf.file))]
@@ -84,15 +84,27 @@ filter_calls = function(
                 # HGVSp_Short,
                 Reference_Allele,Tumor_Seq_Allele2) %>% mutate(DMP = 'Signed out') %>% unique() %>% data.table()
     
-    fillouts.dt <- fillouts.dt %>% dcast.data.table(Hugo_Symbol + Chromosome + Start_Position + End_Position + Variant_Classification + 
+    if(nrow(dmp.maf) > 0){
+        fillouts.dt <- fillouts.dt %>% dcast.data.table(Hugo_Symbol + Chromosome + Start_Position + End_Position + Variant_Classification + 
+                                                              HGVSp_Short + Reference_Allele + Tumor_Seq_Allele2 + ExAC_AF ~ Tumor_Sample_Barcode,
+                                                            value.var = 't_var_freq') %>%
+              # hotspot information 
+              merge(hotspot.maf,by = c('Hugo_Symbol','Chromosome','Start_Position','End_Position','Variant_Classification','Reference_Allele','Tumor_Seq_Allele2'),all.x = T) %>%
+              # Identifying signed out calls
+              merge(dmp.maf,by = c('Hugo_Symbol','Chromosome','Start_Position','End_Position','Variant_Classification','Reference_Allele','Tumor_Seq_Allele2'),all.x = T) %>%
+              # pooled normal for systemic artifacts
+              merge(pooled.normal.mafs,by = c('Hugo_Symbol','Chromosome','Start_Position','End_Position','Variant_Classification','Reference_Allele','Tumor_Seq_Allele2'),all.x = T) %>% data.table()
+    }else{
+      fillouts.dt <- fillouts.dt %>% dcast.data.table(Hugo_Symbol + Chromosome + Start_Position + End_Position + Variant_Classification + 
                                                       HGVSp_Short + Reference_Allele + Tumor_Seq_Allele2 + ExAC_AF ~ Tumor_Sample_Barcode,
                                                     value.var = 't_var_freq') %>%
-      # hotspot information 
-      merge(hotspot.maf,by = c('Hugo_Symbol','Chromosome','Start_Position','End_Position','Variant_Classification','Reference_Allele','Tumor_Seq_Allele2'),all.x = T) %>%
-      # Identifying signed out calls
-      merge(dmp.maf,by = c('Hugo_Symbol','Chromosome','Start_Position','End_Position','Variant_Classification','Reference_Allele','Tumor_Seq_Allele2'),all.x = T) %>%
-      # pooled normal for systemic artifacts
-      merge(pooled.normal.mafs,by = c('Hugo_Symbol','Chromosome','Start_Position','End_Position','Variant_Classification','Reference_Allele','Tumor_Seq_Allele2'),all.x = T) %>% data.table()
+        # hotspot information 
+        merge(hotspot.maf,by = c('Hugo_Symbol','Chromosome','Start_Position','End_Position','Variant_Classification','Reference_Allele','Tumor_Seq_Allele2'),all.x = T) %>%
+        # pooled normal for systemic artifacts
+        merge(pooled.normal.mafs,by = c('Hugo_Symbol','Chromosome','Start_Position','End_Position','Variant_Classification','Reference_Allele','Tumor_Seq_Allele2'),all.x = T) %>% 
+        mutate(DMP = NA) %>% data.table()
+    }
+    
     # Interesting cases where DMP signed out calls are artifacets
     if(any(!is.na(fillouts.dt$DMP) & !is.na(fillouts.dt$duplex_support_num))){
       print(paste0('Look at ',x,' for DMP signed out plasma artifacts...'))

@@ -3,6 +3,7 @@
 # library(tidyr)
 # library(dplyr)
 # library(ggplot2)
+# library(ggpubr)
 # library(RColorBrewer)
 
 
@@ -168,7 +169,7 @@ plot_all_events = function(
     
     # transform sample IDs into times
     if(all(!is.na(as.Date(master.ref[cmo_patient_id == x]$collection_date,'%m/%d/%y')))){
-      transform.vector = structure(as.Date(master.ref[cmo_patient_id == x]$collection_date,'%m/%d/%y')),
+      transform.vector = structure(as.Date(master.ref[cmo_patient_id == x]$collection_date,'%m/%d/%y'),
                                    names = master.ref[cmo_patient_id == x]$cmo_sample_id_plasma)
       print(transform.vector)      
     }else{
@@ -232,6 +233,9 @@ suppressPackageStartupMessages({
   library(stringr)
   library(dplyr)
   library(argparse)
+  library(ggplot2)
+  library(ggpubr)
+  library(RColorBrewer)
 })
 
 if (!interactive()) {
