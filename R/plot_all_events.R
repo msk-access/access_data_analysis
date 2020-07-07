@@ -178,8 +178,9 @@ plot_all_events = function(
       print(transform.vector)
     }
     tmp.table$Tumor_Sample_Barcode = transform.vector[tmp.table$Tumor_Sample_Barcode]
-    factor.levels = sort(unique(tmp.table$Tumor_Sample_Barcode)) 
-    tmp.table$Tumor_Sample_Barcode = factor(as.character(tmp.table$Tumor_Sample_Barcode),levels = factor.levels)
+    #factor.levels = sort(unique(tmp.table$Tumor_Sample_Barcode)) 
+    #print(factor.levels)
+    #tmp.table$Tumor_Sample_Barcode = factor(as.character(tmp.table$Tumor_Sample_Barcode),levels = factor.levels)
     
     if(nrow(tmp.table) == 0 | all(tmp.table$t_alt_count == 0)){
       print('skiping to the next')
@@ -194,9 +195,9 @@ plot_all_events = function(
                     color = paste0(Hugo_Symbol,' ',ifelse(grepl('^p\\.',HGVSp_Short),HGVSp_Short,'')),group = paste0(Hugo_Symbol,'_',HGVSp_Short))) +
       geom_point(aes(x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count/t_total_count)),
                      color = paste0(Hugo_Symbol,' ',ifelse(grepl('^p\\.',HGVSp_Short),HGVSp_Short,'')),shape = call_confidence),size = 1.5) +
-      labs(title=x,x='Time Point', y='log10(VAF)') + #scale_x_date(date_labels = "%Y %b %d") +
+      labs(title=x,x='Time Point', y='log10(VAF)') + scale_x_date(date_labels = "%Y %b %d",breaks = sort(unique(tmp.table$Tumor_Sample_Barocde))) +
       scale_shape_manual(values=status_id,name = 'Call Status') + scale_color_manual(values = getPalette(colourCount),name = 'Alteration') +
-      theme_minimal() + scale_y_log10() + scale_x_discrete(breaks = sort(unique(tmp.table$Tumor_Sample_Barocde)),labels = sort(unique(tmp.table$Tumor_Sample_Barocde))) + 
+      theme_minimal() + scale_y_log10() + #scale_x_discrete(breaks = sort(unique(tmp.table$Tumor_Sample_Barocde)),labels = sort(unique(tmp.table$Tumor_Sample_Barocde))) + 
       theme(panel.grid.major = element_blank(),legend.position="top",legend.box = "vertical",
             axis.text.x = element_text(angle=45, hjust=1, face = 'bold'))
     print(SNV.SV.plot)
@@ -207,14 +208,15 @@ plot_all_events = function(
         data.table() %>% dcast.data.table(Hugo_Symbol + CNA ~ Tumor_Sample_Barcode,drop = c(TRUE, FALSE),fill = 0,value.var = 'fc') %>%
         melt.data.table(id.vars = c('Hugo_Symbol','CNA'),variable.name = 'Tumor_Sample_Barcode',value.name = 'fc') %>% data.table()
       tmp.table$Tumor_Sample_Barcode = transform.vector[tmp.table$Tumor_Sample_Barcode]
-      factor.levels = sort(unique(tmp.table$Tumor_Sample_Barcode))      
-      tmp.table$Tumor_Sample_Barcode = factor(as.character(tmp.table$Tumor_Sample_Barcode),levels = factor.levels)
+      #factor.levels = sort(unique(tmp.table$Tumor_Sample_Barcode))      
+      #tmp.table$Tumor_Sample_Barcode = factor(as.character(tmp.table$Tumor_Sample_Barcode),levels = factor.levels)
       
       colourCount = nrow(unique(tmp.cna[,.(Hugo_Symbol,CNA)]))
       getPalette = colorRampPalette(brewer.pal(8, "Set2"))
       CNA.plot = ggplot(tmp.cna) +
         geom_bar(aes(x = Tumor_Sample_Barcode,y = abs(fc),fill = paste0(Hugo_Symbol,'_',CNA)),position="dodge", stat="identity") +
-        labs(x='Time Point', y='Absolute fc') + scale_x_discrete(breaks = sort(unique(tmp.table$Tumor_Sample_Barocde)),labels = sort(unique(tmp.table$Tumor_Sample_Barocde))) +
+        labs(x='Time Point', y='Absolute fc') + scale_x_date(date_labels = "%Y %b %d",breaks = sort(unique(tmp.table$Tumor_Sample_Barocde))) +
+        #scale_x_discrete(breaks = sort(unique(tmp.table$Tumor_Sample_Barocde)),labels = sort(unique(tmp.table$Tumor_Sample_Barocde))) +
         scale_fill_manual(values = getPalette(colourCount),name = 'Alteration') +
         theme_minimal() + theme(panel.grid.major = element_blank(),legend.position="bottom",axis.text.x = element_text(angle=45, hjust=1,face = 'bold'))
       print(CNA.plot)
