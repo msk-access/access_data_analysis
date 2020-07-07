@@ -178,8 +178,8 @@ plot_all_events = function(
       print(transform.vector)
     }
     tmp.table$Tumor_Sample_Barcode = transform.vector[tmp.table$Tumor_Sample_Barcode]
-    #factor.levels = sort(unique(tmp.table$Tumor_Sample_Barcode)) 
-    #print(factor.levels)
+    factor.levels = sort(unique(tmp.table$Tumor_Sample_Barcode)) 
+    print(factor.levels)
     #tmp.table$Tumor_Sample_Barcode = factor(as.character(tmp.table$Tumor_Sample_Barcode),levels = factor.levels)
     
     if(nrow(tmp.table) == 0 | all(tmp.table$t_alt_count == 0)){
