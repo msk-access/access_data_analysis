@@ -211,7 +211,7 @@ plot_all_events <- function(
     factor.levels <- sort(unique(tmp.table$Tumor_Sample_Barcode))
     print(factor.levels)
     # tmp.table$Tumor_Sample_Barcode = factor(as.character(tmp.table$Tumor_Sample_Barcode),levels = factor.levels)
-    tmp.table$Tumor_Sample_Barcode = as.character(tmp.table$Tumor_Sample_Barcode,format = "%Y-%b-%d"))
+    tmp.table$Tumor_Sample_Barcode = as.character(tmp.table$Tumor_Sample_Barcode,format = "%Y-%b-%d")
 
 
     if (nrow(tmp.table) == 0 | all(tmp.table$t_alt_count == 0)) {
