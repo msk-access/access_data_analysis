@@ -253,7 +253,7 @@ plot_all_events <- function(
         dcast.data.table(Hugo_Symbol + CNA ~ Tumor_Sample_Barcode, drop = c(TRUE, FALSE), fill = 0, value.var = "fc") %>%
         melt.data.table(id.vars = c("Hugo_Symbol", "CNA"), variable.name = "Tumor_Sample_Barcode", value.name = "fc") %>%
         data.table()
-      tmp.cna$Tumor_Sample_Barcode <- transform.vector[tmp.table$Tumor_Sample_Barcode]
+      tmp.table$Tumor_Sample_Barcode <- transform.vector[tmp.table$Tumor_Sample_Barcode]
       # factor.levels = sort(unique(tmp.table$Tumor_Sample_Barcode))
       # tmp.table$Tumor_Sample_Barcode = factor(as.character(tmp.table$Tumor_Sample_Barcode),levels = factor.levels)
       # tmp.cna$dates <- as.character(tmp.cna$Tumor_Sample_Barcode, format = "%Y-%b-%d")
