@@ -255,8 +255,8 @@ plot_all_events <- function(
         data.table()
       tmp.table$Tumor_Sample_Barcode <- transform.vector[tmp.table$Tumor_Sample_Barcode]
       # factor.levels = sort(unique(tmp.table$Tumor_Sample_Barcode))
-      tmp.table$Tumor_Sample_Barcode = factor(as.character(tmp.table$Tumor_Sample_Barcode),levels = factor.levels)
-      #tmp.table$Tumor_Sample_Barcode = as.character(tmp.table$Tumor_Sample_Barcode, format = "%Y-%b-%d")
+      # tmp.table$Tumor_Sample_Barcode = factor(as.character(tmp.table$Tumor_Sample_Barcode),levels = factor.levels)
+      tmp.table$dates = as.character(tmp.table$Tumor_Sample_Barcode, format = "%Y-%b-%d")
       colourCount <- nrow(unique(tmp.cna[, .(Hugo_Symbol, CNA)]))
       getPalette <- colorRampPalette(brewer.pal(8, "Set2"))
       CNA.plot <- ggplot(tmp.cna) +
