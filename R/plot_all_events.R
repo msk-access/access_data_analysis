@@ -260,7 +260,7 @@ plot_all_events <- function(
       colourCount <- nrow(unique(tmp.cna[, .(Hugo_Symbol, CNA)]))
       getPalette <- colorRampPalette(brewer.pal(8, "Set2"))
       CNA.plot <- ggplot(tmp.cna) +
-        geom_bar(aes(x = Tumor_Sample_Barocde, y = abs(fc), fill = paste0(Hugo_Symbol, "_", CNA)), position = "dodge", stat = "identity") +
+        geom_bar(aes(x = Tumor_Sample_Barocode, y = abs(fc), fill = paste0(Hugo_Symbol, "_", CNA)), position = "dodge", stat = "identity") +
         labs(x = "Time Point", y = "Absolute fc") +
         #scale_x_discrete(breaks = sort(unique(tmp.table$,labels = sort(unique(tmp.table$Tumor_Sample_BaroTumor_Sample_Barocde))cde))) +
         #scale_x_discrete(breaks = order(unique(tmp.cna$Tumor_Sample_Barocde)), labels = order(unique(tmp.cna$Tumor_Sample_Barocde))) +
