@@ -235,7 +235,7 @@ plot_all_events <- function(
       scale_color_manual(values = getPalette(colourCount), name = "Alteration") +
       theme_minimal() +
       scale_y_log10() + 
-      scale_x_continuous(breaks = sort(unique(tmp.table$Tumor_Sample_Barocde)),labels = sort(unique(tmp.table$Tumor_Sample_Barocde))) +
+      scale_x_discrete(breaks = sort(unique(tmp.table$Tumor_Sample_Barocde)),labels = sort(unique(tmp.table$Tumor_Sample_Barocde))) +
       theme(
         panel.grid.major = element_blank(), legend.position = "top", legend.box = "vertical",
         axis.text.x = element_text(angle = 45, hjust = 1, face = "bold")
