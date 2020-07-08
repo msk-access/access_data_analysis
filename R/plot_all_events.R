@@ -210,8 +210,8 @@ plot_all_events <- function(
     tmp.table$Tumor_Sample_Barcode <- transform.vector[tmp.table$Tumor_Sample_Barcode]
     factor.levels <- sort(unique(tmp.table$Tumor_Sample_Barcode))
     print(factor.levels)
-    tmp.table$Tumor_Sample_Barcode = factor(as.character(tmp.table$Tumor_Sample_Barcode),levels = factor.levels)
-    # tmp.table$Tumor_Sample_Barcode = as.character(tmp.table$Tumor_Sample_Barcode,format = "%Y-%b-%d")
+    #tmp.table$Tumor_Sample_Barcode <- factor(as.character(tmp.table$Tumor_Sample_Barcode),levels = factor.levels)
+    tmp.table$dates <- as.character(tmp.table$Tumor_Sample_Barcode,format = "%Y-%b-%d")
 
 
     if (nrow(tmp.table) == 0 | all(tmp.table$t_alt_count == 0)) {
@@ -224,15 +224,16 @@ plot_all_events <- function(
     getPalette <- colorRampPalette(brewer.pal(8, "Set2"))
     SNV.SV.plot <- ggplot(tmp.table) +
       geom_line(aes(
-        x = factor(Tumor_Sample_Barcode), y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
+        x = dates, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
         color = paste0(Hugo_Symbol, " ", ifelse(grepl("^p\\.", HGVSp_Short), HGVSp_Short, "")), group = paste0(Hugo_Symbol, "_", HGVSp_Short)
       )) +
       geom_point(aes(
-        x = factor(Tumor_Sample_Barcode), y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
+        x = dates, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
         color = paste0(Hugo_Symbol, " ", ifelse(grepl("^p\\.", HGVSp_Short), HGVSp_Short, "")), shape = call_confidence
       ), size = 1.5) +
       labs(title = x, x = "Time Point", y = "log10(VAF)") +
-      scale_x_discrete(breaks = sort(unique(tmp.table$Tumor_Sample_Barocde)),labels = sort(unique(tmp.table$Tumor_Sample_Barocde))) +
+      #scale_x_discrete(breaks = sort(unique(tmp.table$Tumor_Sample_Barocde)),labels = sort(unique(tmp.table$Tumor_Sample_Barocde))) +
+      scale_x_discrete(breaks = unique(tmp.table$Tumor_Sample_Barocde), labels = unique(tmp.table$Tumor_Sample_Barocde)) +
       #scale_x_date(date_labels = "%Y %b %d", breaks = "1 month") +
       scale_shape_manual(values = status_id, name = "Call Status") +
       scale_color_manual(values = getPalette(colourCount), name = "Alteration") +
@@ -259,9 +260,10 @@ plot_all_events <- function(
       colourCount <- nrow(unique(tmp.cna[, .(Hugo_Symbol, CNA)]))
       getPalette <- colorRampPalette(brewer.pal(8, "Set2"))
       CNA.plot <- ggplot(tmp.cna) +
-        geom_bar(aes(x = factor(Tumor_Sample_Barcode), y = abs(fc), fill = paste0(Hugo_Symbol, "_", CNA)), position = "dodge", stat = "identity") +
+        geom_bar(aes(x = dates, y = abs(fc), fill = paste0(Hugo_Symbol, "_", CNA)), position = "dodge", stat = "identity") +
         labs(x = "Time Point", y = "Absolute fc") +
-        scale_x_discrete(breaks = sort(unique(tmp.table$Tumor_Sample_Barocde)),labels = sort(unique(tmp.table$Tumor_Sample_Barocde))) +
+        #scale_x_discrete(breaks = sort(unique(tmp.table$Tumor_Sample_Barocde)),labels = sort(unique(tmp.table$Tumor_Sample_Barocde))) +
+        scale_x_discrete(breaks = unique(tmp.table$Tumor_Sample_Barocde), labels = unique(tmp.table$Tumor_Sample_Barocde)) +
         #scale_x_date(date_labels = "%Y %b %d", breaks = "1 month") +
         scale_fill_manual(values = getPalette(colourCount), name = "Alteration") +
         theme_minimal() +
