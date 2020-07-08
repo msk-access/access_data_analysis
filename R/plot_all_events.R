@@ -222,7 +222,7 @@ plot_all_events <- function(
     getPalette <- colorRampPalette(brewer.pal(8, "Set2"))
     SNV.SV.plot <- ggplot(tmp.table) +
       geom_line(aes(
-        x = factor(Tumor_Sample_Barcode), y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
+        x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
         color = paste0(Hugo_Symbol, " ", ifelse(grepl("^p\\.", HGVSp_Short), HGVSp_Short, "")), group = paste0(Hugo_Symbol, "_", HGVSp_Short)
       )) +
       geom_point(aes(
