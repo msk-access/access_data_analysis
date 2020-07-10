@@ -63,6 +63,7 @@ filter_calls = function(
           melt.data.table(id.vars = melt.id.vars,variable.name = 'variable',value.name = 'value') %>%
           mutate(variable = gsub('fragment','_',variable)) %>% separate(variable,c('variable','Sample_Type'),sep = '___') %>%
           mutate(Tumor_Sample_Barcode = paste0(sample.name,'___',Sample_Type)) %>% select(-Sample_Type) %>% data.table() %>%
+          unique() %>%
           dcast.data.table(as.formula(paste0(paste0(melt.id.vars,collapse = ' + '),' ~ variable')),value.var = 'value') -> maf.file
       }else{
         maf.file <- maf.file %>% mutate(Tumor_Sample_Barcode = paste0(sample.name,'___',sample.type)) %>%
