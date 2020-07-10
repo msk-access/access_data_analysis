@@ -74,8 +74,7 @@ filter_calls = function(
         transmute(Hugo_Symbol,Tumor_Sample_Barcode,Chromosome = as.character(Chromosome),Start_Position,End_Position,Variant_Classification,
                   HGVSp_Short,Reference_Allele,Tumor_Seq_Allele2,t_var_freq,ExAC_AF) %>% data.table()
       return(maf.file)
-    }))
-    print(fillouts.dt)
+    })) %>% unique() %>% data.table()
     # merging and melting -----------------------------------------------------
     hotspot.maf <- fread(paste0(results.dir,'/',x,'/',x,'_all_unique_calls_hotspots.maf')) %>% rowwise() %>%
       transmute(Hugo_Symbol,Chromosome = as.character(Chromosome),Start_Position,End_Position,Variant_Classification,
