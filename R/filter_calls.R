@@ -39,7 +39,7 @@ filter_calls = function(
   
   # for each patient produce the correct results ----------------------------
   # x <- unique(master.ref$cmo_patient_id)[1]
-  all.fillout.dim <- lapply(unique(master.ref$cmo_patient_id),function(x){
+  all.fillout.dim <- lapply(unique(master.ref[cmo_patient_id == 'C-DFJ7RT']$cmo_patient_id),function(x){
     print(paste0('Processing patient ',x))
     # Inputs and sanity checks ------------------------------------------------
     fillouts.filenames <- list.files(paste0(results.dir,'/',x,'/'),'ORG-STD_genotyped.maf|ORG-SIMPLEX-DUPLEX_genotyped.maf',full.names = T)
@@ -74,6 +74,7 @@ filter_calls = function(
                   HGVSp_Short,Reference_Allele,Tumor_Seq_Allele2,t_var_freq,ExAC_AF) %>% data.table()
       return(maf.file)
     }))
+    print(fillouts.dt)
     # merging and melting -----------------------------------------------------
     hotspot.maf <- fread(paste0(results.dir,'/',x,'/',x,'_all_unique_calls_hotspots.maf')) %>% rowwise() %>%
       transmute(Hugo_Symbol,Chromosome = as.character(Chromosome),Start_Position,End_Position,Variant_Classification,
