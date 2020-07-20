@@ -167,17 +167,11 @@ plot_all_events = function(
       fread(paste0(results.dir,'/CNA_final_call_set/',y,'_cna_final_call_set.txt'))
     }))
     
-    # transform sample IDs into times
-    if(all(!is.na(as.Date(master.ref[cmo_patient_id == x]$collection_date,'%m/%d/%y')))){
-      transform.vector = structure(as.Date(master.ref[cmo_patient_id == x]$collection_date,'%m/%d/%y'),
-                                   names = master.ref[cmo_patient_id == x]$cmo_sample_id_plasma)
-      print(transform.vector)      
-    }else{
-      transform.vector = structure(as.character(master.ref[cmo_patient_id == x]$collection_date),
-                                   names = master.ref[cmo_patient_id == x]$cmo_sample_id_plasma)
-      print(transform.vector)
-    }
-    tmp.table$Tumor_Sample_Barcode = transform.vector[tmp.table$Tumor_Sample_Barcode]
+
+    transform.vector = structure(as.numeric(master.ref[cmo_patient_id == x]$collection_date),
+                                 names = master.ref[cmo_patient_id == x]$cmo_sample_id_plasma)
+    print(transform.vector)
+    tmp.table$Tumor_Sample_Barcode = factor(transform.vector[tmp.table$Tumor_Sample_Barcode], levels = sort(transform.vector))
     
     if(nrow(tmp.table) == 0 | all(tmp.table$t_alt_count == 0)){
       print('skiping to the next')
@@ -192,7 +186,7 @@ plot_all_events = function(
                     color = paste0(Hugo_Symbol,' ',ifelse(grepl('^p\\.',HGVSp_Short),HGVSp_Short,'')),group = paste0(Hugo_Symbol,'_',HGVSp_Short))) +
       geom_point(aes(x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count/t_total_count)),
                      color = paste0(Hugo_Symbol,' ',ifelse(grepl('^p\\.',HGVSp_Short),HGVSp_Short,'')),shape = call_confidence),size = 1.5) +
-      labs(title=x,x='Time Point', y='VAF') + #scale_x_date(date_labels = "%Y %b %d") +
+      labs(title=x,x='Time Point', y='VAF') +
       scale_shape_manual(values=status_id,name = 'Call Status') + scale_color_manual(values = getPalette(colourCount),name = 'Alteration') +
       theme_minimal() + scale_y_log10() +
       theme(panel.grid.major = element_blank(),legend.position="top",legend.box = "vertical",
@@ -210,7 +204,7 @@ plot_all_events = function(
       getPalette = colorRampPalette(brewer.pal(8, "Set2"))
       CNA.plot = ggplot(tmp.cna) +
         geom_bar(aes(x = Tumor_Sample_Barcode,y = abs(fc),fill = paste0(Hugo_Symbol,'_',CNA)),position="dodge", stat="identity") +
-        labs(x='Time Point', y='Absolute fc') + #scale_x_date(date_labels = "%Y %b %d") +
+        labs(x='Time Point', y='Absolute fc') + 
         scale_fill_manual(values = getPalette(colourCount),name = 'Alteration') +
         theme_minimal() + theme(panel.grid.major = element_blank(),legend.position="bottom",axis.text.x = element_text(angle=45, hjust=1,face = 'bold'))
       print(CNA.plot)
