@@ -196,7 +196,7 @@ plot_all_events <- function(
     }))
     
 
-    transform.vector = structure(as.numeric(master.ref[cmo_patient_id == x]$collection_date),
+    transform.vector = structure(as.date(master.ref[cmo_patient_id == x]$collection_date,'%m/%d/%Y'),
                                  names = master.ref[cmo_patient_id == x]$cmo_sample_id_plasma)
     print(transform.vector)
     tmp.table$Tumor_Sample_Barcode = factor(transform.vector[tmp.table$Tumor_Sample_Barcode], levels = sort(transform.vector))
@@ -216,7 +216,7 @@ plot_all_events <- function(
                      color = paste0(Hugo_Symbol,' ',ifelse(grepl('^p\\.',HGVSp_Short),HGVSp_Short,'')),shape = call_confidence),size = 1.5) +
       labs(title=x,x='Time Point', y='VAF') +
       scale_shape_manual(values=status_id,name = 'Call Status') + scale_color_manual(values = getPalette(colourCount),name = 'Alteration') +
-      theme_minimal() + scale_y_log10() +
+      theme_minimal() + scale_y_log10() + scale_x_date(date_minor_breaks = "1 day") +
       theme(panel.grid.major = element_blank(),legend.position="top",legend.box = "vertical",
             axis.text.x = element_text(angle=45, hjust=1, face = 'bold'))
     print(SNV.SV.plot)
