@@ -194,80 +194,48 @@ plot_all_events <- function(
     tmp.cna <- do.call(rbind, lapply(master.ref[cmo_patient_id == x]$cmo_sample_id_plasma, function(y) {
       fread(paste0(results.dir, "/CNA_final_call_set/", y, "_cna_final_call_set.txt"))
     }))
+    
 
-    # transform sample IDs into times
-    if (all(!is.na(as.Date(master.ref[cmo_patient_id == x]$collection_date, "%m/%d/%y")))) {
-      transform.vector <- structure(as.Date(master.ref[cmo_patient_id == x]$collection_date, "%m/%d/%y"),
-        names = master.ref[cmo_patient_id == x]$cmo_sample_id_plasma
-      )
-      print(transform.vector)
-    } else {
-      transform.vector <- structure(as.character(master.ref[cmo_patient_id == x]$collection_date),
-        names = master.ref[cmo_patient_id == x]$cmo_sample_id_plasma
-      )
-      print(transform.vector)
-    }
-    tmp.table$Tumor_Sample_Barcode <- transform.vector[tmp.table$Tumor_Sample_Barcode]
-    #factor.levels <- sort(unique(tmp.table$Tumor_Sample_Barcode))
-    #print(factor.levels)
-    #tmp.table$Tumor_Sample_Barcode <- factor(as.character(tmp.table$Tumor_Sample_Barcode),levels = factor.levels)
-    #tmp.table$dates <- as.character(tmp.table$Tumor_Sample_Barcode,format = "%Y-%m-%d")
-
-
-    if (nrow(tmp.table) == 0 | all(tmp.table$t_alt_count == 0)) {
-      print("skiping to the next")
-      if (nrow(tmp.cna)) stop(paste0("Need to make CNA only file for: ", x))
+    transform.vector = structure(as.numeric(master.ref[cmo_patient_id == x]$collection_date),
+                                 names = master.ref[cmo_patient_id == x]$cmo_sample_id_plasma)
+    print(transform.vector)
+    tmp.table$Tumor_Sample_Barcode = factor(transform.vector[tmp.table$Tumor_Sample_Barcode], levels = sort(transform.vector))
+    
+    if(nrow(tmp.table) == 0 | all(tmp.table$t_alt_count == 0)){
+      print('skiping to the next')
+      if(nrow(tmp.cna)) stop(paste0('Need to make CNA only file for: ',x))
       return()
     }
-
-    colourCount <- nrow(unique(tmp.table[, .(Hugo_Symbol, HGVSp_Short)]))
-    getPalette <- colorRampPalette(brewer.pal(8, "Set2"))
-    SNV.SV.plot <- ggplot(tmp.table) +
-      geom_line(aes(
-        x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
-        color = paste0(Hugo_Symbol, " ", ifelse(grepl("^p\\.", HGVSp_Short), HGVSp_Short, "")), group = paste0(Hugo_Symbol, "_", HGVSp_Short)
-      )) +
-      geom_point(aes(
-        x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
-        color = paste0(Hugo_Symbol, " ", ifelse(grepl("^p\\.", HGVSp_Short), HGVSp_Short, "")), shape = call_confidence
-      ), size = 1.5) +
-      labs(title = x, x = "Time Point", y = "log10(VAF)") +
-      #scale_x_discrete(breaks = sort(unique(tmp.table$Tumor_Sample_Barocde)),labels = sort(unique(tmp.table$Tumor_Sample_Barocde))) +
-      #scale_x_discrete(breaks = order(unique(tmp.table$Tumor_Sample_Barocde)), labels = order(unique(tmp.table$Tumor_Sample_Barocde))) +
-      #scale_x_date(date_labels = "%Y %b %d", breaks = "1 month") +
-      scale_shape_manual(values = status_id, name = "Call Status") +
-      scale_color_manual(values = getPalette(colourCount), name = "Alteration") +
-      theme_minimal() +
-      scale_y_log10() +
-      theme(
-        panel.grid.major = element_blank(), legend.position = "top", legend.box = "vertical",
-        axis.text.x = element_text(angle = 45, hjust = 1, face = "bold")
-      )
+    
+    colourCount = nrow(unique(tmp.table[,.(Hugo_Symbol,HGVSp_Short)]))
+    getPalette = colorRampPalette(brewer.pal(8, "Set2"))
+    SNV.SV.plot = ggplot(tmp.table) +
+      geom_line(aes(x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count/t_total_count)),
+                    color = paste0(Hugo_Symbol,' ',ifelse(grepl('^p\\.',HGVSp_Short),HGVSp_Short,'')),group = paste0(Hugo_Symbol,'_',HGVSp_Short))) +
+      geom_point(aes(x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count/t_total_count)),
+                     color = paste0(Hugo_Symbol,' ',ifelse(grepl('^p\\.',HGVSp_Short),HGVSp_Short,'')),shape = call_confidence),size = 1.5) +
+      labs(title=x,x='Time Point', y='VAF') +
+      scale_shape_manual(values=status_id,name = 'Call Status') + scale_color_manual(values = getPalette(colourCount),name = 'Alteration') +
+      theme_minimal() + scale_y_log10() +
+      theme(panel.grid.major = element_blank(),legend.position="top",legend.box = "vertical",
+            axis.text.x = element_text(angle=45, hjust=1, face = 'bold'))
     print(SNV.SV.plot)
 
     if (nrow(tmp.cna) > 0) {
       tmp.cna <- tmp.cna %>%
         mutate(Tumor_Sample_Barcode = factor(Tumor_Sample_Barcode, unique(tmp.sample.sheets[Sample_Type == "duplex"]$Sample_Barcode))) %>%
         # expand table on all empty samples without any calls
-        data.table() %>%
-        dcast.data.table(Hugo_Symbol + CNA ~ Tumor_Sample_Barcode, drop = c(TRUE, FALSE), fill = 0, value.var = "fc") %>%
-        melt.data.table(id.vars = c("Hugo_Symbol", "CNA"), variable.name = "Tumor_Sample_Barcode", value.name = "fc") %>%
-        data.table()
-      tmp.table$Tumor_Sample_Barcode <- transform.vector[tmp.table$Tumor_Sample_Barcode]
-      # factor.levels = sort(unique(tmp.table$Tumor_Sample_Barcode))
-      # tmp.table$Tumor_Sample_Barcode = factor(as.character(tmp.table$Tumor_Sample_Barcode),levels = factor.levels)
-      # tmp.cna$dates <- as.character(tmp.cna$Tumor_Sample_Barcode, format = "%Y-%b-%d")
-      colourCount <- nrow(unique(tmp.cna[, .(Hugo_Symbol, CNA)]))
-      getPalette <- colorRampPalette(brewer.pal(8, "Set2"))
-      CNA.plot <- ggplot(tmp.cna) +
-        geom_bar(aes(x = Tumor_Sample_Barcode, y = abs(fc), fill = paste0(Hugo_Symbol, "_", CNA)), position = "dodge", stat = "identity") +
-        labs(x = "Time Point", y = "Absolute fc") +
-        #scale_x_discrete(breaks = sort(unique(tmp.table$,labels = sort(unique(tmp.table$Tumor_Sample_BaroTumor_Sample_Barocde))cde))) +
-        #scale_x_discrete(breaks = order(unique(tmp.cna$Tumor_Sample_Barocde)), labels = order(unique(tmp.cna$Tumor_Sample_Barocde))) +
-        #scale_x_date(date_labels = "%Y %b %d", breaks = "1 month") +
-        scale_fill_manual(values = getPalette(colourCount), name = "Alteration") +
-        theme_minimal() +
-        theme(panel.grid.major = element_blank(), legend.position = "bottom", axis.text.x = element_text(angle = 45, hjust = 1, face = "bold"))
+        data.table() %>% dcast.data.table(Hugo_Symbol + CNA ~ Tumor_Sample_Barcode,drop = c(TRUE, FALSE),fill = 0,value.var = 'fc') %>%
+        melt.data.table(id.vars = c('Hugo_Symbol','CNA'),variable.name = 'Tumor_Sample_Barcode',value.name = 'fc') %>% data.table()
+      tmp.cna$Tumor_Sample_Barcode = transform.vector[tmp.cna$Tumor_Sample_Barcode]
+      
+      colourCount = nrow(unique(tmp.cna[,.(Hugo_Symbol,CNA)]))
+      getPalette = colorRampPalette(brewer.pal(8, "Set2"))
+      CNA.plot = ggplot(tmp.cna) +
+        geom_bar(aes(x = Tumor_Sample_Barcode,y = abs(fc),fill = paste0(Hugo_Symbol,'_',CNA)),position="dodge", stat="identity") +
+        labs(x='Time Point', y='Absolute fc') + 
+        scale_fill_manual(values = getPalette(colourCount),name = 'Alteration') +
+        theme_minimal() + theme(panel.grid.major = element_blank(),legend.position="bottom",axis.text.x = element_text(angle=45, hjust=1,face = 'bold'))
       print(CNA.plot)
 
       pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 10, height = 7)
