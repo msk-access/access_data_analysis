@@ -232,7 +232,7 @@ plot_all_events <- function(
       scale_color_manual(values = getPalette(colourCount), name = "Alteration") +
       theme_minimal() +
       scale_y_log10() +
-      scale_x_date(date_minor_breaks = "1 day", date_major_breaks = "1 week", date_labels = "%d") +
+      scale_x_date(date_minor_breaks = "1 day", date_breaks = "1 week", date_labels = "%d") +
       theme(
         panel.grid.major = element_blank(), legend.position = "top", legend.box = "vertical",
         axis.text.x = element_text(angle = 45, hjust = 1, face = "bold")
@@ -256,7 +256,7 @@ plot_all_events <- function(
         labs(x = "Time Point", y = "Absolute fc") +
         scale_fill_manual(values = getPalette(colourCount), name = "Alteration") +
         theme_minimal() +
-        scale_x_date(date_minor_breaks = "1 day", date_major_breaks = "1 week", date_labels = "%d") +
+        scale_x_date(date_minor_breaks = "1 day", date_breaks = "1 week", date_labels = "%d") +
         theme(panel.grid.major = element_blank(), legend.position = "bottom", axis.text.x = element_text(angle = 45, hjust = 1, face = "bold"))
       print(CNA.plot)
 
