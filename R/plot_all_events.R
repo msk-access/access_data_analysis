@@ -200,7 +200,7 @@ plot_all_events <- function(
                                  names = master.ref[cmo_patient_id == x]$cmo_sample_id_plasma)
     print(transform.vector)
     tmp.table$Tumor_Sample_Barcode = factor(transform.vector[tmp.table$Tumor_Sample_Barcode], levels = sort(transform.vector))
-    
+    print(tmp.table)
     if(nrow(tmp.table) == 0 | all(tmp.table$t_alt_count == 0)){
       print('skiping to the next')
       if(nrow(tmp.cna)) stop(paste0('Need to make CNA only file for: ',x))
