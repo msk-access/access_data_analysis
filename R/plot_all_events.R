@@ -208,7 +208,7 @@ plot_all_events <- function(
       )
       print(transform.vector)
     }
-    tmp.table$Tumor_Sample_Barcode <- factor(transform.vector[tmp.table$Tumor_Sample_Barcode], levels = sort(transform.vector))
+    tmp.table$Tumor_Sample_Barcode <- transform.vector[tmp.table$Tumor_Sample_Barcode]
     print(tmp.table)
     if (nrow(tmp.table) == 0 | all(tmp.table$t_alt_count == 0)) {
       print("skiping to the next")
