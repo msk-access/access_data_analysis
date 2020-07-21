@@ -196,7 +196,7 @@ plot_all_events <- function(
     }))
     
 
-    transform.vector = structure(as.date(master.ref[cmo_patient_id == x]$collection_date,'%m/%d/%Y'),
+    transform.vector = structure(as.Date(master.ref[cmo_patient_id == x]$collection_date,'%m/%d/%Y'),
                                  names = master.ref[cmo_patient_id == x]$cmo_sample_id_plasma)
     print(transform.vector)
     tmp.table$Tumor_Sample_Barcode = factor(transform.vector[tmp.table$Tumor_Sample_Barcode], levels = sort(transform.vector))
