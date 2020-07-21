@@ -63,6 +63,7 @@ filter_calls = function(
           melt.data.table(id.vars = melt.id.vars,variable.name = 'variable',value.name = 'value') %>%
           mutate(variable = gsub('fragment','_',variable)) %>% separate(variable,c('variable','Sample_Type'),sep = '___') %>%
           mutate(Tumor_Sample_Barcode = paste0(sample.name,'___',Sample_Type)) %>% select(-Sample_Type) %>% data.table() %>%
+          unique() %>%
           dcast.data.table(as.formula(paste0(paste0(melt.id.vars,collapse = ' + '),' ~ variable')),value.var = 'value') -> maf.file
       }else{
         maf.file <- maf.file %>% mutate(Tumor_Sample_Barcode = paste0(sample.name,'___',sample.type)) %>%
@@ -73,7 +74,7 @@ filter_calls = function(
         transmute(Hugo_Symbol,Tumor_Sample_Barcode,Chromosome = as.character(Chromosome),Start_Position,End_Position,Variant_Classification,
                   HGVSp_Short,Reference_Allele,Tumor_Seq_Allele2,t_var_freq,ExAC_AF) %>% data.table()
       return(maf.file)
-    }))
+    })) %>% unique() %>% data.table()
     # merging and melting -----------------------------------------------------
     hotspot.maf <- fread(paste0(results.dir,'/',x,'/',x,'_all_unique_calls_hotspots.maf')) %>% rowwise() %>%
       transmute(Hugo_Symbol,Chromosome = as.character(Chromosome),Start_Position,End_Position,Variant_Classification,
@@ -137,16 +138,16 @@ filter_calls = function(
     if(all(!c('unfilterednormal','normal_DMP') %in% sample.sheet$Sample_Type)){
       tmp.col.name <- plasma.samples[1]
       lapply(plasma.samples,function(tmp.col.name){
-        fillouts.dt[as.numeric(gsub("\\(|\\)",'',str_extract(get(tmp.col.name),"\\(.*.\\)"))) >= 0.3 | ExAC_AF >= 0.0001,eval(paste0(tmp.col.name,'.called')) := 'Not Called']
+        #fillouts.dt[as.numeric(gsub("\\(|\\)",'',str_extract(get(tmp.col.name),"\\(.*.\\)"))) >= 0.3 | ExAC_AF >= 0.0001,eval(paste0(tmp.col.name,'.called')) := 'Not Called']
         fillouts.dt[get(tmp.col.name)  == '0/0(NaN)',eval(paste0(tmp.col.name,'.called')) := 'Not Covered']
       })
     }else{
       lapply(plasma.samples,function(tmp.col.name){
         lapply(normal.samples,function(tmp.col.name.normal){
           # duplex tvar/nvar > 5
-          fillouts.dt[(as.numeric(gsub("\\(|\\)",'',str_extract(get(tmp.col.name),"\\(.*.\\)")))/as.numeric(gsub("\\(|\\)",'',str_extract(get(tmp.col.name.normal),"\\(.*.\\)"))) < 5) |
+          fillouts.dt[(as.numeric(gsub("\\(|\\)",'',str_extract(get(tmp.col.name),"\\(.*.\\)")))/as.numeric(gsub("\\(|\\)",'',str_extract(get(tmp.col.name.normal),"\\(.*.\\)"))) < 2) |
                         # if duplex have no reads, use simplex tvar
-                        (as.numeric(gsub("\\(|\\)",'',str_extract(get(gsub('duplex','simplex',tmp.col.name)),"\\(.*.\\)")))/as.numeric(gsub("\\(|\\)",'',str_extract(get(tmp.col.name.normal),"\\(.*.\\)"))) < 5 &
+                        (as.numeric(gsub("\\(|\\)",'',str_extract(get(gsub('duplex','simplex',tmp.col.name)),"\\(.*.\\)")))/as.numeric(gsub("\\(|\\)",'',str_extract(get(tmp.col.name.normal),"\\(.*.\\)"))) < 2 &
                            as.numeric(gsub("/.*.$",'',get(tmp.col.name)))  == 0),
                       eval(paste0(tmp.col.name,'.called')) := 'Not Called']
           fillouts.dt[get(tmp.col.name)  == '0/0(NaN)',eval(paste0(tmp.col.name,'.called')) := 'Not Covered']
@@ -156,7 +157,10 @@ filter_calls = function(
     
     # final processing --------------------------------------------------------
     # Save only the useful column
-    fillouts.dt <-  fillouts.dt[DMP == 'Signed out' | fillouts.dt[,apply(.SD,1,function(x){any(x == 'Called')})]]  
+    #print(fillouts.dt)
+    #print("#######")
+    fillouts.dt <-  fillouts.dt[DMP == 'Signed out' | fillouts.dt[,apply(.SD,1,function(x){any(x == 'Called')})]] 
+    #print(fillouts.dt)
     # combining duplex and simplex counts
     lapply(plasma.samples,function(tmp.col.name){
       # hotspot reads
