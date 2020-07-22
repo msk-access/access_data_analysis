@@ -199,14 +199,14 @@ plot_all_events <- function(
       transform.vector <- structure(as.Date(master.ref[cmo_patient_id == x]$collection_date, "%m/%d/%y"),
         names = master.ref[cmo_patient_id == x]$cmo_sample_id_plasma
       )
-      print("###Date Presentation:####")
-      print(transform.vector)
+      #print("###Date Presentation:####")
+      #print(transform.vector)
     }
     else {
       transform.vector <- structure(as.character(master.ref[cmo_patient_id == x]$collection_date),
         names = master.ref[cmo_patient_id == x]$cmo_sample_id_plasma
       )
-      print(transform.vector)
+      #print(transform.vector)
     }
     tmp.table$Tumor_Sample_Barcode <- transform.vector[tmp.table$Tumor_Sample_Barcode]
     print(tmp.table)
