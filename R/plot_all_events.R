@@ -269,7 +269,7 @@ plot_all_events <- function(
       tmp.cna$Tumor_Sample_Barcode <- transform.vector[tmp.cna$Tumor_Sample_Barcode]
 
       colourCount <- nrow(unique(tmp.cna[, .(Hugo_Symbol, CNA)]))
-      getPalette <- colorRampPalette(brewer.pal(8, "Set2"))
+      getPalette <- colorRampPalette(brewer.pal(8, "Set3"))
       CNA.plot <- ggplot(tmp.cna) +
         geom_bar(aes(x = Tumor_Sample_Barcode, y = abs(fc), fill = paste0(Hugo_Symbol, "_", CNA)), position = "dodge", stat = "identity") +
         labs(x = "time point (weeks)", y = "absolute fold-change") +
