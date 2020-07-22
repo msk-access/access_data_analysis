@@ -217,7 +217,7 @@ plot_all_events <- function(
     }
 
     colourCount <- nrow(unique(tmp.table[, .(Hugo_Symbol, HGVSp_Short)]))
-    getPalette <- colorRampPalette(brewer.pal(8, "Set2"))
+    getPalette <- colorRampPalette(brewer.pal(8, "Set3"))
     SNV.SV.plot.log <- ggplot(tmp.table) +
       geom_line(aes(
         x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
