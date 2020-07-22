@@ -227,7 +227,7 @@ plot_all_events <- function(
         x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
         color = paste0(Hugo_Symbol, " ", ifelse(grepl("^p\\.", HGVSp_Short), HGVSp_Short, "")), shape = call_confidence
       ), size = 1.5) +
-      labs(title = x, x = "Time Point(weeks)", y = "log10(Variant Allele Frequency)") +
+      labs(title = x, x = "time point (weeks)", y = "log10(variant allele frequency)") +
       scale_shape_manual(values = status_id, name = "Call Status") +
       scale_color_manual(values = getPalette(colourCount), name = "Alteration") +
       theme_minimal() +
@@ -247,7 +247,7 @@ plot_all_events <- function(
         x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
         color = paste0(Hugo_Symbol, " ", ifelse(grepl("^p\\.", HGVSp_Short), HGVSp_Short, "")), shape = call_confidence
       ), size = 1.5) +
-      labs(title = x, x = "Time Point(weeks)", y = "Variant Allele Frequency") +
+      labs(title = x, x = "time point (weeks)", y = "variant allele frequency") +
       scale_shape_manual(values = status_id, name = "Call Status") +
       scale_color_manual(values = getPalette(colourCount), name = "Alteration") +
       theme_minimal() +
@@ -272,7 +272,7 @@ plot_all_events <- function(
       getPalette <- colorRampPalette(brewer.pal(8, "Set2"))
       CNA.plot <- ggplot(tmp.cna) +
         geom_bar(aes(x = Tumor_Sample_Barcode, y = abs(fc), fill = paste0(Hugo_Symbol, "_", CNA)), position = "dodge", stat = "identity") +
-        labs(x = "Time Point (weeks)", y = "Absolute fold-change") +
+        labs(x = "time point (weeks)", y = "absolute fold-change") +
         scale_fill_manual(values = getPalette(colourCount), name = "Alteration") +
         theme_minimal() +
         scale_x_date(date_minor_breaks = "1 day", date_breaks = "1 week", date_labels = "%b %d") +
