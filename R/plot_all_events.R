@@ -218,7 +218,7 @@ plot_all_events <- function(
 
     colourCount <- nrow(unique(tmp.table[, .(Hugo_Symbol, HGVSp_Short)]))
     getPalette <- colorRampPalette(brewer.pal(8, "Set2"))
-    SNV.SV.plot <- ggplot(tmp.table) +
+    SNV.SV.plot.log <- ggplot(tmp.table) +
       geom_line(aes(
         x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
         color = paste0(Hugo_Symbol, " ", ifelse(grepl("^p\\.", HGVSp_Short), HGVSp_Short, "")), group = paste0(Hugo_Symbol, "_", HGVSp_Short)
@@ -237,7 +237,26 @@ plot_all_events <- function(
         panel.grid.major = element_blank(), legend.position = "top", legend.box = "vertical",
         axis.text.x = element_text(angle = 45, hjust = 1, face = "bold")
       )
-    print(SNV.SV.plot)
+    print(SNV.SV.plot.log)
+    SNV.SV.plot.linear <- ggplot(tmp.table) +
+      geom_line(aes(
+        x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
+        color = paste0(Hugo_Symbol, " ", ifelse(grepl("^p\\.", HGVSp_Short), HGVSp_Short, "")), group = paste0(Hugo_Symbol, "_", HGVSp_Short)
+      )) +
+      geom_point(aes(
+        x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
+        color = paste0(Hugo_Symbol, " ", ifelse(grepl("^p\\.", HGVSp_Short), HGVSp_Short, "")), shape = call_confidence
+      ), size = 1.5) +
+      labs(title = x, x = "Time Point", y = "VAF") +
+      scale_shape_manual(values = status_id, name = "Call Status") +
+      scale_color_manual(values = getPalette(colourCount), name = "Alteration") +
+      theme_minimal() +
+      scale_x_date(date_minor_breaks = "1 day", date_breaks = "1 week", date_labels = "%b %d") +
+      theme(
+        panel.grid.major = element_blank(), legend.position = "top", legend.box = "vertical",
+        axis.text.x = element_text(angle = 45, hjust = 1, face = "bold")
+      )
+    print(SNV.SV.plot.linear)
 
     if (nrow(tmp.cna) > 0) {
       tmp.cna <- tmp.cna %>%
@@ -261,11 +280,11 @@ plot_all_events <- function(
       print(CNA.plot)
 
       pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 10, height = 7)
-      print(ggarrange(SNV.SV.plot, CNA.plot, ncol = 1, heights = c(2, 1)))
+      print(ggarrange(SNV.SV.plot.log, CNA.plot, SNV.SV.plot.linear, CNA.plot, ncol = 2, heights = c(2, 1, 2, 1)))
       dev.off()
     } else {
       pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 10, height = 7)
-      print(SNV.SV.plot)
+      print(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, nrow = 2, heights = c(2, 2)))
       dev.off()
     }
   })
