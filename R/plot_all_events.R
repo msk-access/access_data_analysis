@@ -227,7 +227,7 @@ plot_all_events <- function(
         x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
         color = paste0(Hugo_Symbol, " ", ifelse(grepl("^p\\.", HGVSp_Short), HGVSp_Short, "")), shape = call_confidence
       ), size = 1.5) +
-      labs(title = x, x = "Time Point", y = "VAF") +
+      labs(title = x, x = "Time Point", y = "VAF(log10)") +
       scale_shape_manual(values = status_id, name = "Call Status") +
       scale_color_manual(values = getPalette(colourCount), name = "Alteration") +
       theme_minimal() +
@@ -280,11 +280,11 @@ plot_all_events <- function(
       print(CNA.plot)
 
       pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 10, height = 7)
-      print(ggarrange(SNV.SV.plot.log, CNA.plot, SNV.SV.plot.linear, CNA.plot, ncol = 2, heights = c(2, 1, 2, 1)))
+      print(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, CNA.plot, CNA.plot, ncol = 2, nrow = 2, heights = c(2, 2, 1, 1)))
       dev.off()
     } else {
       pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 10, height = 7)
-      print(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, nrow = 2, heights = c(2, 2)))
+      print(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, ncol = 2, heights = c(2, 2)))
       dev.off()
     }
   })
