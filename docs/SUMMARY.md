@@ -12,7 +12,7 @@
 
 ## Analysis
 
-* [Overview of Analysis Workflow](analysis/untitled.md)
+* [Overview of Analysis Workflow](analysis/steps.md)
 * [Compile Reads](analysis/compile-reads.md)
 * [Filter Calls](analysis/filter-calls.md)
 * [SV Incorporation](analysis/sv-incorporation.md)
