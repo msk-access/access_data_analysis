@@ -28,17 +28,23 @@ optional arguments:
                         File path to master reference file
   -o RESULTSDIR, --resultsdir RESULTSDIR
                         Output directory
-  -dmpk DMPKEYPATH, --dmpkeypath DMPKEYPATH
-                        DMP mirror BAM key file [default]
   -ch CHLIST, --chlist CHLIST
                         List of signed out CH calls [default]
   -c CRITERIA, --criteria CRITERIA
                         Calling criteria [default]
 ```
 
+## Default
+
+Default options can be found [here](../setup/resources.md#filter-calls)
+
 ## What `filter_calls.R` does
 
-[Generate a reference of systematic artifacts](https://github.com/msk-access/access_data_analysis/blob/17a26eea455707c82824493ebc597d9850d47e82/R/filter_calls.R#L35-L39) -- any call with occurrence in more than or equal to 2 donor samples \(occurrence defined as more than or equal to 2 duplex reads\)
+[Generate a reference of systematic artifacts](https://github.com/msk-access/access_data_analysis/blob/17a26eea455707c82824493ebc597d9850d47e82/R/filter_calls.R#L35-L39) -- any call with occurrence in more than or equal to 2 donor samples \(occurrence defined as more than or equal to 2 duplex reads\) 
+
+{% hint style="info" %}
+We suggest that you filter out anything with duplex\_support\_num &gt;= 2
+{% endhint %}
 
 ### [For each patient](https://github.com/msk-access/access_data_analysis/blob/17a26eea455707c82824493ebc597d9850d47e82/R/filter_calls.R#L43)
 

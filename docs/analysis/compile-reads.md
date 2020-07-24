@@ -35,6 +35,10 @@ optional arguments:
                         DMP mirror BAM key file [default]
 ```
 
+## Default
+
+Default options can be found [here](../setup/resources.md#compile-reads)
+
 ## What `compile_reads.R` does
 
 ### [For each patient](https://github.com/msk-access/access_data_analysis/blob/17a26eea455707c82824493ebc597d9850d47e82/R/compile_reads.R#L47)

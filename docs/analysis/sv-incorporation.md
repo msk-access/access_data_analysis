@@ -27,6 +27,10 @@ optional arguments:
                         Calling criteria [default]
 ```
 
+## Default
+
+Default options can be found [here](../setup/resources.md#sv-incorporation)
+
 ## What `SV_incorporation.R` does
 
 [Gets DMP signed out SV calls](https://github.com/msk-access/access_data_analysis/blob/17a26eea455707c82824493ebc597d9850d47e82/R/SV_incorporation.R#L20-L24)
