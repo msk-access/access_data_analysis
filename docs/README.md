@@ -12,7 +12,7 @@ This gitbook will walk you through:
   * [Installation](setup/installation.md)
   * [Master file creation](setup/setup-for-running-analysis.md#master-reference-file)
   * [Resource files](setup/resources.md)
-* [Analysis](analysis/untitled.md)
+* [Analysis]()
   * Running each step
   * Documentation of code
   * [Intermediate file structure](analysis/intermediate-file-organization.md)

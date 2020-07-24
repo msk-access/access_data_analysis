@@ -7,13 +7,12 @@ description: Intermediate files are generated in a internal structure
 There are intermediate files generated with each step in the `/output/directory` , here is a diagram for its organization 
 
 ```text
-.
+.s
 +-- C-000001
 |   +-- C-000001_all_unique_calls.maf
 |   +-- C-000001_impact_calls.maf
 |   +-- C-000001_sample_sheet.tsv
 |   +-- C-000001_genotype_metadata.tsv
-|   +-- C-000001_sample_sheet.tsv
         #plasma sample mafs
 |   +-- C-000001-L001-d-SIMPLEX_genotyped.maf
 |   +-- C-000001-L001-d-DUPLEX_genotyped.maf
@@ -39,7 +38,6 @@ There are intermediate files generated with each step in the `/output/directory`
 |   +-- C-000002_impact_calls.maf
 |   +-- C-000002_sample_sheet.tsv
 |   +-- C-000002_genotype_metadata.tsv
-|   +-- C-000002_sample_sheet.tsv
         #plasma sample mafs
 |   +-- C-000002-L001-d-SIMPLEX_genotyped.maf
 |   +-- C-000002-L001-d-DUPLEX_genotyped.maf
