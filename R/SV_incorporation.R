@@ -53,8 +53,7 @@ SV_incorporation = function(
     }else{
       # dummy df if there is no DMP fusion found
       DMP.sv <- data.frame(matrix(nrow = 0,ncol = ncol(DMP.fusion)))
-      colnames(DMP.sv) <- colnames(DMP.fusion)
-      setnames(DMP.sv,'DMP_SAMPLE_ID','TumorId')
+      colnames(DMP.sv) <- colnames(total.sv)
     }
     print('done with reading in')
     print(colnames(total.sv))
