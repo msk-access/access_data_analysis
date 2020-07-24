@@ -31,12 +31,10 @@ SV_incorporation = function(
   access.gene.list <- access.genes.info$V1
   # x <- unique(master.ref$cmo_patient_id)[1]
   lapply(unique(master.ref$cmo_patient_id),function(x){
-    print(x)
     # get sample sheet --------------------------------------------------------
     sample.sheet <- fread(paste0(results.dir,'/',x,'/',x,'_sample_sheet.tsv'))
     # get plasma SV calls -----------------------------------------------------
     total.sv <- do.call(rbind,lapply(sample.sheet[Sample_Type == 'duplex']$Sample_Barcode,function(y){
-      print(y)
       SV.filename <- master.ref[cmo_sample_id_plasma == y]$sv_path
       if(!file.exists(SV.filename)){stop(paste0('SV file: ',SV.filename,' ----- does not exist'))}
       tmp.SV <- fread(SV.filename) %>% filter(Significance == 'KeyGene')
@@ -45,7 +43,6 @@ SV_incorporation = function(
     
     # get DMP SV calls --------------------------------------------------------
     DMP.sv <- do.call(rbind,lapply(sample.sheet[Sample_Type == 'DMP_Tumor']$Sample_Barcode,function(y){
-      print(y)
       DMP.fusion[DMP_SAMPLE_ID == y]
     })) 
     if(!is.null(DMP.sv)){
@@ -57,6 +54,7 @@ SV_incorporation = function(
       # dummy df if there is no DMP fusion found
       DMP.sv <- data.frame(matrix(nrow = 0,ncol = ncol(DMP.fusion)))
       colnames(DMP.sv) <- colnames(DMP.fusion)
+      setnames(DMP.sv,'DMP_SAMPLE_ID','TumorId')
     }
     print('done with reading in')
     print(colnames(total.sv))
@@ -87,7 +85,6 @@ SV_incorporation = function(
     
     # adding some annotation columns specific to snv table --------------------
     apply(sample.sheet[Sample_Type != 'plasma_simplex'],1,function(y){
-      print(y)
       current.colname <- paste0(y[which(colnames(sample.sheet) == 'Sample_Barcode')],'___',
                                 case_when(y[which(colnames(sample.sheet) == 'Sample_Type')] == 'duplex' ~'total',
                                           y[which(colnames(sample.sheet) == 'Sample_Type')] == 'DMP_Tumor' ~'DMP_Tumor',
