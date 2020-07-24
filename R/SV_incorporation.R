@@ -36,6 +36,7 @@ SV_incorporation = function(
     sample.sheet <- fread(paste0(results.dir,'/',x,'/',x,'_sample_sheet.tsv'))
     # get plasma SV calls -----------------------------------------------------
     total.sv <- do.call(rbind,lapply(sample.sheet[Sample_Type == 'duplex']$Sample_Barcode,function(y){
+      print(y)
       SV.filename <- master.ref[cmo_sample_id_plasma == y]$sv_path
       if(!file.exists(SV.filename)){stop(paste0('SV file: ',SV.filename,' ----- does not exist'))}
       tmp.SV <- fread(SV.filename) %>% filter(Significance == 'KeyGene')
