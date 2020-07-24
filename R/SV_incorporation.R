@@ -58,6 +58,9 @@ SV_incorporation = function(
       DMP.sv <- data.frame(matrix(nrow = 0,ncol = ncol(DMP.fusion)))
       colnames(DMP.sv) <- colnames(DMP.fusion)
     }
+    print('done with reading in')
+    print(colnames(total.sv))
+    print(colnames(DMP.sv))
     
     # event desc. reconciliating possible DMP vs manta ------------------------
     rbind(total.sv,DMP.sv) %>% 
@@ -84,6 +87,7 @@ SV_incorporation = function(
     
     # adding some annotation columns specific to snv table --------------------
     apply(sample.sheet[Sample_Type != 'plasma_simplex'],1,function(y){
+      print(y)
       current.colname <- paste0(y[which(colnames(sample.sheet) == 'Sample_Barcode')],'___',
                                 case_when(y[which(colnames(sample.sheet) == 'Sample_Type')] == 'duplex' ~'total',
                                           y[which(colnames(sample.sheet) == 'Sample_Type')] == 'DMP_Tumor' ~'DMP_Tumor',
