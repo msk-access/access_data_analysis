@@ -216,6 +216,8 @@ plot_all_events <- function(
       return()
     }
 
+  if(all(!is.na(as.Date(transform.vector, "%m/%d/%y"))){
+
     colourCount <- nrow(unique(tmp.table[, .(Hugo_Symbol, HGVSp_Short)]))
     getPalette <- colorRampPalette(brewer.pal(8, "Set3"))
     SNV.SV.plot.log <- ggplot(tmp.table) +
@@ -287,6 +289,77 @@ plot_all_events <- function(
       print(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, ncol = 2, heights = c(2, 2)))
       dev.off()
     }
+  }
+  else{
+    colourCount <- nrow(unique(tmp.table[, .(Hugo_Symbol, HGVSp_Short)]))
+    getPalette <- colorRampPalette(brewer.pal(8, "Set3"))
+    SNV.SV.plot.log <- ggplot(tmp.table) +
+      geom_line(aes(
+        x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
+        color = paste0(Hugo_Symbol, " ", ifelse(grepl("^p\\.", HGVSp_Short), HGVSp_Short, "")), group = paste0(Hugo_Symbol, "_", HGVSp_Short)
+      )) +
+      geom_point(aes(
+        x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
+        color = paste0(Hugo_Symbol, " ", ifelse(grepl("^p\\.", HGVSp_Short), HGVSp_Short, "")), shape = call_confidence
+      ), size = 1.5) +
+      labs(title = x, x = "time point", y = "log10(variant allele frequency)") +
+      scale_shape_manual(values = status_id, name = "Call Status") +
+      scale_color_manual(values = getPalette(colourCount), name = "Alteration") +
+      theme_minimal() +
+      scale_y_log10() +
+      theme(
+        panel.grid.major = element_blank(), legend.position = "top", legend.box = "vertical",
+        axis.text.x = element_text(angle = 45, hjust = 1, face = "bold")
+      )
+    print(SNV.SV.plot.log)
+    SNV.SV.plot.linear <- ggplot(tmp.table) +
+      geom_line(aes(
+        x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
+        color = paste0(Hugo_Symbol, " ", ifelse(grepl("^p\\.", HGVSp_Short), HGVSp_Short, "")), group = paste0(Hugo_Symbol, "_", HGVSp_Short)
+      )) +
+      geom_point(aes(
+        x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
+        color = paste0(Hugo_Symbol, " ", ifelse(grepl("^p\\.", HGVSp_Short), HGVSp_Short, "")), shape = call_confidence
+      ), size = 1.5) +
+      labs(title = x, x = "time point", y = "variant allele frequency") +
+      scale_shape_manual(values = status_id, name = "Call Status") +
+      scale_color_manual(values = getPalette(colourCount), name = "Alteration") +
+      theme_minimal() +
+      theme(
+        panel.grid.major = element_blank(), legend.position = "top", legend.box = "vertical",
+        axis.text.x = element_text(angle = 45, hjust = 1, face = "bold")
+      )
+    print(SNV.SV.plot.linear)
+
+    if (nrow(tmp.cna) > 0) {
+      tmp.cna <- tmp.cna %>%
+        mutate(Tumor_Sample_Barcode = factor(Tumor_Sample_Barcode, unique(tmp.sample.sheets[Sample_Type == "duplex"]$Sample_Barcode))) %>%
+        # expand table on all empty samples without any calls
+        data.table() %>%
+        dcast.data.table(Hugo_Symbol + CNA ~ Tumor_Sample_Barcode, drop = c(TRUE, FALSE), fill = 0, value.var = "fc") %>%
+        melt.data.table(id.vars = c("Hugo_Symbol", "CNA"), variable.name = "Tumor_Sample_Barcode", value.name = "fc") %>%
+        data.table()
+      tmp.cna$Tumor_Sample_Barcode <- transform.vector[tmp.cna$Tumor_Sample_Barcode]
+
+      colourCount <- nrow(unique(tmp.cna[, .(Hugo_Symbol, CNA)]))
+      getPalette <- colorRampPalette(brewer.pal(8, "Set3"))
+      CNA.plot <- ggplot(tmp.cna) +
+        geom_bar(aes(x = Tumor_Sample_Barcode, y = abs(fc), fill = paste0(Hugo_Symbol, "_", CNA)), position = "dodge", stat = "identity") +
+        labs(x = "time point", y = "absolute fold-change") +
+        scale_fill_manual(values = getPalette(colourCount), name = "Alteration") +
+        theme_minimal() +
+        theme(panel.grid.major = element_blank(), legend.position = "bottom", axis.text.x = element_text(angle = 45, hjust = 1, face = "bold"))
+      print(CNA.plot)
+
+      pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 16, height = 8)
+      print(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, CNA.plot, CNA.plot, ncol = 2, nrow = 2, heights = c(2, 2, 1, 1)))
+      dev.off()
+    } else {
+      pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 16, height = 8)
+      print(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, ncol = 2, heights = c(2, 2)))
+      dev.off()
+    }
+  }
   })
 }
 
