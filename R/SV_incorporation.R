@@ -31,6 +31,7 @@ SV_incorporation = function(
   access.gene.list <- access.genes.info$V1
   # x <- unique(master.ref$cmo_patient_id)[1]
   lapply(unique(master.ref$cmo_patient_id),function(x){
+    print(x)
     # get sample sheet --------------------------------------------------------
     sample.sheet <- fread(paste0(results.dir,'/',x,'/',x,'_sample_sheet.tsv'))
     # get plasma SV calls -----------------------------------------------------
@@ -43,6 +44,7 @@ SV_incorporation = function(
     
     # get DMP SV calls --------------------------------------------------------
     DMP.sv <- do.call(rbind,lapply(sample.sheet[Sample_Type == 'DMP_Tumor']$Sample_Barcode,function(y){
+      print(y)
       DMP.fusion[DMP_SAMPLE_ID == y]
     })) 
     if(!is.null(DMP.sv)){
