@@ -255,7 +255,7 @@ plot_all_events <- function(
         scale_x_date(date_minor_breaks = "1 day", date_breaks = "1 week", date_labels = "%b %d") +
         theme(
           panel.grid.major = element_blank(), legend.position = "top", legend.box = "vertical",
-          axis.text.x = element_text(angle = 45, hjust = 1, face = "bold")
+          axis.text.x = element_text(angle = 45, face = "bold")
         )
       print(SNV.SV.plot.log)
       SNV.SV.plot.linear <- ggplot(tmp.table) +
@@ -274,7 +274,7 @@ plot_all_events <- function(
         scale_x_date(date_minor_breaks = "1 day", date_breaks = "1 week", date_labels = "%b %d") +
         theme(
           panel.grid.major = element_blank(), legend.position = "top", legend.box = "vertical",
-          axis.text.x = element_text(angle = 45, hjust = 1, face = "bold")
+          axis.text.x = element_text(angle = 45, face = "bold")
         )
       print(SNV.SV.plot.linear)
 
@@ -327,7 +327,7 @@ plot_all_events <- function(
         scale_y_log10() +
         theme(
           panel.grid.major = element_blank(), legend.position = "top", legend.box = "vertical",
-          axis.text.x = element_text(angle = 45, hjust = 1, face = "bold")
+          axis.text.x = element_text(angle = 45, face = "bold")
         )
       print(SNV.SV.plot.log)
       SNV.SV.plot.linear <- ggplot(tmp.table) +
@@ -345,7 +345,7 @@ plot_all_events <- function(
         theme_mine() +
         theme(
           panel.grid.major = element_blank(), legend.position = "top", legend.box = "vertical",
-          axis.text.x = element_text(angle = 45, hjust = 1, face = "bold")
+          axis.text.x = element_text(angle = 45, face = "bold")
         )
       print(SNV.SV.plot.linear)
 
