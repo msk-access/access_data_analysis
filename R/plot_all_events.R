@@ -207,9 +207,11 @@ plot_all_events <- function(
     ]
     tmp.sample.sheets <- fread(paste0(results.dir, "/", x, "/", x, "_sample_sheet.tsv"))[, .(Sample_Barcode, cmo_patient_id, Sample_Type)]
     tmp.table <- table_to_maf(tmp.table, tmp.sample.sheets)
-    print("\n\n#####table_to_maf####\n\n",tmp.table)
+    print("\n\n#####table_to_maf####\n\n")
+    print(tmp.table)
     tmp.table <- data.table(process_maf_for_graph(tmp.table))
-    print("\n\n#####process_maf_for_graph####\n\n", tmp.table)
+    print("\n\n#####process_maf_for_graph####\n\n") 
+    print (tmp.table)
     # CNA
     tmp.cna <- do.call(rbind, lapply(master.ref[cmo_patient_id == x]$cmo_sample_id_plasma, function(y) {
       fread(paste0(results.dir, "/CNA_final_call_set/", y, "_cna_final_call_set.txt"))
