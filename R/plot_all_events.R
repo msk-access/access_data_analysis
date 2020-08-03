@@ -4,6 +4,7 @@
 # library(dplyr)
 # library(ggplot2)
 # library(ggpubr)
+# library(ggthemes)
 # library(RColorBrewer)
 
 
@@ -393,6 +394,7 @@ suppressPackageStartupMessages({
   library(argparse)
   library(ggplot2)
   library(ggpubr)
+  library(ggthemes)
   library(RColorBrewer)
 })
 
