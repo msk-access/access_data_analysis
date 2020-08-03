@@ -20,11 +20,11 @@ theme_mine <- function(base_size = 12, base_family = "") {
       axis.text.y = element_text(size = 10, hjust = 1, face = "bold"),
       axis.ticks.x = element_line(colour = "black"),
       axis.ticks.y = element_line(colour = "black"),
-      axis.title.x = element_blank(),
+      axis.title.x = element_text(size = 16, angle = 90, face = "bold", vjust = 2),
       axis.title.y = element_text(size = 16, angle = 90, face = "bold", vjust = 2),
       legend.position = "top",
-      panel.grid.major.y = element_line(colour = "lightgray"),
-      panel.grid.minor = element_blank(),
+      panel.grid.major = element_line(colour = "lightgray"),
+      panel.grid.minor = element_line(colour = "lightgray"),
       panel.margin = unit(1.0, "lines"),
       plot.background = element_blank(),
       plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "lines"),
@@ -240,7 +240,7 @@ plot_all_events <- function(
 
     if (all(!is.na(as.Date(transform.vector, "%m/%d/%y")))) {
       colourCount <- nrow(unique(tmp.table[, .(Hugo_Symbol, HGVSp_Short)]))
-      getPalette <- colorRampPalette(brewer.pal(8, "Set3"))
+      getPalette <- colorRampPalette(colorblind_pal()(8))
       SNV.SV.plot.log <- ggplot(tmp.table) +
         geom_line(aes(
           x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
@@ -292,7 +292,7 @@ plot_all_events <- function(
         tmp.cna$Tumor_Sample_Barcode <- transform.vector[tmp.cna$Tumor_Sample_Barcode]
 
         colourCount <- nrow(unique(tmp.cna[, .(Hugo_Symbol, CNA)]))
-        getPalette <- colorRampPalette(brewer.pal(8, "Set3"))
+        getPalette <- colorRampPalette(colorblind_pal()(8))
         CNA.plot <- ggplot(tmp.cna) +
           geom_bar(aes(x = Tumor_Sample_Barcode, y = abs(fc), fill = paste0(Hugo_Symbol, "_", CNA)), position = "dodge", stat = "identity") +
           labs(x = "time point (weeks)", y = "absolute fold-change") +
@@ -313,7 +313,7 @@ plot_all_events <- function(
     }
     else {
       colourCount <- nrow(unique(tmp.table[, .(Hugo_Symbol, HGVSp_Short)]))
-      getPalette <- colorRampPalette(brewer.pal(8, "Set3"))
+      getPalette <- colorRampPalette(colorblind_pal()(8))
       SNV.SV.plot.log <- ggplot(tmp.table) +
         geom_line(aes(
           x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
@@ -363,7 +363,7 @@ plot_all_events <- function(
         tmp.cna$Tumor_Sample_Barcode <- transform.vector[tmp.cna$Tumor_Sample_Barcode]
 
         colourCount <- nrow(unique(tmp.cna[, .(Hugo_Symbol, CNA)]))
-        getPalette <- colorRampPalette(brewer.pal(8, "Set3"))
+        getPalette <- colorRampPalette(colorblind_pal()(8))
         CNA.plot <- ggplot(tmp.cna) +
           geom_bar(aes(x = Tumor_Sample_Barcode, y = abs(fc), fill = paste0(Hugo_Symbol, "_", CNA)), position = "dodge", stat = "identity") +
           labs(x = "time point", y = "absolute fold-change") +
