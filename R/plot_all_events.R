@@ -316,7 +316,7 @@ plot_all_events <- function(
         print(
           annotate_figure(
             ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear,
-              ggarrange(CNA.plot, CNA.plot, ncol = 2, heights = c(1, 1), common.legend = TRUE, legend = "bottom"),
+              ggarrange(CNA.plot, CNA.plot, ncol = 2, nrow = 2, heights = c(1, 1), common.legend = TRUE, legend = "bottom"),
               ncol = 2, nrow = 2, heights = c(2, 2), common.legend = TRUE, legend = "top"
             ),
             top = text_grob(x, color = "black", face = "bold", size = 18)
@@ -404,7 +404,7 @@ plot_all_events <- function(
         print(
           annotate_figure(
             ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear,
-              ggarrange(CNA.plot, CNA.plot, ncol = 2, heights = c(1, 1), common.legend = TRUE, legend = "bottom"),
+              ggarrange(CNA.plot, CNA.plot, ncol = 2, nrow = 2, heights = c(1, 1), common.legend = TRUE, legend = "bottom"),
               ncol = 2, nrow = 2, heights = c(2, 2), common.legend = TRUE, legend = "top"
             ),
             top = text_grob(x, color = "black", face = "bold", size = 18)
