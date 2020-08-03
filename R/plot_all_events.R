@@ -203,7 +203,7 @@ plot_all_events <- function(
     # THIS PLOTS PLASMA SAMPLES ONLY
     # SNV
     tmp.table <- fread(list.files(paste0(results.dir, "/results_", criteria, "_combined/"), x, full.names = T))[
-      call_confidence == "HIGH" | call_confidence == "LOW" | call_confidence == "" | grepl("Protein Fusion: in frame", HGVSp_Short)
+      call_confidence == "High" | call_confidence == "Low" | call_confidence == "" | grepl("Protein Fusion: in frame", HGVSp_Short)
     ]
     tmp.sample.sheets <- fread(paste0(results.dir, "/", x, "/", x, "_sample_sheet.tsv"))[, .(Sample_Barcode, cmo_patient_id, Sample_Type)]
     tmp.table <- table_to_maf(tmp.table, tmp.sample.sheets)
