@@ -257,7 +257,7 @@ plot_all_events <- function(
           panel.grid.major = element_blank(), legend.position = "top", legend.box = "vertical",
           axis.text.x = element_text(angle = 45, face = "bold")
         )
-      print(SNV.SV.plot.log)
+      # print(SNV.SV.plot.log)
       SNV.SV.plot.linear <- ggplot(tmp.table) +
         geom_line(aes(
           x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
@@ -276,7 +276,7 @@ plot_all_events <- function(
           panel.grid.major = element_blank(), legend.position = "top", legend.box = "vertical",
           axis.text.x = element_text(angle = 45, face = "bold")
         )
-      print(SNV.SV.plot.linear)
+      # print(SNV.SV.plot.linear)
 
       if (nrow(tmp.cna) > 0) {
         tmp.cna <- tmp.cna %>%
@@ -299,11 +299,11 @@ plot_all_events <- function(
           theme(panel.grid.major = element_blank(), legend.position = "bottom", axis.text.x = element_text(angle = 45, face = "bold"))
         print(CNA.plot)
 
-        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 20, height = 10, onefile = TRUE)
+        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 20, height = 10, onefile = F)
         print(annotate_figure(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, CNA.plot, CNA.plot, ncol = 2, nrow = 2, heights = c(2, 2, 1, 1)), top = text_grob(x, color = "black", face = "bold", size = 14)))
         dev.off()
       } else {
-        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 20, height = 10, onefile = TRUE)
+        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 20, height = 10, onefile = F)
         print(annotate_figure(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, ncol = 2, heights = c(2, 2), common.legend = TRUE, legend = "top"), top = text_grob(x, color = "black", face = "bold", size = 14)))
         dev.off()
       }
@@ -329,7 +329,7 @@ plot_all_events <- function(
           panel.grid.major = element_blank(), legend.position = "top", legend.box = "vertical",
           axis.text.x = element_text(angle = 45, face = "bold")
         )
-      print(SNV.SV.plot.log)
+      # print(SNV.SV.plot.log)
       SNV.SV.plot.linear <- ggplot(tmp.table) +
         geom_line(aes(
           x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
@@ -347,7 +347,7 @@ plot_all_events <- function(
           panel.grid.major = element_blank(), legend.position = "top", legend.box = "vertical",
           axis.text.x = element_text(angle = 45, face = "bold")
         )
-      print(SNV.SV.plot.linear)
+      # print(SNV.SV.plot.linear)
 
       if (nrow(tmp.cna) > 0) {
         tmp.cna <- tmp.cna %>%
@@ -367,13 +367,13 @@ plot_all_events <- function(
           scale_fill_manual(values = getPalette(colourCount), name = "Alteration") +
           theme_mine() +
           theme(panel.grid.major = element_blank(), legend.position = "bottom", axis.text.x = element_text(angle = 45, face = "bold"))
-        print(CNA.plot)
+        # print(CNA.plot)
 
-        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 20, height = 10, onefile = TRUE)
+        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 20, height = 10, onefile = F)
         print(annotate_figure(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, CNA.plot, CNA.plot, ncol = 2, nrow = 2, heights = c(2, 2, 1, 1)), top = text_grob(x, color = "black", face = "bold", size = 14)))
         dev.off()
       } else {
-        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 20, height = 10, onefile = TRUE)
+        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 20, height = 10, onefile = F)
         print(annotate_figure(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, ncol = 2, heights = c(2, 2), common.legend = TRUE, legend = "top"), top = text_grob(x, color = "black", face = "bold", size = 14)))
         dev.off()
       }
