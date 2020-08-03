@@ -203,15 +203,15 @@ plot_all_events <- function(
     # THIS PLOTS PLASMA SAMPLES ONLY
     # SNV
     tmp.table <- fread(list.files(paste0(results.dir, "/results_", criteria, "_combined/"), x, full.names = T))[
-      call_confidence == "High" | grepl("Protein Fusion: in frame", HGVSp_Short)
+      call_confidence == "HIGH" | call_confidence == "LOW" | call_confidence == "" | grepl("Protein Fusion: in frame", HGVSp_Short)
     ]
     tmp.sample.sheets <- fread(paste0(results.dir, "/", x, "/", x, "_sample_sheet.tsv"))[, .(Sample_Barcode, cmo_patient_id, Sample_Type)]
     tmp.table <- table_to_maf(tmp.table, tmp.sample.sheets)
-    print("\n\n#####table_to_maf####\n\n")
-    print(tmp.table)
+    #print("\n\n#####table_to_maf####\n\n")
+    #print(tmp.table)
     tmp.table <- data.table(process_maf_for_graph(tmp.table))
-    print("\n\n#####process_maf_for_graph####\n\n") 
-    print (tmp.table)
+    #print("\n\n#####process_maf_for_graph####\n\n") 
+    #print (tmp.table)
     # CNA
     tmp.cna <- do.call(rbind, lapply(master.ref[cmo_patient_id == x]$cmo_sample_id_plasma, function(y) {
       fread(paste0(results.dir, "/CNA_final_call_set/", y, "_cna_final_call_set.txt"))
@@ -221,8 +221,8 @@ plot_all_events <- function(
       transform.vector <- structure(as.Date(master.ref[cmo_patient_id == x]$collection_date, "%m/%d/%y"),
         names = master.ref[cmo_patient_id == x]$cmo_sample_id_plasma
       )
-      print("\n\n###Date Presentation:####\n\n")
-      print(transform.vector)
+      #print("\n\n###Date Presentation:####\n\n")
+      #print(transform.vector)
     }
     else {
       transform.vector <- structure(as.character(master.ref[cmo_patient_id == x]$collection_date),
