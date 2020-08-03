@@ -21,7 +21,7 @@ theme_mine <- function(base_size = 12, base_family = "") {
       axis.text.y = element_text(size = 10, hjust = 1, face = "bold"),
       axis.ticks.x = element_line(colour = "black"),
       axis.ticks.y = element_line(colour = "black"),
-      axis.title.x = element_text(size = 12, face = "bold",vjust = 2),
+      axis.title.x = element_text(size = 12, face = "bold", vjust = 2),
       axis.title.y = element_text(size = 12, angle = 90, face = "bold", vjust = 2),
       legend.position = "bottom",
       panel.grid.major = element_line(colour = "lightgray"),
