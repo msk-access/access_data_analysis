@@ -4,11 +4,30 @@
 # library(dplyr)
 # library(ggplot2)
 # library(ggpubr)
+# library(ggthemes)
 # library(RColorBrewer)
 
 
 # helper methods ----------------------------------------------------------
-
+theme_mine <- function(base_size = 12, base_family = "") {
+  # Starts with theme_grey and then modify some parts
+  theme_bw(base_size = base_size, base_family = base_family) %+replace%
+    theme(
+      strip.text.x = element_text(size = 16),
+      strip.text.y = element_text(size = 16),
+      strip.background = element_rect(colour = "black", fill = "white"),
+      axis.text.x = element_text(size = 14, face = "bold"),
+      axis.text.y = element_text(size = 14, hjust = 1, face = "bold"),
+      axis.ticks.x = element_line(colour = "black"),
+      axis.ticks.y = element_line(colour = "black"),
+      panel.grid.major = element_line(colour = "lightgray"),
+      panel.grid.minor = element_line(colour = "lightgray"),
+      panel.margin = unit(1.0, "lines"),
+      plot.background = element_blank(),
+      plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "lines"),
+      axis.line = element_line(colour = "black")
+    )
+}
 # collapsing read counts from the same rearrangement events into one total count
 collapse_AF <- function(x) {
   # x = c("32-117-190(0.7842)|53-0-959(0.0553)","NA|16-0-1035(0.0155)","63-0-954(0.066)|NA" )
@@ -209,7 +228,7 @@ plot_all_events <- function(
       # print(transform.vector)
     }
     tmp.table$Tumor_Sample_Barcode <- transform.vector[tmp.table$Tumor_Sample_Barcode]
-    #print(tmp.table)
+    # print(tmp.table)
     if (nrow(tmp.table) == 0 | all(tmp.table$t_alt_count == 0)) {
       print("skiping to the next")
       if (nrow(tmp.cna)) stop(paste0("Need to make CNA only file for: ", x))
@@ -218,7 +237,7 @@ plot_all_events <- function(
 
     if (all(!is.na(as.Date(transform.vector, "%m/%d/%y")))) {
       colourCount <- nrow(unique(tmp.table[, .(Hugo_Symbol, HGVSp_Short)]))
-      getPalette <- colorRampPalette(brewer.pal(8, "Set3"))
+      getPalette <- colorRampPalette(colorblind_pal()(8))
       SNV.SV.plot.log <- ggplot(tmp.table) +
         geom_line(aes(
           x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
@@ -228,17 +247,19 @@ plot_all_events <- function(
           x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
           color = paste0(Hugo_Symbol, " ", ifelse(grepl("^p\\.", HGVSp_Short), HGVSp_Short, "")), shape = call_confidence
         ), size = 1.5) +
-        labs(title = x, x = "time point (weeks)", y = "log10(variant allele frequency)") +
+        labs(x = "time point (weeks)", y = "log10(variant allele frequency)") +
         scale_shape_manual(values = status_id, name = "Call Status") +
         scale_color_manual(values = getPalette(colourCount), name = "Alteration") +
-        theme_minimal() +
+        theme_mine() +
         scale_y_log10() +
         scale_x_date(date_minor_breaks = "1 day", date_breaks = "1 week", date_labels = "%b %d") +
         theme(
-          panel.grid.major = element_blank(), legend.position = "top", legend.box = "vertical",
-          axis.text.x = element_text(angle = 45, hjust = 1, face = "bold")
+          panel.grid.major.x = element_blank(), legend.position = "top", legend.box = "vertical",
+          legend.title = element_text(size = 16,face = "bold"),
+          legend.text = element_text(size = 14, face = "bold"),
+          axis.text.x = element_text(angle = 45, face = "bold")
         )
-      print(SNV.SV.plot.log)
+      # print(SNV.SV.plot.log)
       SNV.SV.plot.linear <- ggplot(tmp.table) +
         geom_line(aes(
           x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
@@ -248,16 +269,18 @@ plot_all_events <- function(
           x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
           color = paste0(Hugo_Symbol, " ", ifelse(grepl("^p\\.", HGVSp_Short), HGVSp_Short, "")), shape = call_confidence
         ), size = 1.5) +
-        labs(title = x, x = "time point (weeks)", y = "variant allele frequency") +
+        labs(x = "time point (weeks)", y = "variant allele frequency") +
         scale_shape_manual(values = status_id, name = "Call Status") +
         scale_color_manual(values = getPalette(colourCount), name = "Alteration") +
-        theme_minimal() +
+        theme_mine() +
         scale_x_date(date_minor_breaks = "1 day", date_breaks = "1 week", date_labels = "%b %d") +
         theme(
-          panel.grid.major = element_blank(), legend.position = "top", legend.box = "vertical",
-          axis.text.x = element_text(angle = 45, hjust = 1, face = "bold")
+          panel.grid.major.x = element_blank(), legend.position = "top", legend.box = "vertical",
+          legend.title = element_text(size = 16,face = "bold"),
+          legend.text = element_text(size = 14, face = "bold"),
+          axis.text.x = element_text(angle = 45, face = "bold")
         )
-      print(SNV.SV.plot.linear)
+      # print(SNV.SV.plot.linear)
 
       if (nrow(tmp.cna) > 0) {
         tmp.cna <- tmp.cna %>%
@@ -270,28 +293,32 @@ plot_all_events <- function(
         tmp.cna$Tumor_Sample_Barcode <- transform.vector[tmp.cna$Tumor_Sample_Barcode]
 
         colourCount <- nrow(unique(tmp.cna[, .(Hugo_Symbol, CNA)]))
-        getPalette <- colorRampPalette(brewer.pal(8, "Set3"))
+        getPalette <- colorRampPalette(colorblind_pal()(8))
         CNA.plot <- ggplot(tmp.cna) +
           geom_bar(aes(x = Tumor_Sample_Barcode, y = abs(fc), fill = paste0(Hugo_Symbol, "_", CNA)), position = "dodge", stat = "identity") +
           labs(x = "time point (weeks)", y = "absolute fold-change") +
           scale_fill_manual(values = getPalette(colourCount), name = "Alteration") +
-          theme_minimal() +
+          theme_mine() +
           scale_x_date(date_minor_breaks = "1 day", date_breaks = "1 week", date_labels = "%b %d") +
-          theme(panel.grid.major = element_blank(), legend.position = "bottom", axis.text.x = element_text(angle = 45, hjust = 1, face = "bold"))
-        print(CNA.plot)
+          theme(panel.grid.major.x = element_blank(), 
+          legend.position = "bottom",
+          legend.title = element_text(size = 16,face = "bold"),
+          legend.text = element_text(size = 14, face = "bold"),
+          axis.text.x = element_text(angle = 45, face = "bold"))
+        # print(CNA.plot)
 
-        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 16, height = 8)
-        print(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, CNA.plot, CNA.plot, ncol = 2, nrow = 2, heights = c(2, 2, 1, 1)))
+        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 20, height = 10, onefile = F)
+        print(annotate_figure(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, CNA.plot, CNA.plot, ncol = 2, nrow = 2, heights = c(2, 2, 1, 1)), top = text_grob(x, color = "black", face = "bold", size = 18)))
         dev.off()
       } else {
-        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 16, height = 8)
-        print(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, ncol = 2, heights = c(2, 2)))
+        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 20, height = 10, onefile = F)
+        print(annotate_figure(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, ncol = 2, heights = c(2, 2), common.legend = TRUE, legend = "top"), top = text_grob(x, color = "black", face = "bold", size = 18)))
         dev.off()
       }
     }
     else {
       colourCount <- nrow(unique(tmp.table[, .(Hugo_Symbol, HGVSp_Short)]))
-      getPalette <- colorRampPalette(brewer.pal(8, "Set3"))
+      getPalette <- colorRampPalette(colorblind_pal()(8))
       SNV.SV.plot.log <- ggplot(tmp.table) +
         geom_line(aes(
           x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
@@ -301,16 +328,18 @@ plot_all_events <- function(
           x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
           color = paste0(Hugo_Symbol, " ", ifelse(grepl("^p\\.", HGVSp_Short), HGVSp_Short, "")), shape = call_confidence
         ), size = 1.5) +
-        labs(title = x, x = "time point", y = "log10(variant allele frequency)") +
+        labs(x = "time point", y = "log10(variant allele frequency)") +
         scale_shape_manual(values = status_id, name = "Call Status") +
         scale_color_manual(values = getPalette(colourCount), name = "Alteration") +
-        theme_minimal() +
+        theme_mine() +
         scale_y_log10() +
         theme(
-          panel.grid.major = element_blank(), legend.position = "top", legend.box = "vertical",
-          axis.text.x = element_text(angle = 45, hjust = 1, face = "bold")
+          panel.grid.major.x = element_blank(), legend.position = "top", legend.box = "vertical",
+          legend.title = element_text(size = 16,face = "bold"),
+          legend.text = element_text(size = 14, face = "bold"),
+          axis.text.x = element_text(angle = 45, face = "bold")
         )
-      print(SNV.SV.plot.log)
+      # print(SNV.SV.plot.log)
       SNV.SV.plot.linear <- ggplot(tmp.table) +
         geom_line(aes(
           x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
@@ -320,15 +349,17 @@ plot_all_events <- function(
           x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
           color = paste0(Hugo_Symbol, " ", ifelse(grepl("^p\\.", HGVSp_Short), HGVSp_Short, "")), shape = call_confidence
         ), size = 1.5) +
-        labs(title = x, x = "time point", y = "variant allele frequency") +
+        labs(x = "time point", y = "variant allele frequency") +
         scale_shape_manual(values = status_id, name = "Call Status") +
         scale_color_manual(values = getPalette(colourCount), name = "Alteration") +
-        theme_minimal() +
+        theme_mine() +
         theme(
-          panel.grid.major = element_blank(), legend.position = "top", legend.box = "vertical",
-          axis.text.x = element_text(angle = 45, hjust = 1, face = "bold")
+          panel.grid.major.x = element_blank(), legend.position = "top", legend.box = "vertical",
+          legend.title = element_text(size = 16,face = "bold"),
+          legend.text = element_text(size = 14, face = "bold"),
+          axis.text.x = element_text(angle = 45, face = "bold")
         )
-      print(SNV.SV.plot.linear)
+      # print(SNV.SV.plot.linear)
 
       if (nrow(tmp.cna) > 0) {
         tmp.cna <- tmp.cna %>%
@@ -341,21 +372,25 @@ plot_all_events <- function(
         tmp.cna$Tumor_Sample_Barcode <- transform.vector[tmp.cna$Tumor_Sample_Barcode]
 
         colourCount <- nrow(unique(tmp.cna[, .(Hugo_Symbol, CNA)]))
-        getPalette <- colorRampPalette(brewer.pal(8, "Set3"))
+        getPalette <- colorRampPalette(colorblind_pal()(8))
         CNA.plot <- ggplot(tmp.cna) +
           geom_bar(aes(x = Tumor_Sample_Barcode, y = abs(fc), fill = paste0(Hugo_Symbol, "_", CNA)), position = "dodge", stat = "identity") +
           labs(x = "time point", y = "absolute fold-change") +
           scale_fill_manual(values = getPalette(colourCount), name = "Alteration") +
-          theme_minimal() +
-          theme(panel.grid.major = element_blank(), legend.position = "bottom", axis.text.x = element_text(angle = 45, hjust = 1, face = "bold"))
-        print(CNA.plot)
+          theme_mine() +
+          theme(panel.grid.major.x = element_blank(), 
+          legend.position = "bottom", 
+          legend.title = element_text(size = 16,face = "bold"),
+          legend.text = element_text(size = 14, face = "bold"),
+          axis.text.x = element_text(angle = 45, face = "bold"))
+        # print(CNA.plot)
 
-        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 16, height = 8)
-        print(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, CNA.plot, CNA.plot, ncol = 2, nrow = 2, heights = c(2, 2, 1, 1)))
+        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 20, height = 10, onefile = F)
+        print(annotate_figure(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, CNA.plot, CNA.plot, ncol = 2, nrow = 2, heights = c(2, 2, 1, 1)), top = text_grob(x, color = "black", face = "bold", size = 18)))
         dev.off()
       } else {
-        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 16, height = 8)
-        print(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, ncol = 2, heights = c(2, 2)))
+        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 20, height = 10, onefile = F)
+        print(annotate_figure(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, ncol = 2, heights = c(2, 2), common.legend = TRUE, legend = "top"), top = text_grob(x, color = "black", face = "bold", size = 18)))
         dev.off()
       }
     }
@@ -371,6 +406,7 @@ suppressPackageStartupMessages({
   library(argparse)
   library(ggplot2)
   library(ggpubr)
+  library(ggthemes)
   library(RColorBrewer)
 })
 
