@@ -8,7 +8,29 @@
 
 
 # helper methods ----------------------------------------------------------
-
+theme_mine <- function(base_size = 12, base_family = "") {
+  # Starts with theme_grey and then modify some parts
+  theme_bw(base_size = base_size, base_family = base_family) %+replace%
+    theme(
+      strip.text.x = element_text(size = 16),
+      strip.text.y = element_text(size = 16),
+      strip.background = element_rect(colour = "black", fill = "white"),
+      # axis.text.x = element_text(size=10,face="bold",angle=45,hjust=1,vjust=1),
+      axis.text.x = element_blank(),
+      axis.text.y = element_text(size = 10, hjust = 1, face = "bold"),
+      axis.ticks.x = element_line(colour = "black"),
+      axis.ticks.y = element_line(colour = "black"),
+      axis.title.x = element_blank(),
+      axis.title.y = element_text(size = 16, angle = 90, face = "bold", vjust = 2),
+      legend.position = "top",
+      panel.grid.major.y = element_line(colour = "lightgray"),
+      panel.grid.minor = element_blank(),
+      panel.margin = unit(1.0, "lines"),
+      plot.background = element_blank(),
+      plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "lines"),
+      axis.line = element_line(colour = "black")
+    )
+}
 # collapsing read counts from the same rearrangement events into one total count
 collapse_AF <- function(x) {
   # x = c("32-117-190(0.7842)|53-0-959(0.0553)","NA|16-0-1035(0.0155)","63-0-954(0.066)|NA" )
@@ -231,7 +253,7 @@ plot_all_events <- function(
         labs(title = x, x = "time point (weeks)", y = "log10(variant allele frequency)") +
         scale_shape_manual(values = status_id, name = "Call Status") +
         scale_color_manual(values = getPalette(colourCount), name = "Alteration") +
-        theme_minimal() +
+        theme_mine() +
         scale_y_log10() +
         scale_x_date(date_minor_breaks = "1 day", date_breaks = "1 week", date_labels = "%b %d") +
         theme(
@@ -251,7 +273,7 @@ plot_all_events <- function(
         labs(title = x, x = "time point (weeks)", y = "variant allele frequency") +
         scale_shape_manual(values = status_id, name = "Call Status") +
         scale_color_manual(values = getPalette(colourCount), name = "Alteration") +
-        theme_minimal() +
+        theme_mine() +
         scale_x_date(date_minor_breaks = "1 day", date_breaks = "1 week", date_labels = "%b %d") +
         theme(
           panel.grid.major = element_blank(), legend.position = "top", legend.box = "vertical",
@@ -275,7 +297,7 @@ plot_all_events <- function(
           geom_bar(aes(x = Tumor_Sample_Barcode, y = abs(fc), fill = paste0(Hugo_Symbol, "_", CNA)), position = "dodge", stat = "identity") +
           labs(x = "time point (weeks)", y = "absolute fold-change") +
           scale_fill_manual(values = getPalette(colourCount), name = "Alteration") +
-          theme_minimal() +
+          theme_mine() +
           scale_x_date(date_minor_breaks = "1 day", date_breaks = "1 week", date_labels = "%b %d") +
           theme(panel.grid.major = element_blank(), legend.position = "bottom", axis.text.x = element_text(angle = 45, hjust = 1, face = "bold"))
         print(CNA.plot)
@@ -304,7 +326,7 @@ plot_all_events <- function(
         labs(title = x, x = "time point", y = "log10(variant allele frequency)") +
         scale_shape_manual(values = status_id, name = "Call Status") +
         scale_color_manual(values = getPalette(colourCount), name = "Alteration") +
-        theme_minimal() +
+        theme_mine() +
         scale_y_log10() +
         theme(
           panel.grid.major = element_blank(), legend.position = "top", legend.box = "vertical",
@@ -323,7 +345,7 @@ plot_all_events <- function(
         labs(title = x, x = "time point", y = "variant allele frequency") +
         scale_shape_manual(values = status_id, name = "Call Status") +
         scale_color_manual(values = getPalette(colourCount), name = "Alteration") +
-        theme_minimal() +
+        theme_mine() +
         theme(
           panel.grid.major = element_blank(), legend.position = "top", legend.box = "vertical",
           axis.text.x = element_text(angle = 45, hjust = 1, face = "bold")
@@ -346,7 +368,7 @@ plot_all_events <- function(
           geom_bar(aes(x = Tumor_Sample_Barcode, y = abs(fc), fill = paste0(Hugo_Symbol, "_", CNA)), position = "dodge", stat = "identity") +
           labs(x = "time point", y = "absolute fold-change") +
           scale_fill_manual(values = getPalette(colourCount), name = "Alteration") +
-          theme_minimal() +
+          theme_mine() +
           theme(panel.grid.major = element_blank(), legend.position = "bottom", axis.text.x = element_text(angle = 45, hjust = 1, face = "bold"))
         print(CNA.plot)
 
