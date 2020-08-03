@@ -299,11 +299,11 @@ plot_all_events <- function(
           theme(panel.grid.major = element_blank(), legend.position = "bottom", axis.text.x = element_text(angle = 45, face = "bold"))
         print(CNA.plot)
 
-        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 20, height = 10)
+        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 20, height = 10, onefile = TRUE)
         print(annotate_figure(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, CNA.plot, CNA.plot, ncol = 2, nrow = 2, heights = c(2, 2, 1, 1)), top = text_grob(x, color = "black", face = "bold", size = 14)))
         dev.off()
       } else {
-        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 20, height = 10)
+        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 20, height = 10, onefile = TRUE)
         print(annotate_figure(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, ncol = 2, heights = c(2, 2), common.legend = TRUE, legend = "top"), top = text_grob(x, color = "black", face = "bold", size = 14)))
         dev.off()
       }
@@ -369,11 +369,11 @@ plot_all_events <- function(
           theme(panel.grid.major = element_blank(), legend.position = "bottom", axis.text.x = element_text(angle = 45, face = "bold"))
         print(CNA.plot)
 
-        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 20, height = 10)
+        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 20, height = 10, onefile = TRUE)
         print(annotate_figure(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, CNA.plot, CNA.plot, ncol = 2, nrow = 2, heights = c(2, 2, 1, 1)), top = text_grob(x, color = "black", face = "bold", size = 14)))
         dev.off()
       } else {
-        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 20, height = 10)
+        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 20, height = 10, onefile = TRUE)
         print(annotate_figure(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, ncol = 2, heights = c(2, 2), common.legend = TRUE, legend = "top"), top = text_grob(x, color = "black", face = "bold", size = 14)))
         dev.off()
       }
