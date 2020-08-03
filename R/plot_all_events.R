@@ -254,7 +254,7 @@ plot_all_events <- function(
         scale_y_log10() +
         scale_x_date(date_minor_breaks = "1 day", date_breaks = "1 week", date_labels = "%b %d") +
         theme(
-          panel.grid.major = element_blank(), legend.position = "top", legend.box = "vertical",
+          panel.grid.major.x = element_blank(), legend.position = "top", legend.box = "vertical",
           axis.text.x = element_text(angle = 45, face = "bold")
         )
       # print(SNV.SV.plot.log)
@@ -273,7 +273,7 @@ plot_all_events <- function(
         theme_mine() +
         scale_x_date(date_minor_breaks = "1 day", date_breaks = "1 week", date_labels = "%b %d") +
         theme(
-          panel.grid.major = element_blank(), legend.position = "top", legend.box = "vertical",
+          panel.grid.major.x = element_blank(), legend.position = "top", legend.box = "vertical",
           axis.text.x = element_text(angle = 45, face = "bold")
         )
       # print(SNV.SV.plot.linear)
@@ -296,7 +296,7 @@ plot_all_events <- function(
           scale_fill_manual(values = getPalette(colourCount), name = "Alteration") +
           theme_mine() +
           scale_x_date(date_minor_breaks = "1 day", date_breaks = "1 week", date_labels = "%b %d") +
-          theme(panel.grid.major = element_blank(), legend.position = "bottom", axis.text.x = element_text(angle = 45, face = "bold"))
+          theme(panel.grid.major.x = element_blank(), legend.position = "bottom", axis.text.x = element_text(angle = 45, face = "bold"))
         print(CNA.plot)
 
         pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 20, height = 10, onefile = F)
@@ -326,7 +326,7 @@ plot_all_events <- function(
         theme_mine() +
         scale_y_log10() +
         theme(
-          panel.grid.major = element_blank(), legend.position = "top", legend.box = "vertical",
+          panel.grid.major.x = element_blank(), legend.position = "top", legend.box = "vertical",
           axis.text.x = element_text(angle = 45, face = "bold")
         )
       # print(SNV.SV.plot.log)
@@ -344,7 +344,7 @@ plot_all_events <- function(
         scale_color_manual(values = getPalette(colourCount), name = "Alteration") +
         theme_mine() +
         theme(
-          panel.grid.major = element_blank(), legend.position = "top", legend.box = "vertical",
+          panel.grid.major.x = element_blank(), legend.position = "top", legend.box = "vertical",
           axis.text.x = element_text(angle = 45, face = "bold")
         )
       # print(SNV.SV.plot.linear)
@@ -366,7 +366,7 @@ plot_all_events <- function(
           labs(x = "time point", y = "absolute fold-change") +
           scale_fill_manual(values = getPalette(colourCount), name = "Alteration") +
           theme_mine() +
-          theme(panel.grid.major = element_blank(), legend.position = "bottom", axis.text.x = element_text(angle = 45, face = "bold"))
+          theme(panel.grid.major.x = element_blank(), legend.position = "bottom", axis.text.x = element_text(angle = 45, face = "bold"))
         # print(CNA.plot)
 
         pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 20, height = 10, onefile = F)
