@@ -21,7 +21,7 @@ theme_mine <- function(base_size = 12, base_family = "") {
       axis.text.y = element_text(size = 10, hjust = 1, face = "bold"),
       axis.ticks.x = element_line(colour = "black"),
       axis.ticks.y = element_line(colour = "black"),
-      axis.title.x = element_text(size = 16, angle = 90, face = "bold", vjust = 2),
+      axis.title.x = element_text(size = 16, face = "bold", hjust = 1),
       axis.title.y = element_text(size = 16, angle = 90, face = "bold", vjust = 2),
       legend.position = "top",
       panel.grid.major = element_line(colour = "lightgray"),
@@ -232,7 +232,7 @@ plot_all_events <- function(
       # print(transform.vector)
     }
     tmp.table$Tumor_Sample_Barcode <- transform.vector[tmp.table$Tumor_Sample_Barcode]
-    #print(tmp.table)
+    # print(tmp.table)
     if (nrow(tmp.table) == 0 | all(tmp.table$t_alt_count == 0)) {
       print("skiping to the next")
       if (nrow(tmp.cna)) stop(paste0("Need to make CNA only file for: ", x))
@@ -258,7 +258,7 @@ plot_all_events <- function(
         scale_y_log10() +
         scale_x_date(date_minor_breaks = "1 day", date_breaks = "1 week", date_labels = "%b %d") +
         theme(
-          panel.grid.major = element_blank(), legend.position = "top", legend.box = "vertical",
+          legend.position = "top", legend.box = "vertical",
           axis.text.x = element_text(angle = 45, hjust = 1, face = "bold")
         )
       print(SNV.SV.plot.log)
@@ -277,7 +277,7 @@ plot_all_events <- function(
         theme_mine() +
         scale_x_date(date_minor_breaks = "1 day", date_breaks = "1 week", date_labels = "%b %d") +
         theme(
-          panel.grid.major = element_blank(), legend.position = "top", legend.box = "vertical",
+          legend.position = "top", legend.box = "vertical",
           axis.text.x = element_text(angle = 45, hjust = 1, face = "bold")
         )
       print(SNV.SV.plot.linear)
@@ -330,7 +330,7 @@ plot_all_events <- function(
         theme_mine() +
         scale_y_log10() +
         theme(
-          panel.grid.major = element_blank(), legend.position = "top", legend.box = "vertical",
+          legend.position = "top", legend.box = "vertical",
           axis.text.x = element_text(angle = 45, hjust = 1, face = "bold")
         )
       print(SNV.SV.plot.log)
@@ -348,7 +348,7 @@ plot_all_events <- function(
         scale_color_manual(values = getPalette(colourCount), name = "Alteration") +
         theme_mine() +
         theme(
-          panel.grid.major = element_blank(), legend.position = "top", legend.box = "vertical",
+          legend.position = "top", legend.box = "vertical",
           axis.text.x = element_text(angle = 45, hjust = 1, face = "bold")
         )
       print(SNV.SV.plot.linear)
