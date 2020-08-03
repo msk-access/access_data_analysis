@@ -304,7 +304,7 @@ plot_all_events <- function(
         dev.off()
       } else {
         pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 20, height = 10)
-        print(annotate_figure(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, common.legend = True, legend = "top", ncol = 2, heights = c(2, 2)), top = text_grob(x, color = "black", face = "bold", size = 14)))
+        print(annotate_figure(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, ncol = 2, heights = c(2, 2), common.legend = TRUE, legend = "top"), top = text_grob(x, color = "black", face = "bold", size = 14)))
         dev.off()
       }
     }
@@ -374,7 +374,7 @@ plot_all_events <- function(
         dev.off()
       } else {
         pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 20, height = 10)
-        print(annotate_figure(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, common.legend = True, legend = "top", ncol = 2, heights = c(2, 2)), top = text_grob(x, color = "black", face = "bold", size = 14)))
+        print(annotate_figure(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, ncol = 2, heights = c(2, 2), common.legend = TRUE, legend = "top"), top = text_grob(x, color = "black", face = "bold", size = 14)))
         dev.off()
       }
     }
