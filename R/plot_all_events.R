@@ -16,14 +16,10 @@ theme_mine <- function(base_size = 12, base_family = "") {
       strip.text.x = element_text(size = 16),
       strip.text.y = element_text(size = 16),
       strip.background = element_rect(colour = "black", fill = "white"),
-      # axis.text.x = element_text(size=10,face="bold",angle=45,hjust=1,vjust=1),
       axis.text.x = element_blank(),
       axis.text.y = element_text(size = 10, hjust = 1, face = "bold"),
       axis.ticks.x = element_line(colour = "black"),
       axis.ticks.y = element_line(colour = "black"),
-      axis.title.x = element_text(size = 12, face = "bold", vjust = 2),
-      axis.title.y = element_text(size = 12, angle = 90, face = "bold", vjust = 2),
-      legend.position = "bottom",
       panel.grid.major = element_line(colour = "lightgray"),
       panel.grid.minor = element_line(colour = "lightgray"),
       panel.margin = unit(1.0, "lines"),
@@ -251,7 +247,7 @@ plot_all_events <- function(
           x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
           color = paste0(Hugo_Symbol, " ", ifelse(grepl("^p\\.", HGVSp_Short), HGVSp_Short, "")), shape = call_confidence
         ), size = 1.5) +
-        labs(title = x, x = "time point (weeks)", y = "log10(variant allele frequency)") +
+        labs(x = "time point (weeks)", y = "log10(variant allele frequency)") +
         scale_shape_manual(values = status_id, name = "Call Status") +
         scale_color_manual(values = getPalette(colourCount), name = "Alteration") +
         theme_mine() +
@@ -303,12 +299,12 @@ plot_all_events <- function(
           theme(panel.grid.major = element_blank(), legend.position = "bottom", axis.text.x = element_text(angle = 45, hjust = 1, face = "bold"))
         print(CNA.plot)
 
-        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 16, height = 12)
-        print(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, CNA.plot, CNA.plot, ncol = 2, nrow = 2, heights = c(2, 2, 1, 1)))
+        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 16, height = 8)
+        print(annotate_figure(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, CNA.plot, CNA.plot, ncol = 2, nrow = 2, heights = c(2, 2, 1, 1)), top = text_grob(x, color = "black", face = "bold", size = 14)))
         dev.off()
       } else {
-        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 16, height = 12)
-        print(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, ncol = 2, heights = c(2, 2)))
+        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 16, height = 8)
+        print(annotate_figure(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, ncol = 2, heights = c(2, 2)), top = text_grob(x, color = "black", face = "bold", size = 14)))
         dev.off()
       }
     }
@@ -324,7 +320,7 @@ plot_all_events <- function(
           x = Tumor_Sample_Barcode, y = ifelse(t_total_count == 0, 0, as.numeric(t_alt_count / t_total_count)),
           color = paste0(Hugo_Symbol, " ", ifelse(grepl("^p\\.", HGVSp_Short), HGVSp_Short, "")), shape = call_confidence
         ), size = 1.5) +
-        labs(title = x, x = "time point", y = "log10(variant allele frequency)") +
+        labs(x = "time point", y = "log10(variant allele frequency)") +
         scale_shape_manual(values = status_id, name = "Call Status") +
         scale_color_manual(values = getPalette(colourCount), name = "Alteration") +
         theme_mine() +
@@ -373,12 +369,12 @@ plot_all_events <- function(
           theme(panel.grid.major = element_blank(), legend.position = "bottom", axis.text.x = element_text(angle = 45, hjust = 1, face = "bold"))
         print(CNA.plot)
 
-        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 16, height = 12)
-        print(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, CNA.plot, CNA.plot, ncol = 2, nrow = 2, heights = c(2, 2, 1, 1)))
+        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 16, height = 8)
+        print(annotate_figure(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, CNA.plot, CNA.plot, ncol = 2, nrow = 2, heights = c(2, 2, 1, 1)), top = text_grob(x, color = "black", face = "bold", size = 14)))
         dev.off()
       } else {
-        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 16, height = 12)
-        print(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, ncol = 2, heights = c(2, 2)))
+        pdf(paste0(output.dir, "/", x, "_all_events.pdf"), width = 16, height = 8)
+        print(annotate_figure(ggarrange(SNV.SV.plot.log, SNV.SV.plot.linear, ncol = 2, heights = c(2, 2)), top = text_grob(x, color = "black", face = "bold", size = 14)))
         dev.off()
       }
     }
