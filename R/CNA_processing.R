@@ -19,15 +19,20 @@ CNA_processing = function(
 
   # master.ref <- master.ref[(master.ref$dmp_patient_id!="") & !is.na(master.ref$dmp_patient_id)]
   # dmp.pattern <- paste0(master.ref$dmp_patient_id, collapse = '|')
-  dmp.ids <- master.ref$dmp_patient_id[(master.ref$dmp_patient_id!="") & !is.na(master.ref$dmp_patient_id)]
+  dmp.ids <- master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id
   dmp.pattern <- paste0(dmp.ids, collapse = '|')
 
 
   DMP.cna.edited = DMP.cna[
-    !Hugo_Symbol %in% c('CDKN2Ap14ARF','CDKN2Ap16INK4A'),
-    c('Hugo_Symbol',grep(dmp.pattern, colnames(DMP.cna),value = T))
-    , with = F] %>%
-    melt.data.table(id.vars = 'Hugo_Symbol',variable.name = 'Tumor_Sample_Barcode',value.name = 'fc') %>%
+      !Hugo_Symbol %in% c('CDKN2Ap14ARF','CDKN2Ap16INK4A'),
+      c('Hugo_Symbol',grep(dmp.pattern, colnames(DMP.cna),value = T)),
+      with = F
+    ] %>%
+    melt.data.table(
+      id.vars = 'Hugo_Symbol',
+      variable.name = 'Tumor_Sample_Barcode',
+      value.name = 'fc'
+    ) %>%
     filter(fc != 0) %>%
     mutate(
       CNA_tumor = case_when(fc < 0 ~ 'HOMDEL',fc > 0 ~ 'AMP'),
@@ -64,14 +69,22 @@ CNA_processing = function(
 
 
   access.cna.genes = c('AR','BRCA1','BRCA2','CDK4','EGFR','ERBB2','MET','MDM2','MLH1','MSH2','MSH6','MYC')
-  merge(access.cna,DMP.cna.edited,by = c('Hugo_Symbol','cmo_patient_id'),all.x = T) %>%
-    mutate(CNA = case_when(
-      (fc > 1.5 & Hugo_Symbol %in% access.cna.genes) ~ 'AMP',
-      (fc < -1.5 & Hugo_Symbol %in% access.cna.genes) ~ 'HOMDEL',
-      # & Hugo_Symbol %in% access.cna.genes
-      (fc > 1.2 & !is.na(CNA_tumor)) ~ 'AMP',
-      (fc > 1.2 & !is.na(CNA_tumor)) ~ 'HOMDEL',
-      TRUE ~ '')
+  merge(
+    access.cna,
+    DMP.cna.
+    edited,
+    by = c('Hugo_Symbol','cmo_patient_id'),
+    all.x = T
+  ) %>%
+    mutate(
+      CNA = case_when(
+        (fc > 1.5 & Hugo_Symbol %in% access.cna.genes) ~ 'AMP',
+        (fc < -1.5 & Hugo_Symbol %in% access.cna.genes) ~ 'HOMDEL',
+        # & Hugo_Symbol %in% access.cna.genes
+        (fc > 1.2 & !is.na(CNA_tumor)) ~ 'AMP',
+        (fc > 1.2 & !is.na(CNA_tumor)) ~ 'HOMDEL',
+        TRUE ~ ''
+      )
     ) %>%
     filter(CNA != '') %>%
     data.table() -> access.call.set
