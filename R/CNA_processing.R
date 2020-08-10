@@ -71,7 +71,7 @@ CNA_processing = function(
   access.cna.genes = c('AR','BRCA1','BRCA2','CDK4','EGFR','ERBB2','MET','MDM2','MLH1','MSH2','MSH6','MYC')
   merge(
     access.cna,
-    DMP.cna.
+    DMP.cna,
     edited,
     by = c('Hugo_Symbol','cmo_patient_id'),
     all.x = T
