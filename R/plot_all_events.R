@@ -276,7 +276,7 @@ plot_all_events <- function(
         labs(x = "time point (weeks)", y = "variant allele frequency") +
         scale_shape_manual(values = status_id, name = "Call Status") +
         scale_color_manual(values = getPalette(colourCount), name = "Alteration") +
-        expand_limits(y = c(NA,0.02) +
+        expand_limits(y = c(NA,0.02)) +
         theme_mine() +
         scale_x_date(date_minor_breaks = "1 day", date_breaks = "1 week", date_labels = "%b %d") +
         theme(
