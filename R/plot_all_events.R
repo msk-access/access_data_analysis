@@ -253,7 +253,7 @@ plot_all_events <- function(
         labs(x = "time point (weeks)", y = "log10(variant allele frequency)") +
         scale_shape_manual(values = status_id, name = "Call Status") +
         scale_color_manual(values = getPalette(colourCount), name = "Alteration") +
-        expand_limits(y = log10(0.02)) + 
+        expand_limits(y = c(NA,log10(0.02)) + 
         theme_mine() +
         scale_y_log10() +
         scale_x_date(date_minor_breaks = "1 day", date_breaks = "1 week", date_labels = "%b %d") +
@@ -276,7 +276,7 @@ plot_all_events <- function(
         labs(x = "time point (weeks)", y = "variant allele frequency") +
         scale_shape_manual(values = status_id, name = "Call Status") +
         scale_color_manual(values = getPalette(colourCount), name = "Alteration") +
-        expand_limits(y = 0.002) +
+        expand_limits(y = c(NA,0.02) +
         theme_mine() +
         scale_x_date(date_minor_breaks = "1 day", date_breaks = "1 week", date_labels = "%b %d") +
         theme(
@@ -348,7 +348,7 @@ plot_all_events <- function(
         scale_color_manual(values = getPalette(colourCount), name = "Alteration") +
         theme_mine() +
         scale_y_log10() +
-        expand_limits(y = log10(0.02)) + 
+        expand_limits(y = c(NA,log10(0.02)) + 
         theme(
           panel.grid.major.x = element_blank(), legend.position = "top", legend.box = "vertical",
           legend.title = element_text(size = 16, face = "bold"),
@@ -368,7 +368,7 @@ plot_all_events <- function(
         labs(x = "time point", y = "variant allele frequency") +
         scale_shape_manual(values = status_id, name = "Call Status") +
         scale_color_manual(values = getPalette(colourCount), name = "Alteration") +
-        expand_limits(y = 0.02) + 
+        expand_limits(y = c(NA,0.02)) + 
         theme_mine() +
         theme(
           panel.grid.major.x = element_blank(), legend.position = "top", legend.box = "vertical",
