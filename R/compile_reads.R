@@ -85,7 +85,7 @@ compile_reads <- function(
     ] %>%
       merge(rbind(
         unique(master.ref[
-          cmo_patient_id == x,
+          cmo_patient_id == x&paired=='Paired',
           # buffy coat + DMP bams -- standard bam only
           .(
             Sample_Barcode = cmo_sample_id_normal, standard_bam = bam_path_normal,
