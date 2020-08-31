@@ -19,7 +19,7 @@ CNA_processing = function(
 
   # master.ref <- master.ref[(master.ref$dmp_patient_id!="") & !is.na(master.ref$dmp_patient_id)]
   # dmp.pattern <- paste0(master.ref$dmp_patient_id, collapse = '|')
-  dmp.ids <- master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id
+  dmp.ids <- master.ref$dmp_patient_id[(master.ref$dmp_patient_id!="") & !is.na(master.ref$dmp_patient_id)]
   dmp.pattern <- paste0(dmp.ids, collapse = '|')
 
 
