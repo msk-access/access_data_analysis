@@ -168,6 +168,9 @@ filter_calls = function(
         mutate(DMP = NA) %>%
         data.table()
     } else {
+
+      print(paste0("Found no tumor or DMP mutations for ", x, ". Writing an empty data.frame to CSV."))
+
       # if fillouts.dt has no data, then add the needed columns with no data
       fillouts.dt[,c("DMP", "Hotspot", "duplex_support_num", "call_confidence", "CH") := NA]
 
@@ -180,7 +183,7 @@ filter_calls = function(
         fillouts.dt,
         paste0(results.dir,'/results_',criteria,'/',x,'_SNV_table.csv'),
         row.names = F)
-      
+
       return()
     }
 
