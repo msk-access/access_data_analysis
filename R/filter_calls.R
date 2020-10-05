@@ -169,7 +169,19 @@ filter_calls = function(
         data.table()
     } else {
       # if fillouts.dt has no data, then add the needed columns with no data
-      fillouts.dt[,c("DMP", "Hotspot", "duplex_support_num") := NA]
+      fillouts.dt[,c("DMP", "Hotspot", "duplex_support_num", "call_confidence", "CH") := NA]
+
+      fillouts.dt <- fillouts.dt %>% select(
+        Hugo_Symbol,Chromosome,Start_Position,End_Position,
+        Variant_Classification,HGVSp_Short,Reference_Allele,Tumor_Seq_Allele2,
+        ExAC_AF,Hotspot,DMP,CH,duplex_support_num,call_confidence,sort(everything()))
+
+      write.csv(
+        fillouts.dt,
+        paste0(results.dir,'/results_',criteria,'/',x,'_SNV_table.csv'),
+        row.names = F)
+      
+      return()
     }
 
     # Interesting cases where DMP signed out calls are artifacets
@@ -185,23 +197,6 @@ filter_calls = function(
       # paste0(gsub('duplex','simplex',plasma.samples),'.called')
 
     ) := 'Not Called']
-
-    # check if the table is emtpy, if so then add the remaining columns and exit
-
-    if (nrow(fillouts.dt) == 0) {
-      fillouts.dt[,c("call_confidence", "CH") := NA]
-
-      fillouts.dt <- fillouts.dt %>% select(
-        Hugo_Symbol,Chromosome,Start_Position,End_Position,
-        Variant_Classification,HGVSp_Short,Reference_Allele,Tumor_Seq_Allele2,
-        ExAC_AF,Hotspot,DMP,CH,duplex_support_num,call_confidence,sort(everything()))
-
-      write.csv(
-        fillouts.dt,
-        paste0(results.dir,'/results_',criteria,'/',x,'_SNV_table.csv'),
-        row.names = F)
-      return
-    }
 
     # preliminary calling
     # tmp.col.name <- plasma.samples[1]
