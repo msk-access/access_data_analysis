@@ -47,6 +47,7 @@ filter_calls = function(
     sample.sheet <- fread(paste0(results.dir,'/',x,'/',x,'_sample_sheet.tsv'))[,.(Sample_Barcode,cmo_patient_id,Sample_Type)]
     simplex.sample.sheet = sample.sheet[Sample_Type == 'duplex',.(Sample_Barcode,cmo_patient_id,Sample_Type = 'simplex')]
     sample.sheet = rbind(sample.sheet,simplex.sample.sheet) %>% mutate(column.names = paste0(Sample_Barcode,'___',Sample_Type)) %>% data.table()
+    sample.names <- c()
     # compiling different genotyp files from step 1
     fillouts.dt <- do.call(rbind,lapply(fillouts.filenames,function(y){
       sample.name = gsub('.*./|-ORG.*.','',y)
@@ -74,7 +75,9 @@ filter_calls = function(
         transmute(Hugo_Symbol,Tumor_Sample_Barcode,Chromosome = as.character(Chromosome),Start_Position,End_Position,Variant_Classification,
                   HGVSp_Short,Reference_Allele,Tumor_Seq_Allele2,t_var_freq,ExAC_AF) %>% data.table()
       return(maf.file)
-    })) %>% unique() %>% data.table()
+    }))
+    fillouts.dt<-fillouts.dt %>% unique() %>% data.table()
+    if(nrow(fillouts.dt)>0){
     # merging and melting -----------------------------------------------------
     hotspot.maf <- fread(paste0(results.dir,'/',x,'/',x,'_all_unique_calls_hotspots.maf')) %>% rowwise() %>%
       transmute(Hugo_Symbol,Chromosome = as.character(Chromosome),Start_Position,End_Position,Variant_Classification,
@@ -186,10 +189,10 @@ filter_calls = function(
       mutate(CH = ifelse(is.na(CH),'No','Yes')) %>%
       select(Hugo_Symbol,Chromosome,Start_Position,End_Position,Variant_Classification,HGVSp_Short,Reference_Allele,Tumor_Seq_Allele2,
              ExAC_AF,Hotspot,DMP,CH,duplex_support_num,call_confidence,sort(everything())) 
-    
     write.csv(fillouts.dt,paste0(results.dir,'/results_',criteria,'/',x,'_SNV_table.csv'),row.names = F)
-  })
-  
+    }
+  }
+  )
   if(all(unlist(all.fillout.dim))){
     print('All dimension of  fillout mafs for each patient looks correct')
   }

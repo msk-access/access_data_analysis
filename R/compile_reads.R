@@ -85,7 +85,7 @@ compile_reads <- function(
     ] %>%
       merge(rbind(
         unique(master.ref[
-          cmo_patient_id == x,
+          cmo_patient_id == x & paired == 'Paired',
           # buffy coat + DMP bams -- standard bam only
           .(
             Sample_Barcode = cmo_sample_id_normal, standard_bam = bam_path_normal,
@@ -99,9 +99,10 @@ compile_reads <- function(
     write.table(sample.sheet, paste0(results.dir, "/", x, "/", x, "_sample_sheet.tsv"), sep = "\t", quote = F, row.names = F)
     # piece together all unique calls -----------------------------------------
     # get duplex calls
-    duplex.calls <- do.call(rbind, lapply(master.ref[cmo_patient_id == x]$maf_path, function(x) {
+     duplex.calls <- do.call(rbind, lapply(master.ref[cmo_patient_id == x]$maf_path, function(x) {
       # fread(x) %>% filter(as.numeric(D_t_alt_count_fragment) > 0) %>% data.table()
-      fread(x)
+     selectcolumns <- c("Hugo_Symbol","Entrez_Gene_Id","Center","NCBI_Build","Chromosome","Start_Position","End_Position","Strand","Variant_Classification","Variant_Type","Reference_Allele","Tumor_Seq_Allele1","Tumor_Seq_Allele2","dbSNP_RS","dbSNP_Val_Status","Tumor_Sample_Barcode","caller_Norm_Sample_Barcode","Match_Norm_Seq_Allele1","Match_Norm_Seq_Allele2","Tumor_Validation_Allele1","Tumor_Validation_Allele2","Match_Norm_Validation_Allele1","Match_Norm_Validation_Allele2","Verification_Status","Validation_Status","Mutation_Status","Sequencing_Phase","Sequence_Source","Validation_Method","Score","BAM_File","Sequencer","Tumor_Sample_UUID","Matched_Norm_Sample_UUID","HGVSc","HGVSp","HGVSp_Short","Transcript_ID","Exon_Number","caller_t_depth","caller_t_ref_count","caller_t_alt_count","caller_n_depth","caller_n_ref_count","caller_n_alt_count","all_effects","Allele","Gene","Feature","Feature_type","Consequence","cDNA_position","CDS_position","Protein_position","Amino_acids","Codons","Existing_variation","ALLELE_NUM","DISTANCE","STRAND_VEP","SYMBOL","SYMBOL_SOURCE","HGNC_ID","BIOTYPE","CANONICAL","CCDS","ENSP","SWISSPROT","TREMBL","UNIPARC","RefSeq","SIFT","PolyPhen","EXON","INTRON","DOMAINS","AF","AFR_AF","AMR_AF","ASN_AF","EAS_AF","EUR_AF","SAS_AF","AA_AF","EA_AF","CLIN_SIG","SOMATIC","PUBMED","MOTIF_NAME","MOTIF_POS","HIGH_INF_POS","MOTIF_SCORE_CHANGE","IMPACT","PICK","VARIANT_CLASS","TSL","HGVS_OFFSET","PHENO","MINIMISED","ExAC_AF","ExAC_AF_AFR","ExAC_AF_AMR","ExAC_AF_EAS","ExAC_AF_FIN","ExAC_AF_NFE","ExAC_AF_OTH","ExAC_AF_SAS","GENE_PHENO","FILTER","flanking_bps","variant_id","variant_qual","ExAC_AF_Adj","ExAC_AC_AN_Adj","ExAC_AC_AN","ExAC_AC_AN_AFR","ExAC_AC_AN_AMR","ExAC_AC_AN_EAS","ExAC_AC_AN_FIN","ExAC_AC_AN_NFE","ExAC_AC_AN_OTH","ExAC_AC_AN_SAS","ExAC_FILTER","gnomAD_AF","gnomAD_AFR_AF","gnomAD_AMR_AF","gnomAD_ASJ_AF","gnomAD_EAS_AF","gnomAD_FIN_AF","gnomAD_NFE_AF","gnomAD_OTH_AF","gnomAD_SAS_AF","CallMethod","VCF_POS","VCF_REF","VCF_ALT","hotspot_whitelist","Status","D_t_alt_count_fragment","D_t_ref_count_fragment","D_t_vaf_fragment","SD_t_alt_count_fragment","SD_t_ref_count_fragment","SD_t_vaf_fragment","Matched_Norm_Sample_Barcode","Matched_Norm_Bamfile","n_alt_count_fragment","n_ref_count_fragment","n_vaf_fragment")
+      fread(x) %>% select(one_of(selectcolumns)) %>% subset(Status == "")
       # %>%
       # filter(as.numeric(t_alt_count) > 0) %>%
       # data.table()
@@ -159,7 +160,9 @@ compile_reads <- function(
   all.all.unique.mafs <- do.call(rbind, lapply(unique(master.ref$cmo_patient_id), function(x) {
     fread(list.files(paste0(results.dir, "/", x), pattern = "unique_calls.maf$", full.names = T))
   }))
-  all.all.unique.mafs <- all.all.unique.mafs[-which(duplicated(all.all.unique.mafs[, .(Hugo_Symbol, Chromosome, Start_Position, End_Position, Variant_Classification, HGVSp_Short, Reference_Allele, Tumor_Seq_Allele2)]))]
+  ## modified: deduplication that works when there are no duplicate rows ##
+  all.all.unique.mafs <- all.all.unique.mafs[!duplicated(all.all.unique.mafs[, .(Hugo_Symbol, Chromosome, Start_Position, End_Position, Variant_Classification, HGVSp_Short, Reference_Allele, Tumor_Seq_Allele2)]),]
+##  all.all.unique.mafs <- all.all.unique.mafs[-which(duplicated(all.all.unique.mafs[, .(Hugo_Symbol, Chromosome, Start_Position, End_Position, Variant_Classification, HGVSp_Short, Reference_Allele, Tumor_Seq_Allele2)]))]
   write.table(all.all.unique.mafs, paste0(results.dir, "/pooled/all_all_unique.maf"), sep = "\t", quote = F, row.names = F)
 
   write.table(data.frame(
@@ -233,15 +236,15 @@ if (!interactive()) {
   )
   args <- parser$parse_args()
 
-  master.ref <- args$masterref
-  results.dir <- args$resultsdir
+  master.ref <- normalizePath(args$masterref)
+  results.dir <- normalizePath(args$resultsdir)
   project.ID <- args$projectid
-  pooled.bam.dir <- args$pooledbamdir
-  fasta.path <- args$fastapath
-  genotyper.path <- args$genotyperpath
-  dmp.dir <- args$dmpdir
-  mirror.bam.dir <- args$mirrorbamdir
-  dmp.key.path <- args$dmpkeypath
+  pooled.bam.dir <- normalizePath(args$pooledbamdir)
+  fasta.path <- normalizePath(args$fastapath)
+  genotyper.path <- normalizePath(args$genotyperpath)
+  dmp.dir <- normalizePath(args$dmpdir)
+  mirror.bam.dir <- normalizePath(args$mirrorbamdir)
+  dmp.key.path <- normalizePath(args$dmpkeypath)
 
 
   if (project.ID == "") {

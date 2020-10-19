@@ -1,4 +1,3 @@
-# library(data.table)
 # library(stringr)
 # library(tidyr)
 # library(dplyr)
@@ -55,9 +54,6 @@ SV_incorporation = function(
       DMP.sv <- data.frame(matrix(nrow = 0,ncol = ncol(DMP.fusion)))
       colnames(DMP.sv) <- colnames(total.sv)
     }
-    print('done with reading in')
-    print(colnames(total.sv))
-    print(colnames(DMP.sv))
     
     # event desc. reconciliating possible DMP vs manta ------------------------
     rbind(total.sv,DMP.sv) %>% 
@@ -112,12 +108,14 @@ SV_incorporation = function(
     # append and write --------------------------------------------------------
     tmp.snv.table.path = paste0(results.dir,'/results_',criteria,'/',x,'_SNV_table.csv')
     if(!file.exists(tmp.snv.table.path)){
-      stop(paste0(tmp.snv.table.path,' does not exist. Check if filter_calls was run correcly'))
-    }
+      print(paste0('WARNING: ', tmp.snv.table.path,' does not exist. Check if filter_calls was run correcly'))
+      snv.sv.table.directory <- paste0(results.dir,'/results_',criteria,'_combined/',x,'_table.csv') 
+      write.csv(SV.table,snv.sv.table.directory,quote = F,row.names = F)
+    } else {
     SNV.table <- fread(tmp.snv.table.path)
     snv.sv.table.directory <- paste0(results.dir,'/results_',criteria,'_combined/',x,'_table.csv') 
     write.csv(rbind(SNV.table,SV.table),snv.sv.table.directory,quote = F,row.names = F)
-    
+   }
   })
   
 }
