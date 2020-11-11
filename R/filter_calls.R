@@ -38,6 +38,15 @@ filter_calls = function(
     group_by(Hugo_Symbol,Chromosome,Start_Position,End_Position,Variant_Classification,Reference_Allele,Tumor_Seq_Allele2) %>%
     summarise(duplex_support_num = length(which(t_alt_count >= 2))) %>%
     filter(duplex_support_num > 0,.preserve = T) %>%
+    mutate(
+      Hugo_Symbol = as.character(Hugo_Symbol),
+      Chromosome = as.character(Chromosome),
+      Start_Position = as.integer(Start_Position),
+      End_Position = as.integer(End_Position),
+      Variant_Classification = as.character(Variant_Classification),
+      Reference_Allele = as.character(Reference_Allele),
+      Tumor_Seq_Allele2 = as.character(Tumor_Seq_Allele2)
+    ) %>%
     data.table()
 
   # for each patient produce the correct results ----------------------------
