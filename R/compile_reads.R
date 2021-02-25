@@ -9,7 +9,7 @@ compile_reads <- function(
                           master.ref, results.dir, project.ID, pooled.bam.dir = "/juno/work/access/production/resources/msk-access/current/novaseq_curated_duplex_bams_dmp/current/",
                           fasta.path = "/juno/work/access/production/resources/reference/current/Homo_sapiens_assembly19.fasta",
                           genotyper.path = "/work/access/production/resources/tools/GetBaseCountsMultiSample/current/GetBaseCountsMultiSample",
-                          dmp.dir = "/juno/work/access/production/resources/cbioportal/current/mixedpact", mirror.bam.dir = "/juno/res/dmpcollab/dmpshare/share/irb12_245",
+                          dmp.dir = "/juno/work/access/production/resources/cbioportal/current/msk_solid_heme", mirror.bam.dir = "/juno/res/dmpcollab/dmpshare/share/irb12_245",
                           dmp.key.path = "/juno/res/dmpcollab/dmprequest/12-245/key.txt") {
   # # test input section -----------------------------------------------------------
   # master.ref = fread('/juno/work/bergerm1/bergerlab/zhengy1/access_data_analysis/data/example_master_file.csv')
@@ -226,7 +226,7 @@ if (!interactive()) {
     help = "Genotyper executable path [default]"
   )
   parser$add_argument("-dmp", "--dmpdir",
-    type = "character", default = "/juno/work/access/production/resources/cbioportal/current/mixedpact",
+    type = "character", default = "/juno/work/access/production/resources/cbioportal/current/msk_solid_heme",
     help = "Directory of clinical DMP repository [default]"
   )
   parser$add_argument("-mb", "--mirrorbamdir",
