@@ -8,8 +8,8 @@
 compile_reads <- function(
                           master.ref, results.dir, project.ID, pooled.bam.dir = "/juno/work/access/production/resources/msk-access/current/novaseq_curated_duplex_bams_dmp/current/",
                           fasta.path = "/juno/work/access/production/resources/reference/current/Homo_sapiens_assembly19.fasta",
-                          genotyper.path = "/ifs/work/bergerm1/Innovation/software/maysun/GetBaseCountsMultiSample/GetBaseCountsMultiSample",
-                          dmp.dir = "/juno/work/access/production/resources/cbioportal/current/mskimpact", mirror.bam.dir = "/juno/res/dmpcollab/dmpshare/share/irb12_245",
+                          genotyper.path = "/work/access/production/resources/tools/GetBaseCountsMultiSample/current/GetBaseCountsMultiSample",
+                          dmp.dir = "/juno/work/access/production/resources/cbioportal/current/msk_solid_heme", mirror.bam.dir = "/juno/res/dmpcollab/dmpshare/share/irb12_245",
                           dmp.key.path = "/juno/res/dmpcollab/dmprequest/12-245/key.txt") {
   # # test input section -----------------------------------------------------------
   # master.ref = fread('/juno/work/bergerm1/bergerlab/zhengy1/access_data_analysis/data/example_master_file.csv')
@@ -33,11 +33,11 @@ compile_reads <- function(
 
   # data from DMP -----------------------------------------------------------
   DMP.key <- fread(dmp.key.path)
-  if (any(!master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id %in% gsub("-T..-IM.", "", DMP.key[grepl("IM", V1)]$V1))) {
+  if (any(!master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id %in% gsub("-T..-IH.|-T..-IM.|-T..-XS", "", DMP.key[grepl("IH|IM|XS", V1)]$V1))) {
     stop(paste0(
       "These DMP IDs are not found in DMP key file: ",
       paste0(master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id[which(!master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id %in%
-        gsub("-T..-IM.", "", DMP.key[grepl("IM", V1)]$V1))], collapse = " ,")
+        gsub("-T..-IH.|-T..-IM.|-T..-XS", "", DMP.key[grepl("IH|IM|XS", V1)]$V1))], collapse = " ,")
     ))
   }
   DMP.maf <- fread(paste0(dmp.dir, "/data_mutations_extended.txt")) %>%
@@ -63,8 +63,14 @@ compile_reads <- function(
     if (is.na(dmp_id) | dmp_id == '') {
       dmp.sample.sheet <- NULL
     } else {
-      all.dmp.ids <- DMP.key[grepl(paste0(dmp_id, "-T..-IM."), V1)]$V1
-      all.dmp.bam.ids <- DMP.key[grepl(paste0(dmp_id, "-T..-IM."), V1)]$V2
+      all.dmp.ids.IM <- DMP.key[grepl(paste0(dmp_id, "-T..-IM."), V1)]$V1
+      all.dmp.ids.IH <- DMP.key[grepl(paste0(dmp_id, "-T..-IH."), V1)]$V1
+      all.dmp.ids.XS <- DMP.key[grepl(paste0(dmp_id, "-T..-XS."), V1)]$V1
+      all.dmp.ids <- c(all.dmp.ids.IM,all.dmp.ids.IH,all.dmp.ids.XS)
+      all.dmp.bam.ids.IM <- DMP.key[grepl(paste0(dmp_id, "-T..-IM."), V1)]$V2
+      all.dmp.bam.ids.IH <- DMP.key[grepl(paste0(dmp_id, "-T..-IH."), V1)]$V2
+      all.dmp.bam.ids.XS <- DMP.key[grepl(paste0(dmp_id, "-T..-XS."), V1)]$V2
+      all.dmp.bam.ids <- c(all.dmp.bam.ids.IM,all.dmp.bam.ids.IH,all.dmp.bam.ids.XS)
       bam.sub.dir <- unlist(lapply(strsplit(substr(all.dmp.bam.ids, 1, 2), ""), function(x) {
         paste0(x, collapse = "/")
       }))
@@ -85,7 +91,7 @@ compile_reads <- function(
     ] %>%
       merge(rbind(
         unique(master.ref[
-          cmo_patient_id == x,
+          cmo_patient_id == x&paired=='Paired',
           # buffy coat + DMP bams -- standard bam only
           .(
             Sample_Barcode = cmo_sample_id_normal, standard_bam = bam_path_normal,
@@ -126,9 +132,9 @@ compile_reads <- function(
     system(paste0(
       'bsub  -R "rusage[mem=4]" -cwd ', results.dir, "/", x, "/ -oo hotspot.o -eo hotspot.e -W 00:59 ",
       " -P ", project.ID, " -J ", x, "_tag_hotspot ",
-      " python /ifs/work/bergerm1/zhengy1/ACCESS-Pipeline-DEV/cwl_tools/hotspots/tag_hotspots.py ",
+      " python /work/access/production/workflows/access_workflows/v1/pipeline_2.0.0/ACCESS-Pipeline/cwl_tools/hotspots/tag_hotspots.py ",
       " -m ", results.dir, "/", x, "/", x, "_all_unique_calls.maf",
-      " -itxt /ifs/work/bergerm1/Innovation/Resources/Hotspots/hotspot-list-union-v1-v2_with_TERT.txt ",
+      " -itxt /work/access/production/resources/msk-access/current/regions_of_interest/current/hotspot-list-union-v1-v2_with_TERT.txt ",
       " -o ", results.dir, "/", x, "/", x, "_all_unique_calls_hotspots.maf",
       " -outdir ", results.dir, "/", x, "/", x
     ))
@@ -216,12 +222,12 @@ if (!interactive()) {
     help = "Reference fasta path [default]"
   )
   parser$add_argument("-gt", "--genotyperpath",
-    type = "character", default = "/ifs/work/bergerm1/Innovation/software/maysun/GetBaseCountsMultiSample/GetBaseCountsMultiSample",
+    type = "character", default = "/work/access/production/resources/tools/GetBaseCountsMultiSample/current/GetBaseCountsMultiSample",
     help = "Genotyper executable path [default]"
   )
   parser$add_argument("-dmp", "--dmpdir",
-    type = "character", default = "/juno/work/access/production/resources/cbioportal/current/mskimpact",
-    help = "Directory of clinical DMP IMPACT repository [default]"
+    type = "character", default = "/juno/work/access/production/resources/cbioportal/current/msk_solid_heme",
+    help = "Directory of clinical DMP repository [default]"
   )
   parser$add_argument("-mb", "--mirrorbamdir",
     type = "character", default = "/juno/res/dmpcollab/dmpshare/share/irb12_245",
