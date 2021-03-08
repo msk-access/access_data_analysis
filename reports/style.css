@@ -1,0 +1,32 @@
+<style type="text/css">
+h1.title {
+  font-size: 38px;
+  color: dodgerblue;
+  font-family: "Times New Roman", Times, serif;
+  text-align: center;
+}
+h4.author { /* Header 4 - and the author and data headers use this too  */
+  font-size: 18px;
+  font-family: "Times New Roman", Times, serif;
+  color: Black;
+  text-align: center;
+}
+h4.date { /* Header 4 - and the author and data headers use this too  */
+  font-size: 18px;
+  font-family: "Times New Roman", Times, serif;
+  color: Black;
+  text-align: center;
+}
+h1 {
+  color: dodgerblue;
+  font-size: 25px;
+}
+h2 {
+  color: Black;
+  font-size: 20px;
+}
+h3 {
+  color: Black;
+  font-size: 18px;
+}
+</style>
