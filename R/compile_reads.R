@@ -114,7 +114,7 @@ compile_reads <- function(
     }))
     # get impact calls
     impact.calls <- DMP.RET.maf[Tumor_Sample_Barcode %in% sample.sheet$Sample_Barcode]
-    write.table(impact.calls[, .(Hugo_Symbol, Chromosome, Start_Position, End_Position, Variant_Classification, HGVSp_Short, Reference_Allele, Tumor_Seq_Allele2)],
+    write.table(impact.calls[, .(Hugo_Symbol, Chromosome, Start_Position, End_Position, Variant_Classification, HGVSp_Short, Reference_Allele, Tumor_Seq_Allele2, Matched_Norm_Sample_Barcode)],
       paste0(results.dir, "/", x, "/", x, "_impact_calls.maf"),
       sep = "\t", quote = F, row.names = F
     )
