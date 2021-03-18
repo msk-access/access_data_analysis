@@ -12,19 +12,13 @@ parser$add_argument("-p", "--patient-id", required=T, help="Patient ID")
 parser$add_argument("-r", "--results", required=T, help="Path to CSV file containing mutation and genotype results for the patient.")
 parser$add_argument("-rc", "--cna-results-dir", required=T, help="Path to directory containing CNA results for the patient.")
 parser$add_argument("-tt", "--tumor-type", required=T, help="Tumor type")
-parser$add_argument("-m", "--metadata", required=T, help="Path to file containing meta data.")
-parser$add_argument("-d", "--dmp-id", help="DMP patient ID.")
-parser$add_argument("-ds", "--dmp-sample-id", help="DMP sample ID")
-parser$add_argument("-dm", "--dmp-maf", help="Path to DMP MAF file")
+parser$add_argument("-m", "--metadata", required=T, help="Path to file containing meta data for each sample. Should contain a \'cmo_sample_id_plasma\', \'sex\', and \'collection_date\' columns. Can also optionally include a \'timepoint\' column (e.g. for treatment information).")
+parser$add_argument("-d", "--dmp-id", help="DMP patient ID (optional).")
+parser$add_argument("-ds", "--dmp-sample-id", help="DMP sample ID (optional).")
+parser$add_argument("-dm", "--dmp-maf", help="Path to DMP MAF file (optional).")
 parser$add_argument("-o", "--output", help="Output file")
 
 args <- parser$parse_args()
-
-
-treatment_file <- NULL
-if (!is.null(args$treatment)) {
-  treatment_file <- normalizePath(args$treatment)
-}
 
 dmp_maf <- NULL
 if (!is.null(args$dmp_maf)) {
