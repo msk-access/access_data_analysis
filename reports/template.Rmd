@@ -1,11 +1,8 @@
 ---
-title: "{{PATIENT_ID}} ({{DMP_ID}})"
-subtitle: "{{TUMOR_TYPE}}"
 output:
   html_document:
     df_print: paged
 ---
-***
 
 ```{r global_options, include=FALSE}
 knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE, fig.width=10, fig.height=6)
@@ -18,8 +15,36 @@ library(plotly)
 library(scales)
 library(kableExtra)
 library(DT)
+library(RColorBrewer)
 theme_set(theme_bw())
+
+show_text <- TRUE
+
+dmp_id <- "{{DMP_ID}}"
+has_dmp <- F
+if (dmp_id != "") {
+  has_dmp = T
+}
+
 ```
+
+```{r echo=FALSE, eval=show_text}
+
+if (dmp_id != "") {
+  asis_output("# {{PATIENT_ID}} ({{DMP_ID}}) \n")
+} else {
+  asis_output("# {{PATIENT_ID}} \n")
+}
+```
+
+```{r echo=FALSE, eval=show_text}
+if ("{{TUMOR_TYPE}}" != "") {
+  asis_output("### {{TUMOR_TYPE}} \n")
+}
+```
+
+---
+
 
 ```{r read_input, include=FALSE}
 
@@ -30,10 +55,25 @@ impact_sample_id<-"{{DMP_SAMPLE_ID}}"
 impact_ccf_file<-"{{DMP_MAF_PATH}}"
 metadata_file<-"{{METADATA}}"
 
+## read metadata files ##
+metadata <- fread(metadata_file)
+metadata$collection_date <- as.Date(metadata$collection_date, format="%m/%d/%y")
+
 ## Possible timepoints in the treatment info file, and their associated colors
-timepoints<-c("Pre-Treatment", "On-Treatment", "Disease Progression")
-timepointcolors<-c("Khaki","Aquamarine","Light Salmon")
-names(timepointcolors)<-timepoints
+
+timepointcolors <- NULL
+
+if ("timepoint" %in% colnames(metadata)) {
+
+  metadata <- metadata[,c("cmo_sample_id_plasma", "sex", "collection_date", "timepoint")]
+
+  timepoints <- unique(metadata$timepoint)
+  timepointcolors <- brewer.pal(length(timepoints), "Paired")
+  names(timepointcolors) <- timepoints
+} else {
+  metadata <- metadata[,c("cmo_sample_id_plasma", "sex", "collection_date")]
+}
+
 ```
 
 ```{r global_functions, include=FALSE}
@@ -113,18 +153,6 @@ cna_plot<-function(cna, xlimits, xbreaks){
   return(fig)
 }
 
-cna_plot_old<-function(cna_table, xlimits, xbreaks){
-#  cols<-c("red","blue")
-#  names(cols)<-c("AMP","DEL")
-  fig<-ggplot(cna, aes(x=collection_date, y=Hugo_Symbol, fill=fc, cna=CNA, sampleid=cmo_sample_id_plasma)) +
-    geom_tile(col="white", size=2, width=0.7, height=0.7) +
-    scale_fill_gradient2(low="blue",mid="white",high="red",midpoint=0) +
-    theme(legend.title=element_blank(), strip.background = element_blank(), axis.text.x=element_text(angle=90)) +
-    scale_x_date(breaks=xbreaks, limits=xlimits) +
-    xlab("") + theme(legend.position="none")
-  fig<-ggplotly(fig) # %>% layout(showlegend=F, showcale=F)
-  return(fig)
-}
 print_table<-function(table){
   datatable(table, rownames=FALSE, escape=FALSE, options=list(scrollX=T, autoWidth = TRUE))
 }
@@ -134,17 +162,6 @@ print_table<-function(table){
 
 ## read variant files ##
 accesstab<-fread(access_data_analysis_results, na.strings=c("NA",""))
-
-## read metadata files ##
-metadata<-fread(metadata_file)[,c("cmo_sample_id_plasma", "sex", "collection_date", "Timepoint")]
-metadata$collection_date<-as.Date(metadata$collection_date, format="%m/%d/%y")
-
-treatment <- NULL
-if (treatment_info_file != "") {
-  treatment<-fread(treatment_info_file)
-  treatment$collection_date<-as.Date(treatment$collection_date, format="%m/%d/%y")
-  treatment<-treatment[grep(sample,treatment$cmo_sample_id_plasma),] %>% distinct()
-}
 
 dmp <- data.frame()
 if (impact_ccf_file != "") {
@@ -213,10 +230,6 @@ if (nrow(dmp) > 0) {
 final <- merge(combined, metadata, by=c("cmo_sample_id_plasma"), all.x=TRUE)
 final$collection_date <- as.Date(final$collection_date, format="%m/%d/%y")
 
-if (!is.null(treatment)) {
-  final <- merge(final,treatment, by=c("collection_date","cmo_sample_id_plasma"),all.x=TRUE)
-}
-
 # Create a variant name column
 final$VarName=paste(final$Hugo_Symbol, final$HGVSp_Short)
 
@@ -258,12 +271,12 @@ xbreaks<-final$collection_date
 ## Sample information
 ```{r sample-info-table}
 
-cols <- c("cmo_sample_id_plasma", "collection_date", "Timepoint")
-if (!is.null(treatment)) {
-  cols <- c(cols, "Timepoint")
+cols <- c("cmo_sample_id_plasma", "collection_date")
+if (!is.null(timepointcolors)) {
+  cols <- c(cols, "timepoint")
 }
 
-unique(final[,cols]) %>% kable() %>% kable_styling()
+unique(final[, cols]) %>% kable() %>% kable_styling()
 ```
 
 ## SNVs and INDELs{.tabset}
@@ -271,14 +284,19 @@ unique(final[,cols]) %>% kable() %>% kable_styling()
 
 ```{r plot_snvs_linear}
 
-timepoints<-c("Post-NAC Pre-RC", "Post-RC", "Post-TUR Pre-NAC", "Post-TUR Pre-RC")
-timepointcolors<-c("Khaki", "Aquamarine", "Light Salmon", "black")
-names(timepointcolors)<-timepoints
+treatment_table <- NULL
+fig1 <- NULL
 
-treatment_table<-unique(final[,c("cmo_sample_id_plasma","collection_date","Timepoint")])
-fig1<-treatment_plot(treatment_table, xbreaks, timepointcolors, ids=c("collection_date","cmo_sample_id_plasma"))
-fig2<-vaf_plot(final_snv, xlimits, xbreaks, varcolors, yaccuracy=0.01, log=FALSE)
-subplot(fig1,fig2,nrows=2,shareX=TRUE, heights=c(0.1,0.9))
+if (!is.null(timepointcolors)) {
+  treatment_table<-unique(final[,c("cmo_sample_id_plasma","collection_date","timepoint")])
+  fig1<-treatment_plot(treatment_table, xbreaks, timepointcolors, ids=c("collection_date","cmo_sample_id_plasma"))
+  fig2<-vaf_plot(final_snv, xlimits, xbreaks, varcolors, yaccuracy=0.01, log=FALSE)
+  subplot(fig1, fig2, nrows=2,shareX=TRUE, heights=c(0.1,0.9))
+} else {
+  fig1<-vaf_plot(final_snv, xlimits, xbreaks, varcolors, yaccuracy=0.01, log=FALSE)
+  subplot(fig1, nrows=1)
+}
+
 ```
 
 ### Log
@@ -290,7 +308,7 @@ subplot(fig1,fig2,nrows=2,shareX=TRUE, heights=c(0.1,0.9))
 
 ### Table
 ```{r snvs_table}
-print_table(subset(tabletoprint,tabletoprint$VarType=="SNV_INDEL"))
+print_table(subset(tabletoprint, tabletoprint$VarType=="SNV_INDEL"))
 ```
 
 ### Description
@@ -299,19 +317,23 @@ print_table(subset(tabletoprint,tabletoprint$VarType=="SNV_INDEL"))
 * Variants at positions with coverage less than 100 were excluded
 * We are plotting VAF+0.0001 for the log plots.
 
-```{r cna, fig.height=3, fig.width=9}
-if(nrow(cna)>0){
-  cat("## Copy number alterations")
-  fig2<-cna_plot(cna, xlimits, xbreaks)
-  subplot(fig1,fig2,nrows=2,shareX=TRUE, heights=c(0.2,0.7), which_layout=1)
-}
+
+```{asis echo=nrow(cna)>0}
+## Copy number alterations
+```
+```{r cna, fig.height=3, fig.width=9, eval=nrow(cna)>0}
+fig2<-cna_plot(cna, xlimits, xbreaks)
+subplot(fig1,fig2,nrows=2,shareX=TRUE, heights=c(0.2,0.7), which_layout=1)
 ```
 
 
+```{asis echo=has_dmp}
 ## Clonal SNVs/INDELs VAF adjusted for copy number {.tabset}
 
 ### Linear
-```{r adjustedvaf-linear, fig.height=4}
+```
+
+```{r adjustedvaf-linear, fig.height=4, eval=has_dmp}
 clonal <- subset(final, final$clonality=="CLONAL")
 
 if (nrow(clonal)>0) {
@@ -345,21 +367,26 @@ if (nrow(clonal)>0) {
 }
 ```
 
+```{asis echo=has_dmp}
 ### Log
-```{r adjustedvaf-log, fig.height=4}
+```
+```{r adjustedvaf-log, fig.height=4, eval=has_dmp}
 if(nrow(clonal)>0){
   fig2<-vaf_plot(clonaltoplot, xlimits, xbreaks, varcolors, yaccuracy=0.01, log=TRUE, cnadjusted = TRUE)
   subplot(fig1,fig2,nrows=2,shareX=TRUE, heights=c(0.2,0.8))
 }
 ```
 
+```{asis echo=has_dmp}
 ### Table
-```{r snv_clonal_table}
+```
+```{r snv_clonal_table, eval=has_dmp}
 if (nrow(clonal) > 0) {
   print_table(clonal[,c("cmo_sample_id_plasma","collection_date","VarName","tcn","expected_alt_copies","ncn", "vaf","adjustedvaf")])
 }
 ```
 
+```{asis echo=has_dmp}
 ### Description
 
 We adjust the variant allele fractions to account for the copy number alterations of the segments they are in. \
@@ -381,3 +408,4 @@ By solving for this, we get:
 $$P = \frac{N_{CN}*VAF}{T_{ALT} + (N_{CN} - T_{CN})*VAF}$$
 
 For ACCESS samples, we compute this value and call it adjusted VAF (VAF~adj~).
+```
