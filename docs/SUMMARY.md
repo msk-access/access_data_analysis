@@ -17,6 +17,5 @@
 * [Filter Calls](analysis/filter-calls.md)
 * [SV Incorporation](analysis/sv-incorporation.md)
 * [CNA Processing](analysis/cna-processing.md)
-* [Plot All Events](analysis/plot-all-events.md)
+* [Create Patient Report](analysis/create-report.md)
 * [Intermediate File Organization](analysis/intermediate-file-organization.md)
-

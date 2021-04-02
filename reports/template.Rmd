@@ -1,11 +1,8 @@
 ---
-title: "C-4XP507 (P-0033223)"
-subtitle: "Salivary Duct Carcinoma"
 output:
   html_document:
     df_print: paged
 ---
-***
 
 ```{r global_options, include=FALSE}
 knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE, fig.width=10, fig.height=6)
@@ -18,20 +15,65 @@ library(plotly)
 library(scales)
 library(kableExtra)
 library(DT)
+library(RColorBrewer)
 theme_set(theme_bw())
+
+show_text <- TRUE
+
+dmp_id <- "{{DMP_ID}}"
+has_dmp <- F
+if (dmp_id != "") {
+  has_dmp = T
+}
+
 ```
 
-```{r read-input, include=FALSE}
-sample="C-4XP507"
-access_data_analysis_results_dir<-"/juno/work/bergerm1/bergerlab/access_projects/Project_06302_TDM1/access_data_analysis_results_v3"
-impact_sample_id<-"P-0033223-T02-IM6"
-impact_ccf_file<-"/juno/work/ccs/shared/resources/impact/facets/all/P-00332/P-0033223-T02-IM6_P-0033223-N01-IM6/default/P-0033223-T02-IM6_P-0033223-N01-IM6.ccf.maf"
-metadata_file<-"/juno/work/bergerm1/bergerlab/access_projects/Project_06302_TDM1/metadata/for_access_data_analysis.2020-08-26.csv"
-treatment_info_file<-"/juno/work/bergerm1/bergerlab/access_projects/Project_06302_TDM1/metadata/tdm1_treatment_info.tsv"
+```{r echo=FALSE, eval=show_text}
+
+if (dmp_id != "") {
+  asis_output("# {{PATIENT_ID}} ({{DMP_ID}}) \n")
+} else {
+  asis_output("# {{PATIENT_ID}} \n")
+}
+```
+
+```{r echo=FALSE, eval=show_text}
+if ("{{TUMOR_TYPE}}" != "") {
+  asis_output("### {{TUMOR_TYPE}} \n")
+}
+```
+
+---
+
+
+```{r read_input, include=FALSE}
+
+sample="{{PATIENT_ID}}"
+access_data_analysis_results<-"{{RESULTS}}"
+access_data_analysis_cna_dir<-"{{CNA_RESULTS_DIR}}"
+impact_sample_id<-"{{DMP_SAMPLE_ID}}"
+impact_ccf_file<-"{{DMP_MAF_PATH}}"
+metadata_file<-"{{METADATA}}"
+
+## read metadata files ##
+metadata <- fread(metadata_file)
+metadata$collection_date <- as.Date(metadata$collection_date, format="%m/%d/%y")
+
 ## Possible timepoints in the treatment info file, and their associated colors
-timepoints<-c("Pre-Treatment", "On-Treatment", "Disease Progression")
-timepointcolors<-c("Khaki","Aquamarine","Light Salmon")
-names(timepointcolors)<-timepoints
+
+timepointcolors <- NULL
+
+if ("timepoint" %in% colnames(metadata)) {
+
+  metadata <- metadata[,c("cmo_sample_id_plasma", "sex", "collection_date", "timepoint")]
+
+  timepoints <- unique(metadata$timepoint)
+  timepointcolors <- brewer.pal(length(timepoints), "Paired")
+  names(timepointcolors) <- timepoints
+} else {
+  metadata <- metadata[,c("cmo_sample_id_plasma", "sex", "collection_date")]
+}
+
 ```
 
 ```{r global_functions, include=FALSE}
@@ -68,12 +110,12 @@ vaf_plot <- function(variant_table, xlimits, xbreaks, varcolors, yaccuracy=0.01,
         ylab("VAF")
     }
   }
-  fig<-fig + geom_point() + 
-    geom_line(aes(group=VarName)) + 
-    facet_grid(clonality~.) + 
+  fig<-fig + geom_point() +
+    geom_line(aes(group=VarName)) +
+    facet_grid(clonality~.) +
     theme(legend.title=element_blank(), strip.background = element_blank(), axis.text.x = element_text(angle=90)) +
-    scale_color_manual(values = varcolors) + 
-    scale_x_date(breaks=xbreaks, limits=xlimits) + 
+    scale_color_manual(values = varcolors) +
+    scale_x_date(breaks=xbreaks, limits=xlimits) +
     xlab("")
   if(cnadjusted==FALSE){
     fig<-ggplotly(fig, tooltip=c("collection_date","vaf","VarName","Hotspot","cmo_sample_id_plasma"))
@@ -90,8 +132,8 @@ treatment_plot <- function(treatment_table, xbreaks, colors, ids=c("collection_d
   tmp<-melt(treatment_table, id=ids)
   tmp$value<-factor(tmp$value, levels=names(colors))
   fig<-ggplot(tmp, aes(x=collection_date, y=variable, fill=value)) +
-    geom_tile() + 
-    theme(panel.grid=element_blank(), legend.title = element_blank()) + 
+    geom_tile() +
+    theme(panel.grid=element_blank(), legend.title = element_blank()) +
     scale_x_date(breaks=xbreaks) +
     scale_fill_manual(values=colors)
   fig<-ggplotly(fig)
@@ -111,39 +153,21 @@ cna_plot<-function(cna, xlimits, xbreaks){
   return(fig)
 }
 
-cna_plot_old<-function(cna_table, xlimits, xbreaks){
-#  cols<-c("red","blue")
-#  names(cols)<-c("AMP","DEL")
-  fig<-ggplot(cna, aes(x=collection_date, y=Hugo_Symbol, fill=fc, cna=CNA, sampleid=cmo_sample_id_plasma)) +
-    geom_tile(col="white", size=2, width=0.7, height=0.7) +
-    scale_fill_gradient2(low="blue",mid="white",high="red",midpoint=0) +
-    theme(legend.title=element_blank(), strip.background = element_blank(), axis.text.x=element_text(angle=90)) +
-    scale_x_date(breaks=xbreaks, limits=xlimits) +
-    xlab("") + theme(legend.position="none")
-  fig<-ggplotly(fig) # %>% layout(showlegend=F, showcale=F)
-  return(fig)
-}
 print_table<-function(table){
   datatable(table, rownames=FALSE, escape=FALSE, options=list(scrollX=T, autoWidth = TRUE))
 }
 ```
 
-```{r read_input}
+```{r read_input1, include=FALSE}
 
 ## read variant files ##
-accesstab<-fread(paste0(access_data_analysis_results_dir, "/results_stringent_combined/",sample,"_table.csv"),na.strings=c("NA",""))
+accesstab<-fread(access_data_analysis_results, na.strings=c("NA",""))
 
-dmp<-fread(impact_ccf_file)[,c("Hugo_Symbol", "Chromosome", "Start_Position", "Reference_Allele", "Tumor_Seq_Allele2", "tcn", "expected_alt_copies", "clonality")]
-dmp$Chromosome<-as.character(dmp$Chromosome)
-
-
-## read metadata files ##
-metadata<-fread(metadata_file)[,c("cmo_sample_id_plasma", "sex", "collection_date")]
-metadata$collection_date<-as.Date(metadata$collection_date, format="%m/%d/%Y")
-treatment<-fread(treatment_info_file)
-treatment$collection_date<-as.Date(treatment$collection_date, format="%m/%d/%Y")
-treatment<-treatment[grep(sample,treatment$cmo_sample_id_plasma),] %>% distinct()
-
+dmp <- data.frame()
+if (impact_ccf_file != "") {
+  dmp<-fread(impact_ccf_file)[,c("Hugo_Symbol", "Chromosome", "Start_Position", "Reference_Allele", "Tumor_Seq_Allele2", "tcn", "expected_alt_copies", "clonality")]
+  dmp$Chromosome<-as.character(dmp$Chromosome)
+}
 
 ## ACCESS variants ##
 tab1<-accesstab[,c("Hugo_Symbol","Chromosome", "Start_Position", "Variant_Classification", "HGVSp_Short", "Reference_Allele", "Tumor_Seq_Allele2", "Hotspot", "DMP", "CH")]
@@ -151,48 +175,60 @@ tab2<-accesstab %>% select(matches("__total$"))
 colnames(tab2)<-gsub("___total","",colnames(tab2))
 cmo_sample_id_order<-metadata$cmo_sample_id_plasma[order(metadata$collection_date)]
 cmo_sample_id_order<-cmo_sample_id_order[cmo_sample_id_order %in% colnames(tab2)]
-tab2<-data.frame(tab2,check.names=FALSE)[,cmo_sample_id_order]
+tab2<-data.frame(tab2,check.names=FALSE)[,cmo_sample_id_order, drop=FALSE]
 tab3<-accesstab %>% select(matches("__DMP_Tumor$"))
 colnames(tab3)<-gsub("___DMP_Tumor","",colnames(tab3))
 
 dmpsamples<-colnames(tab3)
 tab<-cbind(tab1,tab2)
 tab<-cbind(tab,tab3)
-tab$VarType<-"SNV_INDEL"
+tab$VarType <- "SNV_INDEL"
 tab[grep("__",tab$Hugo_Symbol),"VarType"]<-"SV"
 
 tab$Hugo_Symbol<- gsub("__","-",tab$Hugo_Symbol)
 tab$Chromosome<-as.character(tab$Chromosome)
-tabletoprint<-merge(tab, dmp, all.x=TRUE)
+
+if (nrow(dmp) > 0) {
+  tabletoprint<-merge(tab, dmp, all.x=TRUE)
+} else {
+  tabletoprint <- tab
+}
 
 ## read CNA files ##
-all.cna.files <- list.files(path = paste0(access_data_analysis_results_dir,"/CNA_final_call_set"),pattern = sample, full.names=TRUE)
+all.cna.files <- list.files(path = access_data_analysis_cna_dir, pattern = sample, full.names=TRUE)
 cna<-do.call('rbind', lapply(all.cna.files,fread)) %>% rename(cmo_sample_id_plasma=Tumor_Sample_Barcode)
+
 if( nrow(cna) > 0){
   cna<-merge(cna, metadata,by=c("cmo_sample_id_plasma"))
-  cna$collection_date<-as.Date(cna$collection_date, format="%m/%d/%Y")
+  cna$collection_date<-as.Date(cna$collection_date, format="%m/%d/%y")
   cna$fc<-as.numeric(cna$fc)
 }
+
 ```
 
 ```{r prepare_data}
 
 ## Get VAFs of variants ##
-temp <- melt(tab, id=c("Hugo_Symbol","Chromosome", "Start_Position", "Variant_Classification", "HGVSp_Short", "Reference_Allele", "Tumor_Seq_Allele2", "Hotspot", "DMP", "CH", "VarType",dmpsamples)) %>% separate(col=value, into=c("num1", "num2", "num3"))
+
+temp <- melt(tab, id=c("Hugo_Symbol","Chromosome", "Start_Position", "Variant_Classification", "HGVSp_Short", "Reference_Allele", "Tumor_Seq_Allele2", "Hotspot", "DMP", "CH", "VarType", dmpsamples)) %>% separate(col=value, into=c("num1", "num2", "num3"))
 temp$vaf = as.numeric(temp$num1)/as.numeric(temp$num2)
 temp$total=temp$num2
 tempsv<-subset(temp,temp$VarType=="SV")
-temp[which(temp$VarType=="SV"),"vaf"] = (as.numeric(tempsv$num1)+as.numeric(tempsv$num2))/as.numeric(tempsv$num3)
-temp[which(temp$VarType=="SV"),"total"]=tempsv$num3
+temp[which(temp$VarType=="SV"), "vaf"] = (as.numeric(tempsv$num1)+as.numeric(tempsv$num2))/as.numeric(tempsv$num3)
+temp[which(temp$VarType=="SV"), "total"]=tempsv$num3
 temp$Chromosome <- as.character(temp$Chromosome)
 temp$vaf=temp$vaf
 
-# merge with DMP
-combined<-merge(temp, dmp, all.x=TRUE) %>% rename(cmo_sample_id_plasma = variable)
+if (nrow(dmp) > 0) {
+  # merge with DMP
+  combined <- merge(temp, dmp, all.x=TRUE) %>% rename(cmo_sample_id_plasma = variable)
+} else {
+  combined <- temp %>% rename(cmo_sample_id_plasma = variable)
+  combined[, "clonality"] <- NA
+}
 
-final<-merge(combined, metadata, by=c("cmo_sample_id_plasma"), all.x=TRUE)
-final$collection_date<-as.Date(final$collection_date, format="%m/%d/%Y")
-final<-merge(final,treatment,by=c("collection_date","cmo_sample_id_plasma"),all.x=TRUE)
+final <- merge(combined, metadata, by=c("cmo_sample_id_plasma"), all.x=TRUE)
+final$collection_date <- as.Date(final$collection_date, format="%m/%d/%y")
 
 # Create a variant name column
 final$VarName=paste(final$Hugo_Symbol, final$HGVSp_Short)
@@ -208,7 +244,7 @@ final[which(final$VarType=="SV"),"VarName"]<-final$Hugo_Symbol[which(final$VarTy
 # Select variant colors
 
 final$vaf<-round(final$vaf,4)
-final<-final[!is.na(final$vaf)]
+final<-final[!is.na(final$vaf),]
 final$total<-as.numeric(final$total)
 final<-subset(final, final$total>=100)
 vafsum<-aggregate(final$vaf,by=list(VarName=final$VarName),FUN=sum)
@@ -223,8 +259,10 @@ final_snv[is.na(final_snv$clonality),"clonality"]<-"ACCESS-only"
 
 final_snv$clonality<-factor(final_snv$clonality, levels=c("CLONAL","SUBCLONAL","INDETERMINATE","ACCESS-only"))
 final_sv<-subset(final,final$VarType=="SV")
-final_sv$clonality="ACCESS-only"
-final_sv[which(final_sv$DMP=="Signed out"),"clonality"]="IMPACT"
+if (nrow(final_sv) > 0) {
+  final_sv[, "clonality"] = "ACCESS-only"
+  final_sv[which(final_sv$DMP=="Signed out"),"clonality"]="IMPACT"
+}
 
 xlimits<-c(min(final$collection_date)-10, max(final$collection_date)+10)
 xbreaks<-final$collection_date
@@ -232,80 +270,125 @@ xbreaks<-final$collection_date
 
 ## Sample information
 ```{r sample-info-table}
-unique(final[,c("cmo_sample_id_plasma","collection_date","Timepoint")]) %>% kable() %>% kable_styling()
+
+cols <- c("cmo_sample_id_plasma", "collection_date")
+if (!is.null(timepointcolors)) {
+  cols <- c(cols, "timepoint")
+}
+
+unique(final[, cols]) %>% kable() %>% kable_styling()
 ```
 
 ## SNVs and INDELs{.tabset}
 ### Linear
 
 ```{r plot_snvs_linear}
-treatment_table<-unique(final[,c("cmo_sample_id_plasma","collection_date","Timepoint")])
-fig1<-treatment_plot(treatment_table, xbreaks, timepointcolors, ids=c("collection_date","cmo_sample_id_plasma"))
-fig2<-vaf_plot(final_snv, xlimits, xbreaks, varcolors, yaccuracy=0.01, log=FALSE)
-subplot(fig1,fig2,nrows=2,shareX=TRUE, heights=c(0.1,0.9))
+
+treatment_table <- NULL
+fig1 <- NULL
+
+if (!is.null(timepointcolors) && nrow(final_snv) > 0) {
+  treatment_table<-unique(final[,c("cmo_sample_id_plasma","collection_date","timepoint")])
+  fig1<-treatment_plot(treatment_table, xbreaks, timepointcolors, ids=c("collection_date","cmo_sample_id_plasma"))
+  fig2<-vaf_plot(final_snv, xlimits, xbreaks, varcolors, yaccuracy=0.01, log=FALSE)
+  subplot(fig1, fig2, nrows=2,shareX=TRUE, heights=c(0.1,0.9))
+} else if (nrow(final_snv) > 0) {
+  fig1<-vaf_plot(final_snv, xlimits, xbreaks, varcolors, yaccuracy=0.01, log=FALSE)
+  subplot(fig1, nrows=1)
+}
+
 ```
 
 ### Log
 
 ```{r plot_snvs_log}
-fig2<-vaf_plot(final_snv, xlimits, xbreaks, varcolors, yaccuracy=0.01, log=TRUE)
-subplot(fig1,fig2,nrows=2,shareX=TRUE, heights=c(0.1,0.9))
+if (nrow(final_snv) > 0) {
+  fig2<-vaf_plot(final_snv, xlimits, xbreaks, varcolors, yaccuracy=0.01, log=TRUE)
+  subplot(fig1,fig2,nrows=2,shareX=TRUE, heights=c(0.1,0.9))
+}
 ```
 
 ### Table
 ```{r snvs_table}
-print_table(subset(tabletoprint,tabletoprint$VarType=="SNV_INDEL"))
+print_table(subset(tabletoprint, tabletoprint$VarType=="SNV_INDEL"))
 ```
 
 ### Description
 * We used FACETS results of `r toString(impact_sample_id)` to identify CLONAL, SUBCLONAL or INDETERMINATE mutations.
 * Mutations that were not called in `r toString(impact_sample_id)` are labeled as ACCESS-only.
 * Variants at positions with coverage less than 100 were excluded
-* We are plotting VAF+0.0001 for the log plots. 
+* We are plotting VAF+0.0001 for the log plots.
 
+
+```{asis echo=nrow(cna)>0}
 ## Copy number alterations
-```{r cna, fig.height=3, fig.width=9}
-if(nrow(cna)>0){
-  fig2<-cna_plot(cna, xlimits, xbreaks)
-  subplot(fig1,fig2,nrows=2,shareX=TRUE, heights=c(0.2,0.7), which_layout=1)
-}
+```
+```{r cna, fig.height=3, fig.width=9, eval=nrow(cna)>0}
+fig2<-cna_plot(cna, xlimits, xbreaks)
+subplot(fig1,fig2,nrows=2,shareX=TRUE, heights=c(0.2,0.7), which_layout=1)
 ```
 
 
+```{asis echo=has_dmp}
 ## Clonal SNVs/INDELs VAF adjusted for copy number {.tabset}
 
 ### Linear
-```{r adjustedvaf-linear, fig.height=4}
-clonal<-subset(final,final$clonality=="CLONAL")
-if(nrow(clonal)>0){
+```
+
+```{r adjustedvaf-linear, fig.height=4, eval=has_dmp}
+clonal <- subset(final, final$clonality=="CLONAL")
+
+if (nrow(clonal)>0) {
   clonal$ncn <- 2
-  clonal[which((clonal$Chromosome=="X" | clonal$Chromosome=="Y") & clonal$sex == "M"),"ncn"]<-1
-  clonal$adjustedvaf<-clonal$vaf*clonal$ncn / (clonal$expected_alt_copies + (clonal$ncn - clonal$tcn)*clonal$vaf)
-  clonal$adjustedvaf<-round(clonal$adjustedvaf,4)
-  clonaltoplot<-clonal
-  if(length(unique(clonal$VarName))>1){
-   clonaltoplot<-rbind(clonal,data.frame(clonal[,c("vaf","adjustedvaf","collection_date", "cmo_sample_id_plasma")] %>% group_by(cmo_sample_id_plasma,collection_date) %>% summarize_all(list(mean)) %>% mutate(clonality="CLONAL", VarName="average")),fill=TRUE)
-   clonaltoplot$vaf<-round(clonaltoplot$vaf,4)
-   clonaltoplot$adjustedvaf<-round(clonaltoplot$adjustedvaf,4)
+  clonal[which((clonal$Chromosome=="X" | clonal$Chromosome=="Y") & clonal$sex == "M"),"ncn"] <- 1
+  clonal$adjustedvaf <- clonal$vaf*clonal$ncn / (clonal$expected_alt_copies + (clonal$ncn - clonal$tcn)*clonal$vaf)
+  clonal$adjustedvaf <- round(clonal$adjustedvaf,4)
+  clonaltoplot <- clonal
+
+  if (length(unique(clonal$VarName))>1) {
+
+    write.csv(clonal, '/Users/charlesmurphy/Desktop/mskcc-analyses/210205_Project_11442/analyses/210222_initial/patient_reports/clonal.csv')
+
+    clonal_mean <- data.frame(
+      clonal[,c("vaf", "adjustedvaf", "collection_date", "cmo_sample_id_plasma")] %>%
+      group_by(cmo_sample_id_plasma, collection_date) %>%
+      summarize_all(mean) %>%
+      mutate(clonality="CLONAL", VarName="average")
+    )
+
+    common_cols <- c("cmo_sample_id_plasma", "collection_date", "vaf", "adjustedvaf", "Hotspot", "clonality", "VarName")
+    clonal_mean[,"Hotspot"] <- NA
+
+    clonaltoplot<-rbind(clonal[, common_cols], clonal_mean[, common_cols])
+    clonaltoplot$vaf<-round(clonaltoplot$vaf,4)
+    clonaltoplot$adjustedvaf<-round(clonaltoplot$adjustedvaf,4)
   }
+
   fig2<-vaf_plot(clonaltoplot, xlimits, xbreaks, varcolors, yaccuracy=0.01, log=FALSE, cnadjusted = TRUE)
   subplot(fig1,fig2,nrows=2,shareX=TRUE, heights=c(0.2,0.8))
 }
 ```
 
+```{asis echo=has_dmp}
 ### Log
-```{r adjustedvaf-log, fig.height=4}
+```
+```{r adjustedvaf-log, fig.height=4, eval=has_dmp}
 if(nrow(clonal)>0){
   fig2<-vaf_plot(clonaltoplot, xlimits, xbreaks, varcolors, yaccuracy=0.01, log=TRUE, cnadjusted = TRUE)
   subplot(fig1,fig2,nrows=2,shareX=TRUE, heights=c(0.2,0.8))
 }
 ```
 
+```{asis echo=has_dmp}
 ### Table
-```{r snv_clonal_table}
-print_table(clonal[,c("cmo_sample_id_plasma","collection_date","VarName","tcn","expected_alt_copies","ncn", "vaf","adjustedvaf")])
+```
+```{r snv_clonal_table, eval=has_dmp}
+if (nrow(clonal) > 0) {
+  print_table(clonal[,c("cmo_sample_id_plasma","collection_date","VarName","tcn","expected_alt_copies","ncn", "vaf","adjustedvaf")])
+}
 ```
 
+```{asis echo=has_dmp}
 ### Description
 
 We adjust the variant allele fractions to account for the copy number alterations of the segments they are in. \
@@ -327,3 +410,4 @@ By solving for this, we get:
 $$P = \frac{N_{CN}*VAF}{T_{ALT} + (N_{CN} - T_{CN})*VAF}$$
 
 For ACCESS samples, we compute this value and call it adjusted VAF (VAF~adj~).
+```
