@@ -287,12 +287,12 @@ unique(final[, cols]) %>% kable() %>% kable_styling()
 treatment_table <- NULL
 fig1 <- NULL
 
-if (!is.null(timepointcolors)) {
+if (!is.null(timepointcolors) && nrow(final_snv) > 0) {
   treatment_table<-unique(final[,c("cmo_sample_id_plasma","collection_date","timepoint")])
   fig1<-treatment_plot(treatment_table, xbreaks, timepointcolors, ids=c("collection_date","cmo_sample_id_plasma"))
   fig2<-vaf_plot(final_snv, xlimits, xbreaks, varcolors, yaccuracy=0.01, log=FALSE)
   subplot(fig1, fig2, nrows=2,shareX=TRUE, heights=c(0.1,0.9))
-} else {
+} else if (nrow(final_snv) > 0) {
   fig1<-vaf_plot(final_snv, xlimits, xbreaks, varcolors, yaccuracy=0.01, log=FALSE)
   subplot(fig1, nrows=1)
 }
@@ -302,8 +302,10 @@ if (!is.null(timepointcolors)) {
 ### Log
 
 ```{r plot_snvs_log}
-fig2<-vaf_plot(final_snv, xlimits, xbreaks, varcolors, yaccuracy=0.01, log=TRUE)
-subplot(fig1,fig2,nrows=2,shareX=TRUE, heights=c(0.1,0.9))
+if (nrow(final_snv) > 0) {
+  fig2<-vaf_plot(final_snv, xlimits, xbreaks, varcolors, yaccuracy=0.01, log=TRUE)
+  subplot(fig1,fig2,nrows=2,shareX=TRUE, heights=c(0.1,0.9))
+}
 ```
 
 ### Table
