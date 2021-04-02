@@ -43,8 +43,7 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 
-# gitbook
-docs/*
+
 
 # MAC
 .DS_Store
