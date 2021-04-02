@@ -85,7 +85,7 @@ compile_reads <- function(
       cmo_patient_id == x,
       # plasma bams -- duplex and simplex bam
       .(
-        Sample_Barcode = cmo_sample_id_plasma, duplex_bam = bam_path_plasma_duplex,
+        Sample_Barcode = as.character(cmo_sample_id_plasma), duplex_bam = bam_path_plasma_duplex,
         simplex_bam = bam_path_plasma_simplex, cmo_patient_id, Sample_Type = "duplex", dmp_patient_id
       )
     ] %>%
@@ -94,7 +94,7 @@ compile_reads <- function(
           cmo_patient_id == x&paired=='Paired',
           # buffy coat + DMP bams -- standard bam only
           .(
-            Sample_Barcode = cmo_sample_id_normal, standard_bam = bam_path_normal,
+            Sample_Barcode = as.character(cmo_sample_id_normal), standard_bam = bam_path_normal,
             cmo_patient_id, Sample_Type = "unfilterednormal", dmp_patient_id
           )
         ]),
