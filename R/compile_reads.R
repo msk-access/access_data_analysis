@@ -63,13 +63,13 @@ compile_reads <- function(
     if (is.na(dmp_id) | dmp_id == '') {
       dmp.sample.sheet <- NULL
     } else {
-      all.dmp.ids.IM <- DMP.key[grepl(paste0(dmp_id, "-T..-IM."), V1)]$V1
-      all.dmp.ids.IH <- DMP.key[grepl(paste0(dmp_id, "-T..-IH."), V1)]$V1
-      all.dmp.ids.XS <- DMP.key[grepl(paste0(dmp_id, "-T..-XS."), V1)]$V1
+      all.dmp.ids.IM <- DMP.key[grepl(paste0(dmp_id, "-(T|N)..-IM."), V1)]$V1
+      all.dmp.ids.IH <- DMP.key[grepl(paste0(dmp_id, "-(T|N)..-IH."), V1)]$V1
+      all.dmp.ids.XS <- DMP.key[grepl(paste0(dmp_id, "-(T|N)..-XS."), V1)]$V1
       all.dmp.ids <- c(all.dmp.ids.IM,all.dmp.ids.IH,all.dmp.ids.XS)
-      all.dmp.bam.ids.IM <- DMP.key[grepl(paste0(dmp_id, "-T..-IM."), V1)]$V2
-      all.dmp.bam.ids.IH <- DMP.key[grepl(paste0(dmp_id, "-T..-IH."), V1)]$V2
-      all.dmp.bam.ids.XS <- DMP.key[grepl(paste0(dmp_id, "-T..-XS."), V1)]$V2
+      all.dmp.bam.ids.IM <- DMP.key[grepl(paste0(dmp_id, "-(T|N)..-IM."), V1)]$V2
+      all.dmp.bam.ids.IH <- DMP.key[grepl(paste0(dmp_id, "-(T|N)..-IH."), V1)]$V2
+      all.dmp.bam.ids.XS <- DMP.key[grepl(paste0(dmp_id, "-(T|N)..-XS."), V1)]$V2
       all.dmp.bam.ids <- c(all.dmp.bam.ids.IM,all.dmp.bam.ids.IH,all.dmp.bam.ids.XS)
       bam.sub.dir <- unlist(lapply(strsplit(substr(all.dmp.bam.ids, 1, 2), ""), function(x) {
         paste0(x, collapse = "/")
