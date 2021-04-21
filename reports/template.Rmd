@@ -176,8 +176,9 @@ colnames(tab2)<-gsub("___total","",colnames(tab2))
 cmo_sample_id_order<-metadata$cmo_sample_id_plasma[order(metadata$collection_date)]
 cmo_sample_id_order<-cmo_sample_id_order[cmo_sample_id_order %in% colnames(tab2)]
 tab2<-data.frame(tab2,check.names=FALSE)[,cmo_sample_id_order, drop=FALSE]
-tab3<-accesstab %>% select(matches("__DMP_Tumor$"))
+tab3<-accesstab %>% select(matches("__DMP_(Tumor|Normal)$"))
 colnames(tab3)<-gsub("___DMP_Tumor","",colnames(tab3))
+colnames(tab3)<-gsub("___DMP_Normal","",colnames(tab3))
 
 dmpsamples<-colnames(tab3)
 tab<-cbind(tab1,tab2)
