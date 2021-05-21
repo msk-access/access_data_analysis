@@ -68,7 +68,9 @@ if ("timepoint" %in% colnames(metadata)) {
   metadata <- metadata[,c("cmo_sample_id_plasma", "sex", "collection_date", "timepoint")]
 
   timepoints <- unique(metadata$timepoint)
-  timepointcolors <- brewer.pal(length(timepoints), "Paired")
+  colorcount <- length(timepoints)
+  getPalette = colorRampPalette(brewer.pal(12, "Paired"))
+  timepointcolors <- getPalette(colorcount)
   names(timepointcolors) <- timepoints
 } else {
   metadata <- metadata[,c("cmo_sample_id_plasma", "sex", "collection_date")]
@@ -337,6 +339,10 @@ subplot(fig1,fig2,nrows=2,shareX=TRUE, heights=c(0.2,0.7), which_layout=1)
 ```
 
 ```{r adjustedvaf-linear, fig.height=4, eval=has_dmp}
+sample="{{PATIENT_ID}}"
+filename = paste(sample,"_clona.csv")
+path = getwd()
+file_path = file.path(path,filename)
 clonal <- subset(final, final$clonality=="CLONAL")
 
 if (nrow(clonal)>0) {
@@ -348,7 +354,7 @@ if (nrow(clonal)>0) {
 
   if (length(unique(clonal$VarName))>1) {
 
-    write.csv(clonal, '/Users/charlesmurphy/Desktop/mskcc-analyses/210205_Project_11442/analyses/210222_initial/patient_reports/clonal.csv')
+    write.csv(clonal, file_path)
 
     clonal_mean <- data.frame(
       clonal[,c("vaf", "adjustedvaf", "collection_date", "cmo_sample_id_plasma")] %>%
