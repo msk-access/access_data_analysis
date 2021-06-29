@@ -70,19 +70,22 @@ def main(
     # Read Identifiers
     if not id:
         file = open(ids)
-        id = file.readlines()
+        id = file.read().splitlines()[1:]
         file.close()
     #filter for ids
     ns=set(id)
     pattern = "|".join([r'\b{}\b'.format(i) for i in ns])
     result = maf_df[maf_df['Tumor_Sample_Barcode'].str.contains(pattern, regex=True)]
+    results_covered = result.copy(deep=True)
     # Read bed file
     b = BedFile(bed.as_posix())
     # Our chromosome column is 'Chromosome' and position column is 'Start_Position'.
-    result['covered'] = b.lookup_df(result, 'Chromosome', 'Start_Position')
-    result.loc[result['covered'].notnull(),'covered'] = 'yes'
-    result.loc[result['covered'].isnull(),'covered'] = 'no'
-    result.drop_duplicates().to_csv(output_file, sep='\t', index=False)   
+    results_covered['covered'] = b.lookup_df(results_covered, 'Chromosome', 'Start_Position')
+    results_covered.loc[results_covered['covered'].notnull(),'covered'] = 'yes'
+    results_covered.loc[results_covered['covered'].notna(),'covered'] = 'yes'
+    results_covered.loc[results_covered['covered'].isnull(),'covered'] = 'no'
+    results_covered.loc[results_covered['covered'].isna(),'covered'] = 'no'
+    results_covered.drop_duplicates().to_csv(output_file, sep='\t', index=False)   
 
 if __name__ == "__main__":
     typer.run(main)
