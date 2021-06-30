@@ -13,6 +13,8 @@ def validate_date(date_string):
             return date_obj
         except ValueError:
             pass
+        except:
+            print("Something else went wrong")
     raise ValueError('no valid date format found')
 
 def main(
@@ -85,6 +87,10 @@ def main(
                 except IndexError as e:
                     print(i ,"patient does not have second preference timepoint:", timepoint_label_for_baseline_second,"\n")
                     print(e)
+                except:
+                    print("Something else went wrong")
+        except:
+            print("Something else went wrong")
         #convert to days
         days_list = []
         for a, b in zip(t_df['collection_date'], t_df['timepoint']):
