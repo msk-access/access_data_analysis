@@ -1,4 +1,4 @@
-## Convert Dates to Days
+# Convert Dates to Days
 
 Tool to do the following operations:
 
@@ -11,19 +11,19 @@ Tool to do the following operations:
   - MM/DD/YYYY
   - YYYY/MM/DD
 
-### Requirements
+## Requirements
 
 - pandas
 - typing
 - arrow
 
-### Example command
+## Example command
 
 ```bash
 python convert_dates_to_days.py -i ./example_input.txt -t2 "SCREEN"
 ```
 
-### Usage
+## Usage
 
 ```bash
 > python convert_dates_to_days.py --help
