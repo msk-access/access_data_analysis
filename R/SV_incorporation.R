@@ -159,7 +159,7 @@ if (!interactive()) {
   parser=ArgumentParser()
   parser$add_argument('-m', '--masterref', type='character', help='File path to master reference file')
   parser$add_argument('-o', '--resultsdir', type='character', help='Output directory')
-  parser$add_argument('-dmp', '--dmpdir', type='character', default = '/juno/work/access/production/resources/cbioportal/current/mskimpact',
+  parser$add_argument('-dmp', '--dmpdir', type='character', default = '/juno/work/access/production/resources/cbioportal/current/msk_solid_heme',
                       help='Directory of clinical DMP IMPACT repository [default]')
   parser$add_argument('-genes', '--genelist', type='character', default = '/work/access/production/resources/msk-access/current/regions_of_interest/current/MSK-ACCESS-v1_0-target_genes.list',
                       help='File path to genes covered by ACCESS [default]')
