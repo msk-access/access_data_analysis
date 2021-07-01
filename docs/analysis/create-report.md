@@ -28,9 +28,10 @@ If you provided an IMPACT sample, this last section will show SNV/INDEL events t
 
 ```text
 Rscript reports/create_report.R -h                                      
-usage: create_report.R [-h] -t TEMPLATE -p PATIENT_ID -r RESULTS -rc
-                       CNA_RESULTS_DIR -tt TUMOR_TYPE -m METADATA [-d DMP_ID]
-                       [-ds DMP_SAMPLE_ID] [-dm DMP_MAF] [-o OUTPUT]
+usage: reports/create_report.R [-h] -t TEMPLATE -p PATIENT_ID -r RESULTS -rc
+                               CNA_RESULTS_DIR -tt TUMOR_TYPE -m METADATA
+                               [-d DMP_ID] [-ds DMP_SAMPLE_ID] [-dm DMP_MAF]
+                               [-o OUTPUT] [-ca] [-pi]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -47,10 +48,10 @@ optional arguments:
   -tt TUMOR_TYPE, --tumor-type TUMOR_TYPE
                         Tumor type
   -m METADATA, --metadata METADATA
-                        Path to file containing meta data. Should contain a
-                        'cmo_sample_id_plasma', 'sex', and 'collection_date'
-                        columns. Can also optionally include a 'timepoint'
-                        column (e.g. for treatment information).
+                        Path to file containing meta data for each sample.
+                        Should contain a 'cmo_sample_id_plasma', 'sex', and
+                        'collection_date' columns. Can also optionally include
+                        a 'timepoint' column (e.g. for treatment information).
   -d DMP_ID, --dmp-id DMP_ID
                         DMP patient ID (optional).
   -ds DMP_SAMPLE_ID, --dmp-sample-id DMP_SAMPLE_ID
@@ -59,5 +60,8 @@ optional arguments:
                         Path to DMP MAF file (optional).
   -o OUTPUT, --output OUTPUT
                         Output file
+  -ca, --combine-access
+                        Don't splite VAF plots by clonality.
+  -pi, --plot-impact    Also plot VAFs from IMPACT samples.
 ```
 
