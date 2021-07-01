@@ -13,9 +13,7 @@ Conda installation tutorial can be found [here](https://docs.conda.io/projects/c
 ```bash
 conda create --name access_data_analysis python=3
 conda activate access_data_analysis
-conda install r-essentials r-base r-argparse r-ggpubr r-ggthemes
+conda install r-essentials r-base r-argparse r-ggpubr r-ggthemes r-plotly r-kableextra r-htmlwidgets r-dt
 pip install genotype-variants
 ```
-
-
 

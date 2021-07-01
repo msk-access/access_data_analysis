@@ -17,6 +17,10 @@ parser$add_argument("-d", "--dmp-id", help="DMP patient ID (optional).")
 parser$add_argument("-ds", "--dmp-sample-id", help="DMP sample ID (optional).")
 parser$add_argument("-dm", "--dmp-maf", help="Path to DMP MAF file (optional).")
 parser$add_argument("-o", "--output", help="Output file")
+parser$add_argument(
+  "-ca", "--combine-access", help="Don't splite VAF plots by clonality.", action="store_true")
+parser$add_argument(
+  "-pi", "--plot-impact", help="Also plot VAFs from IMPACT samples.", action="store_true")
 
 args <- parser$parse_args()
 
@@ -35,7 +39,9 @@ input_text <- knitr::knit_expand(
   DMP_ID=args$dmp_id,
   DMP_SAMPLE_ID=args$dmp_sample_id,
   DMP_MAF_PATH=dmp_maf,
-  METADATA=normalizePath(args$metadata)
+  METADATA=normalizePath(args$metadata),
+  COMBINE_ACCESS=args$combine_access,
+  PLOT_IMPACT=args$plot_impact
 )
 
 tmp <- tempfile(fileext = ".Rmd")

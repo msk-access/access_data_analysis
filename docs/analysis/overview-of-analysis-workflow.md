@@ -4,7 +4,7 @@ description: Short descriptions on the steps of analysis
 
 # Overview of Analysis Workflow
 
-The pipeline aims to generate uniform and useful outputs for analyst in preliminary stage of analysis. 
+The pipeline aims to generate uniform and useful outputs for analyst in preliminary stage of analysis.
 
 Example command to run through the pipeline:
 
@@ -23,7 +23,7 @@ Example command to run through the pipeline:
 ## [3. SV incorporation](sv-incorporation.md)
 
 ```bash
-> Rscript R/CNA_processing.R -m $PATH/TO/manifest_file.tsv -o $PATH/TO/results_folder
+> Rscript R/SV_incorporation.R -m $PATH/TO/manifest_file.tsv -o $PATH/TO/results_folder
 ```
 
 ## [4. CNA processing](cna-processing.md)
@@ -32,9 +32,13 @@ Example command to run through the pipeline:
 > Rscript R/CNA_processing.R -m $PATH/TO/manifest_file.tsv -o $PATH/TO/results_folder
 ```
 
-## [5. Plot all events](plot-all-events.md)
+## [5. Plot all events]()
 
 ```bash
 > Rscript R/plot_all_events.R -m $PATH/TO/manifest_file.tsv -o $PATH/TO/results_folder
 ```
+
+## [6. Generate HTML report](overview-of-analysis-workflow.md#6-generate-html-report)
+
+## 
 

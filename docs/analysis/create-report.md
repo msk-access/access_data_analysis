@@ -1,24 +1,30 @@
 ---
-description: Step 5 -- Create a report showing genomic alteration data for all samples of a patient.
+description: >-
+  Step 5 -- Create a report showing genomic alteration data for all samples of a
+  patient.
 ---
 
-# Patient report
+# Create Patient Report
 
 The final step takes the processed data from the previous steps and plots the genomic alterations over all samples of each patient. The report includes several sections with interactive plots:
 
-### 1. Patient information
-The first section displays the patient ID, DMP id (if provided), tumor type (if provided), and each sample. Any provided sample meta-information is also display for each sample.
+## 1. Patient information
 
-### 2. Plot of SNV variant allele frequencies
-The second section shows SNV/INDEL events are plotted out by VAFs over timepoints. Above the panel it also display sample timepoint annotation, such as treatment information (if provided). If you provide IMPACT sample information, it will segregate each mutation by whether it is known to be clonal in IMPACT, subclonal in IMPACT, or is present in ACCESS only. There are additional tabs that display a table of mutation data and methods description.
+The first section displays the patient ID, DMP id \(if provided\), tumor type \(if provided\), and each sample. Any provided sample meta-information is also display for each sample.
 
-### 3. Plot of copy number alterations
+## 2. Plot of SNV variant allele frequencies
+
+The second section shows SNV/INDEL events are plotted out by VAFs over timepoints. Above the panel it also display sample timepoint annotation, such as treatment information \(if provided\). If you provide IMPACT sample information, it will segregate each mutation by whether it is known to be clonal in IMPACT, subclonal in IMPACT, or is present in ACCESS only. There are additional tabs that display a table of mutation data and methods description.
+
+## 3. Plot of copy number alterations
+
 The third section shows CNAs that are plotted by fold-change\(fc\) for each ACCESS sample and gene. If there are no CNAs, then this section is not displayed.
 
-### 4. Plot of clonal SNV/INDEL VAFs adjusted for copy number
+## 4. Plot of clonal SNV/INDEL VAFs adjusted for copy number
+
 If you provided an IMPACT sample, this last section will show SNV/INDEL events that are plotted out by VAFs over timepoints. However, the VAFs are corrected for IMPACT copy number information. Details of the method are shown under the `Description` tab in this section. Similar to section 2, sample timepoint annotations are shown above the plot.
 
-### Usage
+## Usage
 
 ```text
 Rscript reports/create_report.R -h                                      
@@ -54,3 +60,4 @@ optional arguments:
   -o OUTPUT, --output OUTPUT
                         Output file
 ```
+
