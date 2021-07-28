@@ -186,7 +186,7 @@ dmpsamples <- NULL
 dmpsamples.ids <- NULL
 
 if ('{{PLOT_IMPACT}}') {
-  tab2<-accesstab %>% select(matches("(__total|__DMP_Tumor)$"))
+  tab2<-accesstab %>% select(matches("(___total|__DMP_Tumor)$"))
   colnames(tab2)<-gsub("___total","",colnames(tab2))
   colnames(tab2)<-gsub("___DMP_Tumor","",colnames(tab2))
 
@@ -194,7 +194,7 @@ if ('{{PLOT_IMPACT}}') {
   colnames(dmpsamples.ids)<-gsub("___DMP_Tumor","",colnames(dmpsamples.ids))
   dmpsamples.ids <- colnames(dmpsamples.ids)
 } else {
-  tab2<-accesstab %>% select(matches("__total$"))
+  tab2<-accesstab %>% select(matches("___total$"))
   colnames(tab2)<-gsub("___total","",colnames(tab2))
 
   tab3<-accesstab %>% select(matches("__DMP_(Tumor|Normal)$"))
