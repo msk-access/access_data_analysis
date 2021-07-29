@@ -190,10 +190,14 @@ if ('{{PLOT_IMPACT}}') {
   colnames(tab2)<-gsub("___DMP_Tumor","",colnames(tab2))
 
   dmpsamples.ids <- accesstab %>% select(matches("___DMP_Tumor$"))
-  print("Before\n",dmpsamples.ids,"\n")
+  cat("Before\n")
+  dmpsamples.ids
+  cat("\n")
   colnames(dmpsamples.ids)<-gsub("___DMP_Tumor","",colnames(dmpsamples.ids))
   dmpsamples.ids <- colnames(dmpsamples.ids)
-  print("After\n",dmpsamples.ids,"\n")
+  cat("After\n")
+  dmpsamples.ids
+  cat("\n")
 } else {
   tab2<-accesstab %>% select(matches("___total$"))
   colnames(tab2)<-gsub("___total","",colnames(tab2))
