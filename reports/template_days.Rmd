@@ -373,7 +373,7 @@ subplot(fig1,fig2,nrows=2,shareX=TRUE, heights=c(0.2,0.7), which_layout=1)
 
 ```{r adjustedvaf-linear, fig.height=4, eval=has_dmp}
 sample="{{PATIENT_ID}}"
-filename = paste(sample,"_clona.csv")
+filename = paste(sample,"_clonal.csv")
 path = getwd()
 file_path = file.path(path,filename)
 clonal <- subset(final, final$clonality=="CLONAL")
@@ -386,8 +386,6 @@ if (nrow(clonal)>0) {
   clonaltoplot <- clonal
 
   if (length(unique(clonal$VarName))>1) {
-
-    write.csv(clonal, file_path)
 
     clonal_mean <- data.frame(
       clonal[,c("vaf", "adjustedvaf", "collection_day", "cmo_sample_id_plasma")] %>%
@@ -403,7 +401,7 @@ if (nrow(clonal)>0) {
     clonaltoplot$vaf<-round(clonaltoplot$vaf,4)
     clonaltoplot$adjustedvaf<-round(clonaltoplot$adjustedvaf,4)
   }
-
+  write.csv(clonaltoplot, file_path, sep = "\t", quote = F, row.names = F)
   fig2<-vaf_plot(clonaltoplot, xlimits, xbreaks, xlabels, varcolors, yaccuracy=0.01, log=FALSE, cnadjusted = TRUE)
   subplot(fig1,fig2,nrows=2,shareX=TRUE, heights=c(0.2,0.8))
 }
