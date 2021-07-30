@@ -185,6 +185,7 @@ if (impact_ccf_file != "") {
 
 ## ACCESS variants ##
 tab1<-accesstab[,c("Hugo_Symbol","Chromosome", "Start_Position", "Variant_Classification", "HGVSp_Short", "Reference_Allele", "Tumor_Seq_Allele2", "Hotspot", "DMP", "CH")]
+tab2<-NULL
 tab3 <- NULL
 dmpsamples <- NULL
 dmpsamples.ids <- NULL
