@@ -1,4 +1,5 @@
 ---
+title: "{{PATIENT_ID}}"
 output:
   html_document:
     df_print: paged
