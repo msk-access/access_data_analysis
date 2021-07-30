@@ -195,7 +195,7 @@ if ('{{PLOT_IMPACT}}') {
   colnames(tab2)<-gsub("___total","",colnames(tab2))
   colnames(tab2)<-gsub("___DMP_Tumor","",colnames(tab2))
 
-  tab3<-accesstab %>% select(matches("___DMP_Tumor)$"))
+  tab3<-accesstab %>% select(matches("___DMP_Tumor$"))
   colnames(tab3)<-gsub("___DMP_Tumor","",colnames(tab3))
 
   dmpsamples.ids <- accesstab %>% select(matches("___DMP_Tumor$"))
