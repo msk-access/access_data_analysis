@@ -242,7 +242,7 @@ if( nrow(cna) > 0){
 
 ## Get VAFs of variants ##
 
-temp <- melt(tab, id=c("Hugo_Symbol","Chromosome", "Start_Position", "Variant_Classification", "HGVSp_Short", "Reference_Allele", "Tumor_Seq_Allele2", "Hotspot", "DMP", "CH", "VarType", dmpsamples)) %>% separate(col=value, into=c("num1", "num2", "num3"))
+temp <- melt(tab, id=c("Hugo_Symbol","Chromosome", "Start_Position", "Variant_Classification", "HGVSp_Short", "Reference_Allele", "Tumor_Seq_Allele2", "Hotspot", "DMP", "CH", "VarType")) %>% separate(col=value, into=c("num1", "num2", "num3"))
 temp$vaf = as.numeric(temp$num1)/as.numeric(temp$num2)
 temp$total=temp$num2
 tempsv<-subset(temp,temp$VarType=="SV")
