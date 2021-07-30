@@ -127,7 +127,7 @@ vaf_plot <- function(variant_table, xlimits, xbreaks, xlabels, varcolors, yaccur
       legend.key.height = unit(2, "cm"),
       axis.text.x = element_text(angle=45)) +
     scale_color_manual(values = varcolors) +
-    scale_x_manual(breaks=xbreaks, limits=xlimits, labels=xlabels) +
+    scale_x_continuous(breaks=xbreaks, limits=xlimits, labels=xlabels) +
     labs(y="VAF") +
     xlab("")
   if(cnadjusted==FALSE){
@@ -147,7 +147,7 @@ treatment_plot <- function(treatment_table, xbreaks, xlimits, colors, ids=c("col
   fig<-ggplot(tmp, aes(x=collection_day, y=variable, fill=value)) +
     geom_tile() +
     theme(panel.grid=element_blank(), legend.title = element_blank()) +
-    scale_x_manual(breaks=xbreaks) +
+    scale_x_continuous(breaks=xbreaks) +
     scale_fill_manual(values=colors)
   fig<-ggplotly(fig)
   fig<-style(fig, showlegend=FALSE)
@@ -160,7 +160,7 @@ cna_plot<-function(cna, xlimits, xbreaks){
     geom_bar(aes(y=1, fill=fc), stat="identity",width=10) +
     scale_fill_gradient2(low="white",mid="red",high="red3",midpoint=1.5, limits=c(0,max(cna$fc))) +
     theme(legend.title=element_blank(), panel.grid.major.y=element_blank(), strip.background = element_blank(), axis.text.x=element_text(angle=90), axis.ticks.y=element_blank(), axis.text.y=element_blank()) +
-    scale_x_manual(breaks=xbreaks, limits=xlimits, labels=xlabels) +
+    scale_x_continuous(breaks=xbreaks, limits=xlimits, labels=xlabels) +
     xlab("") + facet_grid(Hugo_Symbol~.)
   fig<-ggplotly(fig, tooltip=c("collection_day","CNA","sample_id","fc","Hugo_Symbol"))
   return(fig)
