@@ -200,48 +200,40 @@ if ('{{PLOT_IMPACT}}') {
 } else {
   tab2<-accesstab %>% select(matches("___total$"))
   colnames(tab2)<-gsub("___total","",colnames(tab2))
-
   tab3<-accesstab %>% select(matches("___DMP_(Tumor|Normal)$"))
   colnames(tab3)<-gsub("___DMP_Tumor","",colnames(tab3))
   colnames(tab3)<-gsub("___DMP_Normal","",colnames(tab3))
   dmpsamples<-colnames(tab3)
 }
-
 cmo_sample_id_order<-metadata$sample_id[order(metadata$collection_date)]
 cmo_sample_id_order<-cmo_sample_id_order[cmo_sample_id_order %in% colnames(tab2)]
 tab2<-data.frame(tab2,check.names=FALSE)[,cmo_sample_id_order, drop=FALSE]
-
-tab<-cbind(tab1,tab2,tab3)
+tab<-cbind(tab1,tab2)
 if (!is.null(tab3)) {
-   tab<-cbind(tab,tab3)
+  tab<-cbind(tab,tab3)
 }
 tab$VarType <- "SNV_INDEL"
 tab[grep("__",tab$Hugo_Symbol),"VarType"]<-"SV"
 tab$Hugo_Symbol<- gsub("__","-",tab$Hugo_Symbol)
 tab$Chromosome<-as.character(tab$Chromosome)
-
 if (nrow(dmp) > 0) {
   tabletoprint<-merge(tab, dmp, all.x=TRUE)
 } else {
   tabletoprint <- tab
 }
-
 ## read CNA files ##
 all.cna.files <- list.files(path = access_data_analysis_cna_dir, pattern = sample, full.names=TRUE)
 cna<-do.call('rbind', lapply(all.cna.files,fread)) %>% rename(sample_id=Tumor_Sample_Barcode)
-
 if( nrow(cna) > 0){
   cna<-merge(cna, metadata,by=c("sample_id"))
   cna$collection_date<-as.Date(cna$collection_date, format="%m/%d/%y")
   cna$fc<-as.numeric(cna$fc)
 }
-
 ```
 
 ```{r prepare_data}
-
 ## Get VAFs of variants ##
-temp <- melt(tab, id=c("Hugo_Symbol","Chromosome", "Start_Position", "Variant_Classification", "HGVSp_Short", "Reference_Allele", "Tumor_Seq_Allele2", "Hotspot", "DMP", "CH", "VarType"), dmpsamples) %>% separate(col=value, into=c("num1", "num2", "num3"))
+temp <- melt(tab, id=c("Hugo_Symbol","Chromosome", "Start_Position", "Variant_Classification", "HGVSp_Short", "Reference_Allele", "Tumor_Seq_Allele2", "Hotspot", "DMP", "CH", "VarType", dmpsamples)) %>% separate(col=value, into=c("num1", "num2", "num3"))
 temp$vaf = as.numeric(temp$num1)/as.numeric(temp$num2)
 temp$total=temp$num2
 tempsv<-subset(temp,temp$VarType=="SV")
@@ -249,7 +241,6 @@ temp[which(temp$VarType=="SV"), "vaf"] = (as.numeric(tempsv$num1)+as.numeric(tem
 temp[which(temp$VarType=="SV"), "total"]=tempsv$num3
 temp$Chromosome <- as.character(temp$Chromosome)
 temp$vaf=temp$vaf
-
 if (nrow(dmp) > 0) {
   # merge with DMP
   combined <- merge(temp, dmp, all.x=TRUE) %>% rename(sample_id = variable)
@@ -257,23 +248,15 @@ if (nrow(dmp) > 0) {
   combined <- temp %>% rename(sample_id = variable)
   combined[, "clonality"] <- NA
 }
-
 final <- merge(combined, metadata, by=c("sample_id"), all.x=TRUE)
 final$collection_date <- as.Date(final$collection_date, format="%m/%d/%y")
-
 # Create a variant name column
 final$VarName=paste(final$Hugo_Symbol, final$HGVSp_Short)
-
 final[is.na(final$HGVSp_Short), "VarName"] <- paste0(final$Hugo_Symbol, " ", final$Chromosome, ":", final$Start_Position, " ", final$Reference_Allele, ">", final$Tumor_Seq_Allele2)[is.na(final$HGVSp_Short)]
-
 final[is.na(final$HGVSp_Short) & nchar(final$Reference_Allele)>5,"VarName"] <- paste0(final$Hugo_Symbol, " ", final$Chromosome, ":", final$Start_Position, " ", substr(final$Reference_Allele,1,3),"..", ">", final$Tumor_Seq_Allele2)[is.na(final$HGVSp_Short)]
-
 final[is.na(final$HGVSp_Short) & nchar(final$Tumor_Seq_Allele2)>5,"VarName"] <- paste0(final$Hugo_Symbol, " ", final$Chromosome, ":", final$Start_Position, " ", final$Reference_Allele,1,3, ">", substr(final$Tumor_Seq_Allele2,1,3),"..")[is.na(final$HGVSp_Short)]
-
 final[which(final$VarType=="SV"),"VarName"]<-final$Hugo_Symbol[which(final$VarType=="SV")]
-
 # Select variant colors
-
 final$vaf<-round(final$vaf,4)
 final<-final[!is.na(final$vaf),]
 final$total<-as.numeric(final$total)
@@ -282,11 +265,8 @@ vafsum<-aggregate(final$vaf,by=list(VarName=final$VarName),FUN=sum)
 final<-subset(final, !final$VarName %in% vafsum[which(vafsum$x==0),"VarName"])
 varcolors<-c(gg_color_hue(length(unique(final$VarName))),"black")
 names(varcolors)<-c(unique(final$VarName),"average")
-
 tabletoprint<-unique(merge(unique(final[,c("Hugo_Symbol","Chromosome","Start_Position")]), tabletoprint, by=c("Hugo_Symbol","Chromosome","Start_Position")))
-
 final_snv<-subset(final,final$VarType=="SNV_INDEL")
-
 if ('{{COMBINE_ACCESS}}') {
   final_snv$clonality <- "MSK-ACCESS"
 } else {
@@ -294,17 +274,14 @@ if ('{{COMBINE_ACCESS}}') {
   final_snv$clonality<-factor(
     final_snv$clonality, levels=c("CLONAL","SUBCLONAL","INDETERMINATE","ACCESS-only"))
 }
-
 if (!is.null(dmpsamples.ids)) {
   final_snv[which(final_snv$sample_id %in% dmpsamples.ids), "clonality"] <-  "IMPACT"
 }
-
 final_sv<-subset(final,final$VarType=="SV")
 if (nrow(final_sv) > 0) {
   final_sv[, "clonality"] = "ACCESS-only"
   final_sv[which(final_sv$DMP=="Signed out"),"clonality"]="IMPACT"
 }
-
 xlimits<-c(min(final$collection_date)-10, max(final$collection_date)+10)
 xbreaks<-final$collection_date
 xlabels <- final$timepoint
