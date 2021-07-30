@@ -68,7 +68,7 @@ timepointcolors <- NULL
 
 if ("timepoint" %in% colnames(metadata)) {
 
-  metadata <- metadata[,c("cmo_sample_id_plasma", "sex", "collection_day", "timepoint")]
+  metadata <- metadata[,c("sample_id", "sex", "collection_day", "timepoint")]
 
   timepoints <- unique(metadata$timepoint)
   colorcount <- length(timepoints)
@@ -76,7 +76,7 @@ if ("timepoint" %in% colnames(metadata)) {
   timepointcolors <- getPalette(colorcount)
   names(timepointcolors) <- timepoints
 } else {
-  metadata <- metadata[,c("cmo_sample_id_plasma", "sex", "collection_day")]
+  metadata <- metadata[,c("sample_id", "sex", "collection_day")]
 }
 
 ```
@@ -94,23 +94,23 @@ vaf_plot <- function(variant_table, xlimits, xbreaks, xlabels, varcolors, yaccur
   tmp$VarName<-factor(tmp$VarName,levels=names(varcolors))
   if(log == FALSE){
     if(cnadjusted==FALSE){
-      fig<-ggplot(tmp, aes(x=collection_day, y=vaf, col=VarName, hotspot=Hotspot, sampleid=cmo_sample_id_plasma)) +
+      fig<-ggplot(tmp, aes(x=collection_day, y=vaf, col=VarName, hotspot=Hotspot, sampleid=sample_id)) +
         scale_y_continuous(labels = scales::percent_format(accuracy = yaccuracy)) +
         ylab("VAF")
       } else{
-        fig<-ggplot(tmp, aes(x=collection_day, y=adjustedvaf, vaf=vaf, col=VarName, hotspot=Hotspot, sampleid=cmo_sample_id_plasma)) +
+        fig<-ggplot(tmp, aes(x=collection_day, y=adjustedvaf, vaf=vaf, col=VarName, hotspot=Hotspot, sampleid=sample_id)) +
           scale_y_continuous(labels = scales::percent_format(accuracy = yaccuracy)) +
           ylab("Adjusted VAF")
       }
   } else{
     if(cnadjusted==FALSE){
       tmp$vafforlog = tmp$vaf + 0.0001
-      fig<-ggplot(tmp, aes(x=collection_day, y=vafforlog, vaf=vaf, col=VarName, hotspot=Hotspot, sampleid=cmo_sample_id_plasma)) +
+      fig<-ggplot(tmp, aes(x=collection_day, y=vafforlog, vaf=vaf, col=VarName, hotspot=Hotspot, sampleid=sample_id)) +
         scale_y_log10(labels = scales::percent_format(accuracy = yaccuracy)) +
         ylab("VAF")
     } else{
       tmp$vafforlog = tmp$adjustedvaf + 0.0001
-      fig<-ggplot(tmp, aes(x=collection_day, y=vafforlog, adjustedvaf=adjustedvaf, vaf=vaf, col=VarName, hotspot=Hotspot, sampleid=cmo_sample_id_plasma)) +
+      fig<-ggplot(tmp, aes(x=collection_day, y=vafforlog, adjustedvaf=adjustedvaf, vaf=vaf, col=VarName, hotspot=Hotspot, sampleid=sample_id)) +
         scale_y_log10(labels = scales::percent_format(accuracy = yaccuracy)) +
         ylab("VAF")
     }
@@ -127,27 +127,27 @@ vaf_plot <- function(variant_table, xlimits, xbreaks, xlabels, varcolors, yaccur
       legend.key.height = unit(2, "cm"),
       axis.text.x = element_text(angle=45)) +
     scale_color_manual(values = varcolors) +
-    scale_x_continuous(breaks=xbreaks, limits=xlimits, labels=xlabels) +
+    scale_x_discrete(breaks=xbreaks, limits=xlimits, labels=xlabels) +
     labs(y="VAF") +
     xlab("")
   if(cnadjusted==FALSE){
-    fig<-ggplotly(fig, tooltip=c("collection_day","vaf","VarName","Hotspot","cmo_sample_id_plasma"))
+    fig<-ggplotly(fig, tooltip=c("collection_day","vaf","VarName","Hotspot","sample_id"))
   } else{
-    fig<-ggplotly(fig, tooltip=c("collection_day","vaf","adjustedvaf","VarName","Hotspot","cmo_sample_id_plasma"))
+    fig<-ggplotly(fig, tooltip=c("collection_day","vaf","adjustedvaf","VarName","Hotspot","sample_id"))
   }
   fig<-ggplotly(fig)
   return(fig)
 }
 
 # Function to generate treatment plot
-treatment_plot <- function(treatment_table, xbreaks, xlimits, colors, ids=c("collection_day","cmo_sample_id_plasma")){
+treatment_plot <- function(treatment_table, xbreaks, xlimits, colors, ids=c("collection_day","sample_id")){
   # Any column other than the ids columns will be plotted
   tmp<-melt(treatment_table, id=ids)
   tmp$value<-factor(tmp$value, levels=names(colors))
   fig<-ggplot(tmp, aes(x=collection_day, y=variable, fill=value)) +
     geom_tile() +
     theme(panel.grid=element_blank(), legend.title = element_blank()) +
-    scale_x_continuous(breaks=xbreaks) +
+    scale_x_discrete(breaks=xbreaks) +
     scale_fill_manual(values=colors)
   fig<-ggplotly(fig)
   fig<-style(fig, showlegend=FALSE)
@@ -156,13 +156,13 @@ treatment_plot <- function(treatment_table, xbreaks, xlimits, colors, ids=c("col
 
 cna_plot<-function(cna, xlimits, xbreaks){
   cna$fc<-round(cna$fc,2)
-  fig<-ggplot(cna, aes(x=collection_day, sampleid=cmo_sample_id_plasma, gene=Hugo_Symbol)) +
+  fig<-ggplot(cna, aes(x=collection_day, sampleid=sample_id, gene=Hugo_Symbol)) +
     geom_bar(aes(y=1, fill=fc), stat="identity",width=10) +
     scale_fill_gradient2(low="white",mid="red",high="red3",midpoint=1.5, limits=c(0,max(cna$fc))) +
     theme(legend.title=element_blank(), panel.grid.major.y=element_blank(), strip.background = element_blank(), axis.text.x=element_text(angle=90), axis.ticks.y=element_blank(), axis.text.y=element_blank()) +
-    scale_x_continuous(breaks=xbreaks, limits=xlimits, labels=xlabels) +
+    scale_x_discrete(breaks=xbreaks, limits=xlimits, labels=xlabels) +
     xlab("") + facet_grid(Hugo_Symbol~.)
-  fig<-ggplotly(fig, tooltip=c("collection_day","CNA","cmo_sample_id_plasma","fc","Hugo_Symbol"))
+  fig<-ggplotly(fig, tooltip=c("collection_day","CNA","sample_id","fc","Hugo_Symbol"))
   return(fig)
 }
 
@@ -205,7 +205,7 @@ if ('{{PLOT_IMPACT}}') {
   dmpsamples<-colnames(tab3)
 }
 
-cmo_sample_id_order<-metadata$cmo_sample_id_plasma[order(metadata$collection_day)]
+cmo_sample_id_order<-metadata$sample_id[order(metadata$collection_day)]
 cmo_sample_id_order<-cmo_sample_id_order[cmo_sample_id_order %in% colnames(tab2)]
 tab2<-data.frame(tab2,check.names=FALSE)[,cmo_sample_id_order, drop=FALSE]
 
@@ -226,10 +226,10 @@ if (nrow(dmp) > 0) {
 
 ## read CNA files ##
 all.cna.files <- list.files(path = access_data_analysis_cna_dir, pattern = sample, full.names=TRUE)
-cna<-do.call('rbind', lapply(all.cna.files,fread)) %>% rename(cmo_sample_id_plasma=Tumor_Sample_Barcode)
+cna<-do.call('rbind', lapply(all.cna.files,fread)) %>% rename(sample_id=Tumor_Sample_Barcode)
 
 if( nrow(cna) > 0){
-  cna<-merge(cna, metadata,by=c("cmo_sample_id_plasma"))
+  cna<-merge(cna, metadata,by=c("sample_id"))
   cna$fc<-as.numeric(cna$fc)
 }
 
@@ -250,13 +250,13 @@ temp$vaf=temp$vaf
 
 if (nrow(dmp) > 0) {
   # merge with DMP
-  combined <- merge(temp, dmp, all.x=TRUE) %>% rename(cmo_sample_id_plasma = variable)
+  combined <- merge(temp, dmp, all.x=TRUE) %>% rename(sample_id = variable)
 } else {
-  combined <- temp %>% rename(cmo_sample_id_plasma = variable)
+  combined <- temp %>% rename(sample_id = variable)
   combined[, "clonality"] <- NA
 }
 
-final <- merge(combined, metadata, by=c("cmo_sample_id_plasma"), all.x=TRUE)
+final <- merge(combined, metadata, by=c("sample_id"), all.x=TRUE)
 
 # Create a variant name column
 final$VarName=paste(final$Hugo_Symbol, final$HGVSp_Short)
@@ -293,7 +293,7 @@ if ('{{COMBINE_ACCESS}}') {
 }
 
 if (!is.null(dmpsamples.ids)) {
-  final_snv[which(final_snv$cmo_sample_id_plasma %in% dmpsamples.ids), "clonality"] <-  "IMPACT"
+  final_snv[which(final_snv$sample_id %in% dmpsamples.ids), "clonality"] <-  "IMPACT"
 }
 
 final_sv<-subset(final,final$VarType=="SV")
@@ -310,7 +310,7 @@ xlabels <- final$timepoint
 ## Sample information
 ```{r sample-info-table}
 
-cols <- c("cmo_sample_id_plasma", "collection_day")
+cols <- c("sample_id", "collection_day")
 if (!is.null(timepointcolors)) {
   cols <- c(cols, "timepoint")
 }
@@ -327,8 +327,8 @@ treatment_table <- NULL
 fig1 <- NULL
 
 if (!is.null(timepointcolors) && nrow(final_snv) > 0) {
-  treatment_table<-unique(final[,c("cmo_sample_id_plasma","collection_day","timepoint")])
-  fig1<-treatment_plot(treatment_table, xbreaks, xlimits, timepointcolors, ids=c("collection_day","cmo_sample_id_plasma"))
+  treatment_table<-unique(final[,c("sample_id","collection_day","timepoint")])
+  fig1<-treatment_plot(treatment_table, xbreaks, xlimits, timepointcolors, ids=c("collection_day","sample_id"))
   fig2<-vaf_plot(final_snv, xlimits, xbreaks, xlabels, varcolors, yaccuracy=0.01, log=FALSE)
   subplot(fig1, fig2, nrows=2,shareX=TRUE, heights=c(0.1,0.9))
 } else if (nrow(final_snv) > 0) {
@@ -391,13 +391,13 @@ if (nrow(clonal)>0) {
   if (length(unique(clonal$VarName))>1) {
 
     clonal_mean <- data.frame(
-      clonal[,c("vaf", "adjustedvaf", "collection_day", "cmo_sample_id_plasma")] %>%
-      group_by(cmo_sample_id_plasma, collection_day) %>%
+      clonal[,c("vaf", "adjustedvaf", "collection_day", "sample_id")] %>%
+      group_by(sample_id, collection_day) %>%
       summarize_all(mean) %>%
       mutate(clonality="CLONAL", VarName="average")
     )
 
-    common_cols <- c("cmo_sample_id_plasma", "collection_day", "vaf", "adjustedvaf", "Hotspot", "clonality", "VarName")
+    common_cols <- c("sample_id", "collection_day", "vaf", "adjustedvaf", "Hotspot", "clonality", "VarName")
     clonal_mean[,"Hotspot"] <- NA
 
     clonaltoplot<-rbind(clonal[, common_cols], clonal_mean[, common_cols])
@@ -425,7 +425,7 @@ if(nrow(clonal)>0){
 ```
 ```{r snv_clonal_table, eval=has_dmp}
 if (nrow(clonal) > 0) {
-  print_table(clonal[,c("cmo_sample_id_plasma","collection_day","VarName","tcn","expected_alt_copies","ncn", "vaf","adjustedvaf")])
+  print_table(clonal[,c("sample_id","collection_day","VarName","tcn","expected_alt_copies","ncn", "vaf","adjustedvaf")])
 }
 ```
 
