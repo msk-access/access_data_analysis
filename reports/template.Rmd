@@ -28,14 +28,18 @@ if (dmp_id != "") {
 
 ```
 
-```{r echo=FALSE, eval=show_text}
+```{r echo=FALSE}
 
 if (dmp_id != "") {
-  asis_output("# {{PATIENT_ID}} ({{DMP_ID}}) \n")
+  page_title = "{{PATIENT_ID}} ({{DMP_ID}})"
 } else {
-  asis_output("# {{PATIENT_ID}} \n")
+  page_title = "{{PATIENT_ID}}"
 }
 ```
+
+---
+title: "`r page_title`"
+---
 
 ```{r echo=FALSE, eval=show_text}
 if ("{{TUMOR_TYPE}}" != "") {
