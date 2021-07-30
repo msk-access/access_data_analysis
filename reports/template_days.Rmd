@@ -38,7 +38,7 @@ if (dmp_id != "") {
 ```
 
 ---
-title: page_title
+title: `r page_title`
 ---
 
 ```{r echo=FALSE, eval=show_text}
