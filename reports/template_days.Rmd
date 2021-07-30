@@ -167,7 +167,7 @@ print_table<-function(table){
 }
 ```
 
-```{r read_input1, include=FALSE, echo=TRUE, eval=show_text}
+```{r read_input1, include=FALSE, echo=TRUE, message=TRUE}
 
 ## read variant files ##
 accesstab<-fread(access_data_analysis_results, na.strings=c("NA",""))
