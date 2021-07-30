@@ -215,10 +215,10 @@ cmo_sample_id_order<-metadata$cmo_sample_id_plasma[order(metadata$collection_dat
 cmo_sample_id_order<-cmo_sample_id_order[cmo_sample_id_order %in% colnames(tab2)]
 tab2<-data.frame(tab2,check.names=FALSE)[,cmo_sample_id_order, drop=FALSE]
 
-tab<-cbind(tab1,tab2)
-if (!is.null(tab3)) {
-  tab<-cbind(tab,tab3)
-}
+tab<-cbind(tab1,tab2,tab3)
+#if (!is.null(tab3)) {
+#   tab<-cbind(tab,tab3)
+#}
 tab$VarType <- "SNV_INDEL"
 tab[grep("__",tab$Hugo_Symbol),"VarType"]<-"SV"
 tab$Hugo_Symbol<- gsub("__","-",tab$Hugo_Symbol)
