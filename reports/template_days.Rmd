@@ -28,7 +28,7 @@ if (dmp_id != "") {
 
 ```
 
-```{r echo=FALSE, include=FALSE}
+```{r echo=FALSE}
 
 if (dmp_id != "") {
   page_title = "{{PATIENT_ID}} ({{DMP_ID}})"
@@ -38,7 +38,7 @@ if (dmp_id != "") {
 ```
 
 ---
-title: `r page_title`
+title: "`r page_title`"
 ---
 
 ```{r echo=FALSE, eval=show_text}
