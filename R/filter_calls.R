@@ -59,7 +59,7 @@ filter_calls = function(
     # compiling different genotype files from step 1
     fillouts.dt <- do.call(rbind,lapply(fillouts.filenames,function(y){
       sample.name = gsub('.*./|-ORG.*.','',y)
-      sample.type = sample.sheet[Sample_Barcode == sample.name]$Sample_Type
+      sample.type = unique(sample.sheet[Sample_Barcode == sample.name]$Sample_Type)
 
       # t_alt_count,t_ref_count,t_depth these columns are useless, have to use duplex/simplex/standard columms
       maf.file <- fread(y) %>%
