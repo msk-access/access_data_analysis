@@ -66,7 +66,7 @@ def main(
             raise typer.Abort()
 
     #Read maf files
-    maf_df = pd.read_csv(maf, sep='\t', comment="#", low_memory=False)
+    maf_df = pd.read_csv(maf, sep='\t', comment='#', low_memory=False)
     # Read Identifiers
     if not id:
         file = open(ids)
