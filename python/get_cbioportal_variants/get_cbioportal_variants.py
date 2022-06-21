@@ -94,7 +94,7 @@ def main(
 def get_row(file):
     skipped = []
     with open(file, "r") as csvfile:
-        reader = csv.reader(csvfile)
+        reader = csv.reader(csvfile, delimiter='\t')
         for i, row in enumerate(reader):
             if row[0].strip()[:2] == "#":
                 skipped.append(i)
