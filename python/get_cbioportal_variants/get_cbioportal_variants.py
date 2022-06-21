@@ -77,7 +77,7 @@ def main(
     pattern = "|".join([r'\b{}\b'.format(i) for i in ns])
     result = maf_df[maf_df['Tumor_Sample_Barcode'].str.contains(pattern, regex=True)]
     results_covered = result.copy(deep=True)
-    results_covered['Chromosome'].apply(str)
+    results_covered = results_covered['Chromosome'].apply(str)
     # Read bed file
     b = BedFile(bed.as_posix())
     # Our chromosome column is 'Chromosome' and position column is 'Start_Position'.
