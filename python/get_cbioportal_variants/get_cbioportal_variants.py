@@ -5,6 +5,7 @@ import typer
 import pandas as pd
 import csv
 
+
 def main(
     maf: Path = typer.Option(
         "/work/access/production/resources/cbioportal/current/msk_solid_heme/data_mutations_extended.txt",
@@ -94,7 +95,7 @@ def main(
 def get_row(file):
     skipped = []
     with open(file, "r") as csvfile:
-        reader = csv.reader(csvfile, delimiter='\t')
+        reader = csv.reader(csvfile, delimiter="\t")
         for i, row in enumerate(reader):
             if row[0].strip()[:2] == "#":
                 skipped.append(i)
