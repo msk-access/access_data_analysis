@@ -30,6 +30,7 @@ python csv_to_maf.py  -l /path/to/FileOfFiles.txt
 ```
 
 where **FileOfFiles.txt**
+
 ```bash
 > cat FileOfFiles.txt
 /path/to/Test1.csv
