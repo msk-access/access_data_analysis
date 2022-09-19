@@ -18,10 +18,10 @@ SV_incorporation = function(
   # criteria <- 'stringent'
   #
   # DMP fusion calls --------------------------------------------------------
-  DMP.fusion <- fread(paste0(dmp.dir,'/data_SV.txt')) %>%
-    transmute(DMP_SAMPLE_ID = SampleId,EventType = Sv_Class_Name,Gene1 = Site1_Gene,Gene2 = Site2_Gene,
-              Chr1 = Site1_Chrom,Chr2 = Site2_Chrom,Pos1 = Site1_Pos,Pos2 = Site2_Pos,PairedReadCount = Paired_End_Read_Support,
-              SplitReadCount = Split_Read_Support,TumorReadCount = Tumor_Read_Count,EventInfo = Annotation) %>% data.table()
+  DMP.fusion <- fread(paste0(dmp.dir,'/data_sv.txt')) %>%
+    transmute(DMP_SAMPLE_ID = Sample_ID,EventType = Class,Gene1 = Site1_Hugo_Symbol,Gene2 = Site2_Hugo_Symbol,
+              Chr1 = Site1_Chromosome,Chr2 = Site2_Chromosome,Pos1 = Site1_Position,Pos2 = Site2_Position,PairedReadCount = Tumor_Paired_End_Read_Count,
+              SplitReadCount = Tumor_Split_Read_Count,TumorReadCount = Tumor_Read_Count,EventInfo = Event_Info) %>% data.table()
 
   # execution ---------------------------------------------------------------
 
