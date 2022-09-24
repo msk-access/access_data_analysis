@@ -45,15 +45,15 @@ input_text <- knitr::knit_expand(
   COMBINE_ACCESS=args$combine_access,
   PLOT_IMPACT=args$plot_impact
 )
-tmp <- NULL
-if(args$keep_rmarkdown) {
-  tmp <- gsub("html","Rmd",args$output_file)
-} else {
-  tmp <- tempfile(fileext = ".Rmd")
-}
 
+rmd_name <- gsub(".html","", args$output_file)
+
+tmp <- tempfile(rmd_name,fileext = ".Rmd")
 cat(input_text, file = tmp)
 
+if (args$keep_rmarkdown){
+  file.copy(tmp,cwd)
+}
 rmarkdown::render(
   tmp,
   output_format = "html_document",
