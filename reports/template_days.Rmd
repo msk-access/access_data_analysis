@@ -387,7 +387,7 @@ if (nrow(clonal)>0) {
   clonal$adjustedvaf <- clonal$vaf*clonal$ncn / (clonal$expected_alt_copies + (clonal$ncn - clonal$tcn)*clonal$vaf)
   clonal$adjustedvaf <- round(clonal$adjustedvaf,4)
   clonaltoplot <- clonal
-
+  write.table(clonal, file_path, sep="\t", quote = F, row.names = F)
   if (length(unique(clonal$VarName))>1) {
 
     clonal_mean <- data.frame(
@@ -404,7 +404,6 @@ if (nrow(clonal)>0) {
     clonaltoplot$vaf<-round(clonaltoplot$vaf,4)
     clonaltoplot$adjustedvaf<-round(clonaltoplot$adjustedvaf,4)
   }
-  write.table(clonal, file_path, sep="\t", quote = F, row.names = F)
   fig2<-vaf_plot(clonaltoplot, xlimits, xbreaks, xlabels, varcolors, yaccuracy=0.01, log=FALSE, cnadjusted = TRUE)
   subplot(fig1,fig2,nrows=2,shareX=TRUE, heights=c(0.2,0.8))
 }
