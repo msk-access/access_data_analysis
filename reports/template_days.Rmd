@@ -167,8 +167,7 @@ cna_plot<-function(cna, xlimits, xbreaks){
 }
 
 print_table<-function(table){
-  datatable(table, rownames=FALSE, escape=FALSE, extensions = c('Buttons','Responsive'),  
-  options=list(scrollX=T, autoWidth = TRUE, dom = 'Bfrtip',buttons = c('copy', 'csv', 'excel')))
+  datatable(table, class='cell-border stripe compact', filter = 'top', rownames=FALSE, escape=FALSE, extensions = 'Buttons', options=list(scrollX=T, autoWidth = TRUE, dom = 'Bfrtip',buttons = c('copy', 'csv', 'excel', 'pdf', 'print')))
 }
 ```
 
