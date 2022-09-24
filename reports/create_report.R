@@ -50,8 +50,8 @@ tmp <- tempfile(fileext = ".Rmd")
 cat(input_text, file = tmp)
 
 if (args$keep_rmarkdown){
-  rmd_name <- gsub(".html",".Rmd", args$output_file)
-  output_cwd <- getwd() 
+  rmd_name <- gsub(".html",".Rmd", args$output)
+  output_cwd <- normalizePath(dirname(args$output)) 
   output_rmd_path <- paste(output_cwd,"/",rmd_name)
   file.copy(tmp,output_rmd_path)
 }
