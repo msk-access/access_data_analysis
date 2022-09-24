@@ -407,7 +407,7 @@ if (nrow(clonal)>0) {
 ```{r write_clonal, eval=has_dmp}
 sample="{{PATIENT_ID}}"
 filename = paste(sample,"_clonal.csv",sep='')
-fwrite(as.dataframe(clonal), file=filename)
+fwrite(clonal, file=paste(getwd(),filename,sep='/'))
 ```
 
 ```{asis echo=has_dmp}
