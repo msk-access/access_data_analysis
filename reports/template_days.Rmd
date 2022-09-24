@@ -404,7 +404,7 @@ if (nrow(clonal)>0) {
     clonaltoplot$vaf<-round(clonaltoplot$vaf,4)
     clonaltoplot$adjustedvaf<-round(clonaltoplot$adjustedvaf,4)
   }
-  write_tsv(clonaltoplot, file_path, quote = F, row.names = F)
+  write.table(clonaltoplot, file_path, sep="\t", quote = F, row.names = F)
   fig2<-vaf_plot(clonaltoplot, xlimits, xbreaks, xlabels, varcolors, yaccuracy=0.01, log=FALSE, cnadjusted = TRUE)
   subplot(fig1,fig2,nrows=2,shareX=TRUE, heights=c(0.2,0.8))
 }
