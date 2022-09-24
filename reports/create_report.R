@@ -46,7 +46,7 @@ input_text <- knitr::knit_expand(
   PLOT_IMPACT=args$plot_impact
 )
 
-tmp <- tempfile(rmd_name,fileext = ".Rmd")
+tmp <- tempfile(fileext = ".Rmd")
 cat(input_text, file = tmp)
 
 if (args$keep_rmarkdown){
