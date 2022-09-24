@@ -46,7 +46,7 @@ input_text <- knitr::knit_expand(
   PLOT_IMPACT=args$plot_impact
 )
 if(args$keep_rmarkdown) {
-  file = gsub(".html",".Rmd",args$output_file)
+  tmp <- gsub(".html",".Rmd",args$output_file)
 }
 else {
 tmp <- tempfile(fileext = ".Rmd")
