@@ -62,4 +62,4 @@ if (args$keep_rmarkdown){
 #  output_dir = normalizePath(dirname(args$output)),
 #  output_file=args$output)
 
-quarto::render(tmp,output_file=args$output)
+quarto::quarto_render(tmp,output_file=args$output)
