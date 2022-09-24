@@ -3,8 +3,6 @@
 library(knitr)
 library(rmarkdown)
 library(argparse)
-library(quarto)
-
 
 parser <- ArgumentParser()
 
