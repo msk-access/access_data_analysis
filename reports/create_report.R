@@ -45,7 +45,7 @@ input_text <- knitr::knit_expand(
   COMBINE_ACCESS=args$combine_access,
   PLOT_IMPACT=args$plot_impact
 )
-if(arg$keep_rmarkdown) {
+if(args$keep_rmarkdown) {
   file = gsub(".html",".Rmd",args$output_file)
 }
 else {
