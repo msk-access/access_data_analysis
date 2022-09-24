@@ -56,10 +56,8 @@ if (args$keep_rmarkdown){
   output_rmd_path <- paste(output_cwd,"/",rmd_name, sep='')
   file.copy(tmp,output_rmd_path)
 }
-#rmarkdown::render(
-#  tmp,
-#  output_format = "html_document",
-#  output_dir = normalizePath(dirname(args$output)),
-#  output_file=args$output)
-
-quarto::quarto_render(tmp,output_file=args$output)
+rmarkdown::render(
+  tmp,
+  output_format = "html_document",
+  output_dir = normalizePath(dirname(args$output)),
+  output_file=args$output)
