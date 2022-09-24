@@ -49,7 +49,7 @@ if(args$keep_rmarkdown) {
   tmp <- gsub(".html",".Rmd",args$output_file)
 }
 else {
-tmp <- tempfile(fileext = ".Rmd")
+  tmp <- tempfile(fileext = ".Rmd")
 }
 cat(input_text, file = tmp)
 
