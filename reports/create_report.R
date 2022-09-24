@@ -52,7 +52,7 @@ cat(input_text, file = tmp)
 if (args$keep_rmarkdown){
   rmd_name <- gsub(".html",".Rmd", args$output)
   output_cwd <- normalizePath(dirname(args$output)) 
-  output_rmd_path <- paste(output_cwd,"/",rmd_name)
+  output_rmd_path <- paste(output_cwd,"/",rmd_name, sep='')
   file.copy(tmp,output_rmd_path)
 }
 rmarkdown::render(
