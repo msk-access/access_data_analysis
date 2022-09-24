@@ -409,8 +409,7 @@ sample="{{PATIENT_ID}}"
 filename = paste(sample,"_clonal.csv",sep='')
 path = getwd()
 file_path = file.path(path,filename)
-cat(file_path)
-write.table(clonal, file_path, sep="\t", quote = F, row.names = F)
+fwrite(clonal, file=file_path)
 ```
 
 ```{asis echo=has_dmp}
