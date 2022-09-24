@@ -16,9 +16,11 @@ parser$add_argument("-m", "--metadata", required=T, help="Path to file containin
 parser$add_argument("-d", "--dmp-id", help="DMP patient ID (optional).")
 parser$add_argument("-ds", "--dmp-sample-id", help="DMP sample ID (optional).")
 parser$add_argument("-dm", "--dmp-maf", help="Path to DMP MAF file (optional).")
-parser$add_argument("-o", "--output", help="Output file")
+parser$add_argument("-o", "--output", help="Output file with .html extension")
 parser$add_argument(
-  "-ca", "--combine-access", help="Don't splite VAF plots by clonality.", action="store_true")
+  "-md", "--keep-rmarkdown", help="Dont make tmp file for markdown, keep it in the same directory", action="store_true")
+parser$add_argument(
+  "-ca", "--combine-access", help="Don't split VAF plots by clonality.", action="store_true")
 parser$add_argument(
   "-pi", "--plot-impact", help="Also plot VAFs from IMPACT samples.", action="store_true")
 
@@ -43,8 +45,12 @@ input_text <- knitr::knit_expand(
   COMBINE_ACCESS=args$combine_access,
   PLOT_IMPACT=args$plot_impact
 )
-
+if(arg$keep_rmarkdown) {
+  file = gsub(".html",".Rmd",args$output_file)
+}
+else {
 tmp <- tempfile(fileext = ".Rmd")
+}
 cat(input_text, file = tmp)
 
 rmarkdown::render(
