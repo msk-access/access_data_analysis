@@ -1,4 +1,5 @@
 ---
+title: "{{PATIENT_ID}}"
 output:
   html_document:
     df_print: paged
@@ -6,6 +7,7 @@ output:
 
 ```{r global_options, include=FALSE}
 knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE, fig.width=10, fig.height=6)
+library(knitr)
 library(data.table)
 library(tidyr)
 library(dplyr)
@@ -19,27 +21,25 @@ library(RColorBrewer)
 theme_set(theme_bw())
 
 show_text <- TRUE
+```
 
+```{r echo=FALSE, eval=show_text}
+if ("{{DMP_ID}}" != "") {
+  asis_output("### DMP ID: {{DMP_ID}}} \n")
+}
+```
+```{r echo=FALSE}
 dmp_id <- "{{DMP_ID}}"
 has_dmp <- F
 if (dmp_id != "") {
   has_dmp = T
 }
-
-```
-
-```{r echo=FALSE}
-
 if (dmp_id != "") {
   page_title = "{{PATIENT_ID}} ({{DMP_ID}})"
 } else {
   page_title = "{{PATIENT_ID}}"
 }
 ```
-
----
-title: "`r page_title`"
----
 
 ```{r echo=FALSE, eval=show_text}
 if ("{{TUMOR_TYPE}}" != "") {
