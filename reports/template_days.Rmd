@@ -25,9 +25,16 @@ show_text <- TRUE
 
 ```{r echo=FALSE, eval=show_text}
 if ("{{DMP_ID}}" != "") {
-  asis_output("### DMP ID: {{DMP_ID}} \n")
+  asis_output("### DMP Patient ID: {{DMP_ID}} \n")
 }
 ```
+
+```{r echo=FALSE, eval=show_text}
+if ("{{DMP_SAMPLE_ID}}" != "") {
+  asis_output("### DMP Sample ID: {{DMP_SAMPLE_ID}} \n")
+}
+```
+
 ```{r echo=FALSE}
 dmp_id <- "{{DMP_ID}}"
 has_dmp <- F
@@ -435,7 +442,8 @@ if (nrow(clonal) > 0) {
 ### Description
 
 We adjust the variant allele fractions to account for the copy number alterations of the segments they are in. \
-Since it is not easy to call copy number changes from ACCESS data, here we rely on the copy number alterations called by FACETS in the IMPACT sample `r toString(impact_sample_id)`.\
+Since it is not easy to call copy number changes from ACCESS data, here we rely on the copy number alterations called by FACETS in the IMPACT sample.\
+
 *Note: This assumes that there are no changes to copy numbers of these segments between the IMPACT and ACCESS samples.* \
 
 
