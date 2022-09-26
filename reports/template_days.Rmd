@@ -25,7 +25,7 @@ show_text <- TRUE
 
 ```{r echo=FALSE, eval=show_text}
 if ("{{DMP_ID}}" != "") {
-  asis_output("### DMP ID: {{DMP_ID}}} \n")
+  asis_output("### DMP ID: {{DMP_ID}} \n")
 }
 ```
 ```{r echo=FALSE}
