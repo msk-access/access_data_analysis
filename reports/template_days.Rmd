@@ -1,4 +1,5 @@
 ---
+title: "{{PATIENT_ID}}"
 output:
   html_document:
     df_print: paged
@@ -6,6 +7,7 @@ output:
 
 ```{r global_options, include=FALSE}
 knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE, fig.width=10, fig.height=6)
+library(knitr)
 library(data.table)
 library(tidyr)
 library(dplyr)
@@ -19,27 +21,32 @@ library(RColorBrewer)
 theme_set(theme_bw())
 
 show_text <- TRUE
+```
 
+```{r echo=FALSE, eval=show_text}
+if ("{{DMP_ID}}" != "") {
+  asis_output("### DMP Patient ID: {{DMP_ID}} \n")
+}
+```
+
+```{r echo=FALSE, eval=show_text}
+if ("{{DMP_SAMPLE_ID}}" != "") {
+  asis_output("### DMP Sample ID: {{DMP_SAMPLE_ID}} \n")
+}
+```
+
+```{r echo=FALSE}
 dmp_id <- "{{DMP_ID}}"
 has_dmp <- F
 if (dmp_id != "") {
   has_dmp = T
 }
-
-```
-
-```{r echo=FALSE}
-
 if (dmp_id != "") {
   page_title = "{{PATIENT_ID}} ({{DMP_ID}})"
 } else {
   page_title = "{{PATIENT_ID}}"
 }
 ```
-
----
-title: "`r page_title`"
----
 
 ```{r echo=FALSE, eval=show_text}
 if ("{{TUMOR_TYPE}}" != "") {
@@ -167,7 +174,7 @@ cna_plot<-function(cna, xlimits, xbreaks){
 }
 
 print_table<-function(table){
-  datatable(table, rownames=FALSE, escape=FALSE, options=list(scrollX=T, autoWidth = TRUE))
+  datatable(table, class='cell-border stripe compact', filter = 'top', rownames=FALSE, escape=FALSE, extensions = 'Buttons', options=list(scrollX=T, autoWidth = TRUE, dom = 'Bfrtip',buttons = c('copy', 'csv', 'excel', 'pdf', 'print')))
 }
 ```
 
@@ -376,9 +383,6 @@ subplot(fig1,fig2,nrows=2,shareX=TRUE, heights=c(0.2,0.7), which_layout=1)
 
 ```{r adjustedvaf-linear, fig.height=4, eval=has_dmp}
 sample="{{PATIENT_ID}}"
-filename = paste(sample,"_clonal.csv")
-path = getwd()
-file_path = file.path(path,filename)
 clonal <- subset(final, final$clonality=="CLONAL")
 
 if (nrow(clonal)>0) {
@@ -387,7 +391,6 @@ if (nrow(clonal)>0) {
   clonal$adjustedvaf <- clonal$vaf*clonal$ncn / (clonal$expected_alt_copies + (clonal$ncn - clonal$tcn)*clonal$vaf)
   clonal$adjustedvaf <- round(clonal$adjustedvaf,4)
   clonaltoplot <- clonal
-
   if (length(unique(clonal$VarName))>1) {
 
     clonal_mean <- data.frame(
@@ -404,9 +407,15 @@ if (nrow(clonal)>0) {
     clonaltoplot$vaf<-round(clonaltoplot$vaf,4)
     clonaltoplot$adjustedvaf<-round(clonaltoplot$adjustedvaf,4)
   }
-  write.csv(clonaltoplot, file_path, sep = "\t", quote = F, row.names = F)
   fig2<-vaf_plot(clonaltoplot, xlimits, xbreaks, xlabels, varcolors, yaccuracy=0.01, log=FALSE, cnadjusted = TRUE)
   subplot(fig1,fig2,nrows=2,shareX=TRUE, heights=c(0.2,0.8))
+}
+```
+```{r write_clonal, eval=has_dmp}
+if(nrow(clonal)>0){
+  sample="{{PATIENT_ID}}"
+  filename = paste(sample,"_clonal_adjvaf.csv",sep='')
+  fwrite(clonal, file=paste(getwd(),filename,sep='/'))
 }
 ```
 
@@ -433,7 +442,8 @@ if (nrow(clonal) > 0) {
 ### Description
 
 We adjust the variant allele fractions to account for the copy number alterations of the segments they are in. \
-Since it is not easy to call copy number changes from ACCESS data, here we rely on the copy number alterations called by FACETS in the IMPACT sample `r toString(impact_sample_id)`.\
+Since it is not easy to call copy number changes from ACCESS data, here we rely on the copy number alterations called by FACETS in the IMPACT sample.\
+
 *Note: This assumes that there are no changes to copy numbers of these segments between the IMPACT and ACCESS samples.* \
 
 
