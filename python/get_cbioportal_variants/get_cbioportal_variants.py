@@ -25,7 +25,7 @@ def main(
         "-i",
         help="List of ids to search for in the 'Tumor_Sample_Barcode' column. Header of this file is 'sample_id'",
     ),
-    id: Optional[List[str]] = typer.Option(
+    sid: Optional[List[str]] = typer.Option(
         "",
         help="Identifiers to search for in the 'Tumor_Sample_Barcode' column. Can be given multiple times",
     ),
@@ -60,21 +60,21 @@ def main(
     """
     if not ids:
         typer.echo("Identifiers were not provided in a text file")
-        if not id:
+        if not sid:
             typer.echo("Identifiers were not provided via command line as well")
             raise typer.Abort()
 
     # Read maf files
     skip = get_row(maf)
+    print("SkipRows:", skip)
     maf_df = pd.read_csv(maf, sep="\t", skiprows=skip, low_memory=False)
     # Read Identifiers
-    if not id:
-        file = open(ids)
-        id = file.read().splitlines()[1:]
-        file.close()
+    if not sid:
+        with open(ids) as file:
+            sid = file.read().splitlines()[1:]
     # filter for ids
-    ns = set(id)
-    pattern = "|".join([r"\b{}\b".format(i) for i in ns])
+    ns = set(sid)
+    pattern = "|".join([f"\b{i}\b" for i in ns])
     result = maf_df[maf_df["Tumor_Sample_Barcode"].str.contains(pattern, regex=True)]
     results_covered = result.copy(deep=True)
     results_covered["Chromosome"] = results_covered["Chromosome"].apply(str)
