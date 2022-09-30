@@ -4,7 +4,7 @@ from bed_lookup import BedFile
 import typer
 import pandas as pd
 import csv
-
+import sys
 
 def main(
     maf: Path = typer.Option(
@@ -93,12 +93,19 @@ def main(
 
 # preprocessing
 def get_row(file):
+    maxInt = sys.maxsize
+    while True:
+        # decrease the maxInt value by factor 10 
+        # as long as the OverflowError occurs.
+        try:
+            csv.field_size_limit(maxInt)
+            break
+        except OverflowError:
+            maxInt = int(maxInt/10) 
     skipped = []
-    with open(file, "r") as csvfile:
-        reader = csv.reader(csvfile, delimiter="\t")
-        for i, row in enumerate(reader):
-            if row[0].strip()[:2] == "#":
-                skipped.append(i)
+    with open(file, "r") as csv_file:
+        reader = csv.reader(csv_file, delimiter="\t")
+        skipped.extend(i for i, row in enumerate(reader) if row[0].strip()[:2] == "#")
     return skipped
 
 
