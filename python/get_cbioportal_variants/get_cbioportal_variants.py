@@ -103,9 +103,11 @@ def get_row(file):
         except OverflowError:
             maxInt = int(maxInt/10) 
     skipped = []
-    with open(file, "r") as csv_file:
-        reader = csv.reader(csv_file, delimiter="\t")
-        skipped.extend(i for i, row in enumerate(reader) if row[0].strip()[:2] == "#")
+    with open(file, "r") as csvfile:
+        reader = csv.reader(csvfile, delimiter="\t")
+        for i, row in enumerate(reader):
+            if row[0].strip()[:2] == "#":
+                skipped.append(i)
     return skipped
 
 
