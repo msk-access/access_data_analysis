@@ -64,15 +64,16 @@ def main(
 
     # Read maf files
     skip = get_row(maf)
-    print("SkipRows:", skip)
+    typer.echo("Skipping Rows:", skip)
     maf_df = pd.read_csv(maf, sep="\t", skiprows=skip, low_memory=False)
     # Read Identifiers
     if not sid:
-        with open(ids) as file:
-            sid = file.read().splitlines()[1:]
+        file = open(ids)
+        sid = file.read().splitlines()[1:]
+        file.close()
     # filter for ids
     ns = set(sid)
-    pattern = "|".join([f"\b{i}\b" for i in ns])
+    pattern = "|".join([r"\b{}\b".format(i) for i in ns])
     result = maf_df[maf_df["Tumor_Sample_Barcode"].str.contains(pattern, regex=True)]
     results_covered = result.copy(deep=True)
     results_covered["Chromosome"] = results_covered["Chromosome"].apply(str)
