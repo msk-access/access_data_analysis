@@ -64,7 +64,6 @@ def main(
 
     # Read maf files
     skip = get_row(maf)
-    typer.echo("Skipping Rows:", skip)
     maf_df = pd.read_csv(maf, sep="\t", skiprows=skip, low_memory=False)
     # Read Identifiers
     if not sid:
