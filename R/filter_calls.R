@@ -71,7 +71,7 @@ filter_calls = function(
         columns <- c(
           "Hugo_Symbol", "Tumor_Sample_Barcode", "Chromosome", "Start_Position",
           "End_Position", "Variant_Classification", "HGVSp_Short",
-          "Reference_Allele", "Tumor_Seq_Allele2", "t_var_freq", "ExAC_AF")
+          "Reference_Allele", "Tumor_Seq_Allele2", "t_var_freq", "gnomAD_AF")
         df <- data.frame(matrix(ncol = length(columns), nrow = 0))
         colnames(df) <- columns
 
@@ -105,7 +105,7 @@ filter_calls = function(
       maf.file = maf.file %>%
         mutate(t_var_freq = paste0(t_alt_count,'/',t_total_count,'(',round(t_alt_count/t_total_count,4),')')) %>%
         transmute(Hugo_Symbol,Tumor_Sample_Barcode,Chromosome = as.character(Chromosome),Start_Position,End_Position,Variant_Classification,
-                  HGVSp_Short=as.character(HGVSp_Short),Reference_Allele,Tumor_Seq_Allele2,t_var_freq,ExAC_AF) %>%
+                  HGVSp_Short=as.character(HGVSp_Short),Reference_Allele,Tumor_Seq_Allele2,t_var_freq,gnomAD_AF) %>%
         data.table()
 
       return(maf.file)
@@ -132,7 +132,7 @@ filter_calls = function(
     if((nrow(dmp.maf) > 0) && (nrow(fillouts.dt) > 0)){
         fillouts.dt <- fillouts.dt %>%
           dcast.data.table(Hugo_Symbol + Chromosome + Start_Position + End_Position + Variant_Classification +
-                           HGVSp_Short + Reference_Allele + Tumor_Seq_Allele2 + ExAC_AF ~ Tumor_Sample_Barcode,
+                           HGVSp_Short + Reference_Allele + Tumor_Seq_Allele2 + gnomAD_AF ~ Tumor_Sample_Barcode,
                            value.var = 't_var_freq') %>%
           # hotspot information
           merge(
@@ -154,7 +154,7 @@ filter_calls = function(
       fillouts.dt <- fillouts.dt %>%
         dcast.data.table(
           Hugo_Symbol + Chromosome + Start_Position + End_Position + Variant_Classification +
-          HGVSp_Short + Reference_Allele + Tumor_Seq_Allele2 + ExAC_AF ~ Tumor_Sample_Barcode,
+          HGVSp_Short + Reference_Allele + Tumor_Seq_Allele2 + gnomAD_AF ~ Tumor_Sample_Barcode,
           value.var = 't_var_freq') %>%
         # hotspot information
         merge(
@@ -178,7 +178,7 @@ filter_calls = function(
       fillouts.dt <- fillouts.dt %>% select(
         Hugo_Symbol,Chromosome,Start_Position,End_Position,
         Variant_Classification,HGVSp_Short,Reference_Allele,Tumor_Seq_Allele2,
-        ExAC_AF,Hotspot,DMP,CH,duplex_support_num,call_confidence,sort(everything()))
+        gnomAD_AF,Hotspot,DMP,CH,duplex_support_num,call_confidence,sort(everything()))
 
       write.csv(
         fillouts.dt,
@@ -223,7 +223,7 @@ filter_calls = function(
     if(all(!c('unfilterednormal','normal_DMP') %in% sample.sheet$Sample_Type)){
       tmp.col.name <- plasma.samples[1]
       lapply(plasma.samples,function(tmp.col.name){
-        #fillouts.dt[as.numeric(gsub("\\(|\\)",'',str_extract(get(tmp.col.name),"\\(.*.\\)"))) >= 0.3 | ExAC_AF >= 0.0001,eval(paste0(tmp.col.name,'.called')) := 'Not Called']
+        #fillouts.dt[as.numeric(gsub("\\(|\\)",'',str_extract(get(tmp.col.name),"\\(.*.\\)"))) >= 0.3 | gnomAD_AF >= 0.0001,eval(paste0(tmp.col.name,'.called')) := 'Not Called']
         fillouts.dt[get(tmp.col.name)  == '0/0(NaN)',eval(paste0(tmp.col.name,'.called')) := 'Not Covered']
       })
     }else{
@@ -271,7 +271,7 @@ filter_calls = function(
             all.x = T) %>%
       mutate(CH = ifelse(is.na(CH),'No','Yes')) %>%
       select(Hugo_Symbol,Chromosome,Start_Position,End_Position,Variant_Classification,HGVSp_Short,Reference_Allele,Tumor_Seq_Allele2,
-             ExAC_AF,Hotspot,DMP,CH,duplex_support_num,call_confidence,sort(everything()))
+            gnomAD_AF,Hotspot,DMP,CH,duplex_support_num,call_confidence,sort(everything()))
 
     write.csv(fillouts.dt,paste0(results.dir,'/results_',criteria,'/',x,'_SNV_table.csv'),row.names = F)
   })
