@@ -123,7 +123,7 @@ filter_calls = function(
       maf.file = maf.file %>%
         mutate(t_var_freq = paste0(t_alt_count,'/',t_total_count,'(',round(t_alt_count/t_total_count,4),')')) %>%
         transmute(Hugo_Symbol,Tumor_Sample_Barcode,Chromosome = as.character(Chromosome),Start_Position,End_Position,Variant_Classification,
-                  HGVSp_Short=as.character(HGVSp_Short),Reference_Allele,Tumor_Seq_Allele2,t_var_freq,"gnomAD_AF") %>%
+                  HGVSp_Short=as.character(HGVSp_Short),Reference_Allele,Tumor_Seq_Allele2,t_var_freq,'gnomAD_AF') %>%
         data.table()
     
       return(maf.file)
