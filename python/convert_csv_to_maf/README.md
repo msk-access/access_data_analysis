@@ -8,12 +8,10 @@ Tool does the following operations:
 * Massaging the data frame to make it compatible with MAF format
 * Write the data frame to a file in MAF format and Excel format
 
-## Requirements
+## Installation
 
-* pandas
-* openpyxl
-* typing
-* typer
+Dependencies may be installed from the requirements.txt file using ```pip install -r requirements.txt```.
+This should contains all the required python packages required to run csv_to_maf.py and convert CSV files to MAF.
 
 ## Example command
 

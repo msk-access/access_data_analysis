@@ -1,0 +1,4 @@
+typer==0.3.2
+openpyxl==3.0.9
+typing_extensions==3.10.0.0
+pandas==1.2.5
