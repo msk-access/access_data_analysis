@@ -137,7 +137,7 @@ compile_reads <- function(master.ref,
               duplex_bam = paste0(
                 mirror.access.bam.dir,
                 "/",
-                access / bam.sub.dir,
+                access.bam.sub.dir,
                 "/",
                 all.dmp.bam.ids.XS,
                 "-duplex.bam",
