@@ -636,11 +636,25 @@ if (!interactive()) {
     help = "Mirror BAM file directory [default]"
   )
   parser$add_argument(
+    "-mab",
+    "--mirroraccessbamdir",
+    type = "character",
+    default = "/juno/res/dmpcollab/dmpshare/share/access_12_245",
+    help = "Mirror BAM file directory for MSK-ACCESS [default]"
+  )
+  parser$add_argument(
     "-dmpk",
     "--dmpkeypath",
     type = "character",
     default = "/juno/res/dmpcollab/dmprequest/12-245/key.txt",
     help = "DMP mirror BAM key file [default]"
+  )
+  parser$add_argument(
+    "-dmpak",
+    "--dmpaccesskeypath",
+    type = "character",
+    default = " /juno/res/dmpcollab/dmprequest/ACCESS-12-245/key.txt",
+    help = "DMP mirror BAM key file for MSK-ACCESS [default]"
   )
   args <- parser$parse_args()
 
@@ -652,7 +666,9 @@ if (!interactive()) {
   genotyper.path <- args$genotyperpath
   dmp.dir <- args$dmpdir
   mirror.bam.dir <- args$mirrorbamdir
+  mirror.acess.bam.dir <- args$mirroraccessbamdir
   dmp.key.path <- args$dmpkeypath
+  access.key.path <- args$dmpaccesskeypath
 
 
   if (project.ID == "") {
