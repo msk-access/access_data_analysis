@@ -103,9 +103,13 @@ compile_reads <- function(master.ref,
         all.dmp.bam.ids.IH <-
           DMP.key[grepl(paste0(dmp_id, "-(T|N)..-IH."), V1)]$V2
         all.dmp.bam.ids.XS <-
+          access.key[grepl(paste0(dmp_id, "-(T|N)..-XS."), V1)]$V2)
+        cat(all.dmp.bam.ids.XS)
+        all.dmp.bam.ids.XS <-
           gsub("-standard|-unfilter|-simplex|-duplex",
                "",
                access.key[grepl(paste0(dmp_id, "-(T|N)..-XS."), V1)]$V2)
+        cat(all.dmp.bam.ids.XS)
         all.dmp.bam.ids <-
           c(all.dmp.bam.ids.IM,
             all.dmp.bam.ids.IH)
