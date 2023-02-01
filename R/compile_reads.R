@@ -51,7 +51,7 @@ compile_reads <- function(master.ref,
       )], collapse = " ,")
     ))
   }
-  acccess.key <- fread(access.key.path)
+  access.key <- fread(access.key.path)
   if (any(
     !master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id %in% gsub("-T..-IH.|-T..-IM.|-T..-XS", "", access.key[grepl("IH|IM|XS", V1)]$V1)
   )) {
@@ -68,7 +68,7 @@ compile_reads <- function(master.ref,
     filter(Mutation_Status != "GERMLINE") %>%
     data.table()
   DMP.RET.maf <-
-    DMP.maf[grepl(paste0(unique(master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id), collapse = "|"), Tumor_Sample_Barcode), ]
+    DMP.maf[grepl(paste0(unique(master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id), collapse = "|"), Tumor_Sample_Barcode),]
 
   # Pooled normal samples ---------------------------------------------------
   pooled.bams <-
@@ -395,7 +395,7 @@ compile_reads <- function(master.ref,
           HGVSp_Short,
           Reference_Allele,
           Tumor_Seq_Allele2
-        )])), ] %>%
+        )])),] %>%
         mutate(
           t_ref_count = 0,
           t_alt_count = 0,
@@ -520,7 +520,7 @@ compile_reads <- function(master.ref,
       HGVSp_Short,
       Reference_Allele,
       Tumor_Seq_Allele2
-    )]),]
+    )]), ]
   write.table(
     all.all.unique.mafs,
     paste0(results.dir, "/pooled/all_all_unique.maf"),
@@ -666,7 +666,7 @@ if (!interactive()) {
   genotyper.path <- args$genotyperpath
   dmp.dir <- args$dmpdir
   mirror.bam.dir <- args$mirrorbamdir
-  mirror.acess.bam.dir <- args$mirroraccessbamdir
+  mirror.access.bam.dir <- args$mirroraccessbamdir
   dmp.key.path <- args$dmpkeypath
   access.key.path <- args$dmpaccesskeypath
 
@@ -684,7 +684,9 @@ if (!interactive()) {
   print(genotyper.path)
   print(dmp.dir)
   print(mirror.bam.dir)
-  print(dmp.key.path)
+  print(mirror.bam.dir)
+  print(dmp.access.key.path)
+  print(access.key.path)
   suppressWarnings(
     compile_reads(
       fread(master.ref),
