@@ -68,7 +68,7 @@ compile_reads <- function(master.ref,
     filter(Mutation_Status != "GERMLINE") %>%
     data.table()
   DMP.RET.maf <-
-    DMP.maf[grepl(paste0(unique(master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id), collapse = "|"), Tumor_Sample_Barcode),]
+    DMP.maf[grepl(paste0(unique(master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id), collapse = "|"), Tumor_Sample_Barcode), ]
 
   # Pooled normal samples ---------------------------------------------------
   pooled.bams <-
@@ -106,12 +106,12 @@ compile_reads <- function(master.ref,
           gsub("-standard|-unfilter|-simplex|-duplex",
                "",
                access.key[grepl(paste0(dmp_id, "-(T|N)..-XS."), V1)]$V2)
+        all.dmp.bam.ids <-
+          c(all.dmp.bam.ids.IM,
+            all.dmp.bam.ids.IH)
         if (is.null(all.dmp.ids)) {
           dmp.sample.sheet <- NULL
         } else{
-          all.dmp.bam.ids <-
-            c(all.dmp.bam.ids.IM,
-              all.dmp.bam.ids.IH)
           bam.sub.dir <-
             unlist(lapply(strsplit(substr(
               all.dmp.bam.ids, 1, 2
@@ -130,7 +130,7 @@ compile_reads <- function(master.ref,
             )
           )
         }
-        if (is.null(all.dmp.bam.ids.XS)) {
+        if (is.null(all.dmp.ids.XS) | is.null(all.dmp.bam.ids.XS)) {
           access.sample.sheet <- NULL
         } else{
           access.bam.sub.dir <-
@@ -421,7 +421,7 @@ compile_reads <- function(master.ref,
           HGVSp_Short,
           Reference_Allele,
           Tumor_Seq_Allele2
-        )])),] %>%
+        )])), ] %>%
         mutate(
           t_ref_count = 0,
           t_alt_count = 0,
@@ -546,7 +546,7 @@ compile_reads <- function(master.ref,
       HGVSp_Short,
       Reference_Allele,
       Tumor_Seq_Allele2
-    )]), ]
+    )]),]
   write.table(
     all.all.unique.mafs,
     paste0(results.dir, "/pooled/all_all_unique.maf"),
