@@ -68,7 +68,7 @@ compile_reads <- function(master.ref,
     filter(Mutation_Status != "GERMLINE") %>%
     data.table()
   DMP.RET.maf <-
-    DMP.maf[grepl(paste0(unique(master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id), collapse = "|"), Tumor_Sample_Barcode), ]
+    DMP.maf[grepl(paste0(unique(master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id), collapse = "|"), Tumor_Sample_Barcode),]
 
   # Pooled normal samples ---------------------------------------------------
   pooled.bams <-
@@ -125,42 +125,44 @@ compile_reads <- function(master.ref,
             all.dmp.bam.ids,
             ".bam"
           )
-          access.bam.sub.dir <-
-            unlist(lapply(strsplit(
-              substr(all.dmp.bam.ids.XS, 1, 2), ""
-            ), function(x) {
-              paste0(x, collapse = "/")
-            }))
-          access.sample.sheet <- unique(
-            data.frame(
-              Sample_Barcode = all.dmp.ids.XS,
-              duplex_bam = paste0(
-                mirror.access.bam.dir,
-                "/",
-                access.bam.sub.dir,
-                "/",
-                all.dmp.bam.ids.XS,
-                "-duplex.bam"
-              )
-              simplex_bam = paste0(
-                mirror.access.bam.dir,
-                "/",
-                access.bam.sub.dir,
-                "/",
-                all.dmp.bam.ids.XS,
-                "-simplex.bam"
-              )
+        )
+        access.bam.sub.dir <-
+          unlist(lapply(strsplit(
+            substr(all.dmp.bam.ids.XS, 1, 2), ""
+          ), function(x) {
+            paste0(x, collapse = "/")
+          }))
+        access.sample.sheet <- unique(
+          data.frame(
+            Sample_Barcode = all.dmp.ids.XS,
+            duplex_bam = paste0(
+              mirror.access.bam.dir,
+              "/",
+              access.bam.sub.dir,
+              "/",
+              all.dmp.bam.ids.XS,
+              "-duplex.bam"
+            )
+            simplex_bam = paste0(
+              mirror.access.bam.dir,
+              "/",
+              access.bam.sub.dir,
+              "/",
+              all.dmp.bam.ids.XS,
+              "-simplex.bam"
             )
           )
-          dmp.sample.sheet <-
-            bind_row(dmp.sample.sheet, access.sample.sheet)
-        ) %>%
-          mutate(
-            cmo_patient_id = x,
-            Sample_Type = ifelse(grepl("-T", Sample_Barcode), "DMP_Tumor", "DMP_Normal"),
-            dmp_patient_id = dmp_id
-          )
-      }
+        )
+        dmp.sample.sheet <-
+          bind_row(dmp.sample.sheet, access.sample.sheet)
+        )
+  %>%
+    mutate(
+      cmo_patient_id = x,
+      Sample_Type = ifelse(grepl("-T", Sample_Barcode), "DMP_Tumor", "DMP_Normal"),
+      dmp_patient_id = dmp_id
+    )
+    }
       # total sample sheet
       sample.sheet <- master.ref[cmo_patient_id == x,
                                  # plasma bams -- duplex and simplex bam
@@ -395,7 +397,7 @@ compile_reads <- function(master.ref,
           HGVSp_Short,
           Reference_Allele,
           Tumor_Seq_Allele2
-        )])), ] %>%
+        )])),] %>%
         mutate(
           t_ref_count = 0,
           t_alt_count = 0,
@@ -495,85 +497,85 @@ compile_reads <- function(master.ref,
         intern = T
       )
       job.ids <- as.numeric(gsub("Job <|> is.*.$", "", job.ids))
-    })
+      })
 
 
-  # Get base count multi sample in pooled normal ----------------------------
-  # all all unique calls in entire cohort
-  print("Compiling reads in pooled samples")
-  dir.create(paste0(results.dir, "/pooled"))
-  all.all.unique.mafs <-
-    do.call(rbind, lapply(unique(master.ref$cmo_patient_id), function(x) {
-      fread(list.files(
-        paste0(results.dir, "/", x),
-        pattern = "unique_calls.maf$",
-        full.names = T
-      ))
-    }))
-  all.all.unique.mafs <-
-    all.all.unique.mafs[!duplicated(all.all.unique.mafs[, .(
-      Hugo_Symbol,
-      Chromosome,
-      Start_Position,
-      End_Position,
-      Variant_Classification,
-      HGVSp_Short,
-      Reference_Allele,
-      Tumor_Seq_Allele2
-    )]),]
-  write.table(
-    all.all.unique.mafs,
-    paste0(results.dir, "/pooled/all_all_unique.maf"),
-    sep = "\t",
-    quote = F,
-    row.names = F
-  )
+# Get base count multi sample in pooled normal ----------------------------
+# all all unique calls in entire cohort
+print("Compiling reads in pooled samples")
+dir.create(paste0(results.dir, "/pooled"))
+all.all.unique.mafs <-
+  do.call(rbind, lapply(unique(master.ref$cmo_patient_id), function(x) {
+    fread(list.files(
+      paste0(results.dir, "/", x),
+      pattern = "unique_calls.maf$",
+      full.names = T
+    ))
+  }))
+all.all.unique.mafs <-
+  all.all.unique.mafs[!duplicated(all.all.unique.mafs[, .(
+    Hugo_Symbol,
+    Chromosome,
+    Start_Position,
+    End_Position,
+    Variant_Classification,
+    HGVSp_Short,
+    Reference_Allele,
+    Tumor_Seq_Allele2
+  )]),]
+write.table(
+  all.all.unique.mafs,
+  paste0(results.dir, "/pooled/all_all_unique.maf"),
+  sep = "\t",
+  quote = F,
+  row.names = F
+)
 
-  write.table(
-    data.frame(
-      sample_id = gsub("^.*./|.bam", "", pooled.bams),
-      maf = paste0(results.dir, "/pooled/all_all_unique.maf"),
-      standard_bam = pooled.bams,
-      duplex_bam = "",
-      simplex_bam = ""
-    ),
-    paste0(results.dir, "/pooled/pooled_metadata.tsv"),
-    sep = "\t",
-    quote = F,
-    row.names = F
-  )
+write.table(
+  data.frame(
+    sample_id = gsub("^.*./|.bam", "", pooled.bams),
+    maf = paste0(results.dir, "/pooled/all_all_unique.maf"),
+    standard_bam = pooled.bams,
+    duplex_bam = "",
+    simplex_bam = ""
+  ),
+  paste0(results.dir, "/pooled/pooled_metadata.tsv"),
+  sep = "\t",
+  quote = F,
+  row.names = F
+)
 
-  pooled.sample.job.id <- system(
-    paste0(
-      "bsub -cwd ",
-      results.dir,
-      '/pooled -W 12:00  -R "rusage[mem=8]" -oo genotyping.o -eo genotyping.e ',
-      " -w ",
-      ' \"',
-      paste0(paste0("done(", unlist(all.fillout.id), ")"), collapse = "&&"),
-      '\" ',
-      " -P ",
-      project.ID,
-      " -J pooled_genotype_variants ",
-      " genotype_variants small_variants multiple-samples -i ",
-      results.dir,
-      "/pooled/pooled_metadata.tsv",
-      " -r ",
-      fasta.path,
-      " -g ",
-      genotyper.path,
-      " -v DEBUG "
-    ),
-    intern = T
-  )
-  pooled.sample.job.id <-
-    as.numeric(gsub("Job <|> is.*.$", "", pooled.sample.job.id))
-  while (!any(grepl("Done successfully", system(
-    paste0("bjobs -l ", pooled.sample.job.id), intern = T
-  )))) {
-    Sys.sleep(120)
-  }
-  print("Compile reads done!")
+pooled.sample.job.id <- system(
+  paste0(
+    "bsub -cwd ",
+    results.dir,
+    '/pooled -W 12:00  -R "rusage[mem=8]" -oo genotyping.o -eo genotyping.e ',
+    " -w ",
+    ' \"',
+    paste0(paste0("done(", unlist(all.fillout.id), ")"), collapse = "&&"),
+    '\" ',
+    " -P ",
+    project.ID,
+    " -J pooled_genotype_variants ",
+    " genotype_variants small_variants multiple-samples -i ",
+    results.dir,
+    "/pooled/pooled_metadata.tsv",
+    " -r ",
+    fasta.path,
+    " -g ",
+    genotyper.path,
+    " -v DEBUG "
+  ),
+  intern = T
+)
+pooled.sample.job.id <-
+  as.numeric(gsub("Job <|> is.*.$", "", pooled.sample.job.id))
+while (!any(grepl("Done successfully", system(
+  paste0("bjobs -l ", pooled.sample.job.id), intern = T
+)))) {
+  Sys.sleep(120)
+}
+print("Compile reads done!")
 }
 
 # Executable -----------------------------------------------------------------------------------------------------------
