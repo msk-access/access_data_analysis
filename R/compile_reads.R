@@ -139,6 +139,10 @@ compile_reads <- function(master.ref,
             ), function(x) {
               paste0(x, collapse = "/")
             }))
+          print("ID\n")
+          print(all.dmp.ids.XS)
+          print("\nDIR\n")
+          print(access.bam.sub.dir)
           access.sample.sheet <- unique(
             data.frame(
               Sample_Barcode = all.dmp.ids.XS,
