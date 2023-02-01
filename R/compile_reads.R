@@ -109,7 +109,7 @@ compile_reads <- function(master.ref,
         all.dmp.bam.ids <-
           c(all.dmp.bam.ids.IM,
             all.dmp.bam.ids.IH)
-        if (is.null(all.dmp.ids)) {
+        if (length(all.dmp.ids)==0) {
           dmp.sample.sheet <- NULL
         } else{
           bam.sub.dir <-
@@ -130,7 +130,7 @@ compile_reads <- function(master.ref,
             )
           )
         }
-        if (is.null(all.dmp.ids.XS) | is.null(all.dmp.bam.ids.XS)) {
+        if (length(all.dmp.ids.XS) == 0){
           access.sample.sheet <- NULL
         } else{
           access.bam.sub.dir <-
