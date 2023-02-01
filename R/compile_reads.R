@@ -684,8 +684,8 @@ if (!interactive()) {
   print(genotyper.path)
   print(dmp.dir)
   print(mirror.bam.dir)
-  print(mirror.bam.dir)
-  print(dmp.access.key.path)
+  print(mirror.access.bam.dir)
+  print(dmp.key.path)
   print(access.key.path)
   suppressWarnings(
     compile_reads(
