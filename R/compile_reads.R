@@ -43,7 +43,7 @@ compile_reads <- function(master.ref,
   if (any(
     !master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id %in% gsub("-T..-IH.|-T..-IM.|-T..-XS", "", DMP.key[grepl("IH|IM|XS", V1)]$V1)
   )) {
-    warning(paste0(
+    message(paste0(
       "These DMP IDs are not found in DMP key file: ",
       paste0(master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id[which(
         !master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id %in%
@@ -55,7 +55,7 @@ compile_reads <- function(master.ref,
   if (any(
     !master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id %in% gsub("-T..-IH.|-T..-IM.|-T..-XS", "", access.key[grepl("IH|IM|XS", V1)]$V1)
   )) {
-    warning(paste0(
+    message(paste0(
       "These DMP IDs are not found in DMP key file: ",
       paste0(master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id[which(
         !master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id %in%
@@ -63,6 +63,7 @@ compile_reads <- function(master.ref,
       )], collapse = " ,")
     ))
   }
+  print(dmp_patient_id)
   DMP.maf <-
     fread(paste0(dmp.dir, "/data_mutations_extended.txt")) %>%
     filter(Mutation_Status != "GERMLINE") %>%
