@@ -144,7 +144,7 @@ compile_reads <- function(master.ref,
                 simplex_bam = paste0(
                   mirror.access.bam.dir,
                   "/",
-                  access / bam.sub.dir,
+                  access.bam.sub.dir,
                   "/",
                   all.dmp.bam.ids.XS,
                   "-simplex.bam"
