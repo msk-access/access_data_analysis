@@ -233,8 +233,6 @@ compile_reads <- function(master.ref,
           dmp.sample.sheet <- NULL
         }
       }
-      print(dmp.sample.sheet)
-      stop()
       # total sample sheet
       sample.sheet <- master.ref[cmo_patient_id == x,
                                  # plasma bams -- duplex and simplex bam
@@ -775,7 +773,9 @@ if (!interactive()) {
       genotyper.path,
       dmp.dir,
       mirror.bam.dir,
-      dmp.key.path
+      mirror.access.bam.dir,
+      dmp.key.path,
+      access.key.path
     )
   )
   print("compile reads function finished")
