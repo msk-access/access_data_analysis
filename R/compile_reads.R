@@ -109,7 +109,7 @@ compile_reads <- function(master.ref,
         all.dmp.bam.ids <-
           c(all.dmp.bam.ids.IM,
             all.dmp.bam.ids.IH)
-        if (length(all.dmp.ids)==0) {
+        if (length(all.dmp.ids) == 0) {
           dmp.sample.sheet <- NULL
         } else{
           bam.sub.dir <-
@@ -130,7 +130,7 @@ compile_reads <- function(master.ref,
             )
           )
         }
-        if (length(all.dmp.ids.XS) == 0){
+        if (length(all.dmp.ids.XS) == 0) {
           access.sample.sheet <- NULL
         } else{
           access.bam.sub.dir <-
@@ -165,9 +165,11 @@ compile_reads <- function(master.ref,
             )
           )
         }
-        if (is.null(dmp.sample.sheet) &
-            is.null(access.sample.sheet)) {
-          dmp.sample.sheet <- NULL
+        if (!is.null(dmp.sample.sheet) &
+            !is.null(access.sample.sheet)) {
+          dmp.sample.sheet <-
+            bind_row(dmp.sample.sheet, access.sample.sheet)
+
         } else if (is.null(dmp.sample.sheet) &
                    !is.null(access.sample.sheet)) {
           dmp.sample.sheet <- access.sample.sheet
@@ -175,17 +177,22 @@ compile_reads <- function(master.ref,
                    is.null(access.sample.sheet)) {
           dmp.sample.sheet <- dmp.sample.sheet
         } else{
-          dmp.sample.sheet <-
-            bind_row(dmp.sample.sheet, access.sample.sheet)
+          dmp.sample.sheet <- NULL
         }
-        dmp.sample.sheet %>%
-          mutate(
-            cmo_patient_id = x,
-            Sample_Type = ifelse(grepl("-T", Sample_Barcode),
-                                 "DMP_Tumor",
-                                 "DMP_Normal"),
-            dmp_patient_id = dmp_id
-          )
+        if (!is.null(dmp.sample.sheet)) {
+          dmp.sample.sheet %>%
+            mutate(
+              cmo_patient_id = x,
+              Sample_Type = ifelse(
+                grepl("-T", Sample_Barcode),
+                "DMP_Tumor",
+                "DMP_Normal"
+              ),
+              dmp_patient_id = dmp_id
+            )
+        } else{
+          dmp.sample.shett <- NULL
+        }
       }
       print(dmp.sample.sheet)
       stop()
