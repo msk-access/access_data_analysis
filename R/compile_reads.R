@@ -40,8 +40,6 @@ compile_reads <- function(master.ref,
 
   # data from DMP -----------------------------------------------------------
   DMP.key <- fread(dmp.key.path)
-  access.key <-
-    as.data.table(read.csv(access.key.path, header = FALSE, sep = ","))
   if (any(!master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id %in% gsub("-T..-IH.|-T..-IM.", "", DMP.key[grepl("IH|IM", V1)]$V1))) {
     message(paste0(
       "These DMP IDs are not found in DMP key file: ",
@@ -49,8 +47,11 @@ compile_reads <- function(master.ref,
                                                                              gsub("-T..-IH.|-T..-IM.", "", DMP.key[grepl("IH|IM", V1)]$V1))], collapse = " ,")
     ))
   }
+  # data from DMP ACCESS ----------------------------------------------------
+  access.key <-
+    as.data.table(read.csv(access.key.path, header = FALSE, sep = ","))
   if (any(!master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id %in% gsub("-T..-XS.", "", access.key[grepl("XS", V1)]$V1))) {
-    messsage(paste0(
+    message(paste0(
       "These DMP IDs are not found in DMP ACCESS key file: ",
       paste0(master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id[which(!master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id %in%
                                                                              gsub("-T..-XS.", "", access.key[grepl("XS", V1)]$V1))], collapse = " ,")
@@ -62,7 +63,7 @@ compile_reads <- function(master.ref,
     filter(Mutation_Status != "GERMLINE") %>%
     data.table()
   DMP.RET.maf <-
-    DMP.maf[grepl(paste0(unique(master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id), collapse = "|"), Tumor_Sample_Barcode), ]
+    DMP.maf[grepl(paste0(unique(master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id), collapse = "|"), Tumor_Sample_Barcode),]
 
   # Pooled normal samples ---------------------------------------------------
   pooled.bams <-
@@ -434,7 +435,7 @@ compile_reads <- function(master.ref,
           HGVSp_Short,
           Reference_Allele,
           Tumor_Seq_Allele2
-        )])), ] %>%
+        )])),] %>%
         mutate(
           t_ref_count = 0,
           t_alt_count = 0,
@@ -559,7 +560,7 @@ compile_reads <- function(master.ref,
       HGVSp_Short,
       Reference_Allele,
       Tumor_Seq_Allele2
-    )]),]
+    )]), ]
   write.table(
     all.all.unique.mafs,
     paste0(results.dir, "/pooled/all_all_unique.maf"),
