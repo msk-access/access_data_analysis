@@ -181,7 +181,7 @@ compile_reads <- function(master.ref,
             !is.null(access.sample.sheet)) {
           print("I am in 1")
           dmp.sample.sheet <-
-            bind_row(dmp.sample.sheet, access.sample.sheet)
+            bind_rows(dmp.sample.sheet, access.sample.sheet)
 
         } else if (is.null(dmp.sample.sheet) &
                    !is.null(access.sample.sheet)) {
