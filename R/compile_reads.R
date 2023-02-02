@@ -233,6 +233,8 @@ compile_reads <- function(master.ref,
           dmp.sample.sheet <- NULL
         }
       }
+      print(dmp.sample.sheet)
+      stop()
       # total sample sheet
       sample.sheet <- master.ref[cmo_patient_id == x,
                                  # plasma bams -- duplex and simplex bam
