@@ -39,8 +39,8 @@ compile_reads <- function(master.ref,
   }
 
   # data from DMP -----------------------------------------------------------
-  DMP.key <- fread(dmp.key.path, select = c(1, 2))
-  access.key <- read.csv(access.key.path, header = FALSE, quote = FALSE)
+  DMP.key <- fread(dmp.key.path)
+  access.key <- read.csv(access.key.path, header = FALSE, sep = ",")
   print(!master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id %in% gsub("-T..-XS.", "", access.key[grepl("XS", V1)]$V1))
   print(gsub("-T..-XS.", "", access.key[grepl("XS", V1)]$V1))
   if (any(!master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id %in% gsub("-T..-IH.|-T..-IM.", "", DMP.key[grepl("IH|IM", V1)]$V1))) {
