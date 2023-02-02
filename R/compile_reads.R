@@ -222,11 +222,11 @@ compile_reads <- function(master.ref,
 
         } else if (is.null(dmp.sample.sheet) &
                    !is.null(access.sample.sheet)) {
-          print("DMP IMPACT samples are available and DMP ACCESS samples are NOT available")
+          print("DMP IMPACT samples are NOT available and DMP ACCESS samples are available")
           dmp.sample.sheet <- access.sample.sheet
         } else if (!is.null(dmp.sample.sheet) &
                    is.null(access.sample.sheet)) {
-          print("DMP IMPACT samples are NOT available and DMP ACCESS samples are available")
+          print("DMP IMPACT samples are available and DMP ACCESS samples are NOT available")
           dmp.sample.sheet <- dmp.sample.sheet
         } else{
           print("No DMP IMPACT samples or DMP ACCESS samples are available")
