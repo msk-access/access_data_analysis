@@ -186,6 +186,8 @@ compile_reads <- function(master.ref,
             dmp_patient_id = dmp_id
           )
       }
+      print(dmp.sample.sheet)
+      stop()
       # total sample sheet
       sample.sheet <- master.ref[cmo_patient_id == x,
                                  # plasma bams -- duplex and simplex bam
