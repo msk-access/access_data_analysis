@@ -42,14 +42,14 @@ compile_reads <- function(master.ref,
   DMP.key <- fread(dmp.key.path)
   access.key <- fread(access.key.path)
   if (any(!master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id %in% gsub("-T..-IH.|-T..-IM.", "", DMP.key[grepl("IH|IM", V1)]$V1))) {
-    warnings(paste0(
+    message(paste0(
       "These DMP IDs are not found in DMP key file: ",
       paste0(master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id[which(!master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id %in%
                                                                              gsub("-T..-IH.|-T..-IM.", "", DMP.key[grepl("IH|IM", V1)]$V1))], collapse = " ,")
     ))
   }
   if (any(!master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id %in% gsub("-T..-XS.", "", access.key[grepl("XS", V1)]$V1))) {
-    warnings(paste0(
+    stop(paste0(
       "These DMP IDs are not found in DMP ACCESS key file: ",
       paste0(master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id[which(!master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id %in%
                                                                              gsub("-T..-XS.", "", access.key[grepl("XS", V1)]$V1))], collapse = " ,")
