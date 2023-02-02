@@ -91,7 +91,9 @@ compile_reads <- function(master.ref,
         all.dmp.ids.IH <-
           DMP.key[grepl(paste0(dmp_id, "-(T|N)..-IH."), V1)]$V1
         all.dmp.ids.XS <-
-          access.key[grepl(paste0(dmp_id, "-(T|N)..-XS."), V1)]$V1
+          access.key[grepl(paste0(dmp_id, "-T..-XS."), V1)]$V1
+        all.dmp.ids.normal.XS <-
+          access.key[grepl(paste0(dmp_id, "-N..-XS."), V1)]$V1
         all.dmp.ids <- c(all.dmp.ids.IM, all.dmp.ids.IH)
         all.dmp.bam.ids.IM <-
           DMP.key[grepl(paste0(dmp_id, "-(T|N)..-IM."), V1)]$V2
@@ -101,6 +103,10 @@ compile_reads <- function(master.ref,
           gsub("-standard|-unfilter|-simplex|-duplex",
                "",
                access.key[grepl(paste0(dmp_id, "-(T|N)..-XS."), V1)]$V2)
+        all.dmp.bam.ids.normal.XS <-
+          gsub("-standard|-unfilter|-simplex|-duplex",
+               "",
+               access.key[grepl(paste0(dmp_id, "-N..-XS."), V1)]$V2)
         all.dmp.bam.ids <-
           c(all.dmp.bam.ids.IM,
             all.dmp.bam.ids.IH)
@@ -170,33 +176,63 @@ compile_reads <- function(master.ref,
                 cmo_patient_id = x,
                 Sample_Type = ifelse(
                   grepl("-T", Sample_Barcode),
-                  "DMP_Tumor",
-                  "DMP_Normal"
+                  "duplex",
+                  "unfilterednormal"
                 ),
                 dmp_patient_id = dmp_id
               )
           )
+          access.normal.bam.sub.dir <-
+            unlist(lapply(strsplit(
+              substr(all.dmp.bam.ids.normal.XS, 1, 2), ""
+            ), function(x) {
+              paste0(x, collapse = "/")
+            }))
+          access.normal.sample.sheet <- unique(
+            data.frame(
+              Sample_Barcode = all.dmp.ids.normal.XS,
+              standard_bam = paste0(
+                mirror.access.bam.dir,
+                "/",
+                access.normal.bam.sub.dir,
+                "/",
+                all.dmp.bam.ids.normal.XS,
+                "-unfilter.bam"
+              ),
+              duplex_bam = NA,
+              simplex_bam = NA
+            ) %>%
+              mutate(
+                cmo_patient_id = x,
+                Sample_Type = ifelse(
+                  grepl("-N", Sample_Barcode),
+                  "unfilterednormal",
+                  "duplex"
+                ),
+                dmp_patient_id = dmp_id
+              )
+          )
+          access.sample.sheet = bind_rows(access.sample.sheet, access.normal.sample.sheet)
         }
         if (!is.null(dmp.sample.sheet) &
             !is.null(access.sample.sheet)) {
-          print("I am in 1")
+          print("DMP IMPACT and DMP ACCESS samples are available")
           dmp.sample.sheet <-
             bind_rows(dmp.sample.sheet, access.sample.sheet)
 
         } else if (is.null(dmp.sample.sheet) &
                    !is.null(access.sample.sheet)) {
-          print("I am in 2")
+          print("DMP IMPACT samples are available and DMP ACCESS samples are NOT available")
           dmp.sample.sheet <- access.sample.sheet
         } else if (!is.null(dmp.sample.sheet) &
                    is.null(access.sample.sheet)) {
-          print("I am in 3")
+          print("DMP IMPACT samples are NOT available and DMP ACCESS samples are available")
           dmp.sample.sheet <- dmp.sample.sheet
         } else{
-          print("I am in 4")
+          print("No DMP IMPACT samples or DMP ACCESS samples are available")
           dmp.sample.sheet <- NULL
         }
       }
-      print(dmp.sample.sheet)
       # total sample sheet
       sample.sheet <- master.ref[cmo_patient_id == x,
                                  # plasma bams -- duplex and simplex bam
