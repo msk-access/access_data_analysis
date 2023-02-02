@@ -177,7 +177,8 @@ compile_reads <- function(master.ref,
         } else{
           dmp.sample.sheet <-
             bind_row(dmp.sample.sheet, access.sample.sheet)
-        } %>%
+        }
+        dmp.sample.sheet %>%
           mutate(
             cmo_patient_id = x,
             Sample_Type = ifelse(grepl("-T", Sample_Barcode),
