@@ -40,9 +40,8 @@ compile_reads <- function(master.ref,
 
   # data from DMP -----------------------------------------------------------
   DMP.key <- fread(dmp.key.path)
-  access.key <- as.data.table(read.csv(access.key.path, header = FALSE, sep = ","))
-  print(!master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id %in% gsub("-T..-XS.", "", access.key[grepl("XS", V1)]$V1))
-  print(gsub("-T..-XS.", "", access.key[grepl("XS", V1)]$V1))
+  access.key <-
+    as.data.table(read.csv(access.key.path, header = FALSE, sep = ","))
   if (any(!master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id %in% gsub("-T..-IH.|-T..-IM.", "", DMP.key[grepl("IH|IM", V1)]$V1))) {
     message(paste0(
       "These DMP IDs are not found in DMP key file: ",
@@ -63,7 +62,7 @@ compile_reads <- function(master.ref,
     filter(Mutation_Status != "GERMLINE") %>%
     data.table()
   DMP.RET.maf <-
-    DMP.maf[grepl(paste0(unique(master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id), collapse = "|"), Tumor_Sample_Barcode),]
+    DMP.maf[grepl(paste0(unique(master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id), collapse = "|"), Tumor_Sample_Barcode), ]
 
   # Pooled normal samples ---------------------------------------------------
   pooled.bams <-
@@ -122,7 +121,9 @@ compile_reads <- function(master.ref,
               "/",
               all.dmp.bam.ids,
               ".bam"
-            )
+            ),
+            duplex_bam = NA,
+            simplex_bam = NA
           ) %>%
             mutate(
               cmo_patient_id = x,
@@ -146,6 +147,7 @@ compile_reads <- function(master.ref,
           access.sample.sheet <- unique(
             data.frame(
               Sample_Barcode = all.dmp.ids.XS,
+              standard_bam = NA,
               duplex_bam = paste0(
                 mirror.access.bam.dir,
                 "/",
@@ -199,6 +201,7 @@ compile_reads <- function(master.ref,
                                  # plasma bams -- duplex and simplex bam
                                  .(
                                    Sample_Barcode = as.character(cmo_sample_id_plasma),
+                                   standard_bam = NA,
                                    duplex_bam = bam_path_plasma_duplex,
                                    simplex_bam = bam_path_plasma_simplex,
                                    cmo_patient_id,
@@ -211,6 +214,8 @@ compile_reads <- function(master.ref,
                                       .(
                                         Sample_Barcode = as.character(cmo_sample_id_normal),
                                         standard_bam = bam_path_normal,
+                                        duplex_bam = NA,
+                                        simplex_bam = NA,
                                         cmo_patient_id,
                                         Sample_Type = "unfilterednormal",
                                         dmp_patient_id
@@ -429,7 +434,7 @@ compile_reads <- function(master.ref,
           HGVSp_Short,
           Reference_Allele,
           Tumor_Seq_Allele2
-        )])),] %>%
+        )])), ] %>%
         mutate(
           t_ref_count = 0,
           t_alt_count = 0,
@@ -554,7 +559,7 @@ compile_reads <- function(master.ref,
       HGVSp_Short,
       Reference_Allele,
       Tumor_Seq_Allele2
-    )]), ]
+    )]),]
   write.table(
     all.all.unique.mafs,
     paste0(results.dir, "/pooled/all_all_unique.maf"),
