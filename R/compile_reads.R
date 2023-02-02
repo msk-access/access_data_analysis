@@ -167,19 +167,24 @@ compile_reads <- function(master.ref,
         }
         if (!is.null(dmp.sample.sheet) &
             !is.null(access.sample.sheet)) {
+          print("I am in 1")
           dmp.sample.sheet <-
             bind_row(dmp.sample.sheet, access.sample.sheet)
 
         } else if (is.null(dmp.sample.sheet) &
                    !is.null(access.sample.sheet)) {
+          print("I am in 2")
           dmp.sample.sheet <- access.sample.sheet
         } else if (!is.null(dmp.sample.sheet) &
                    is.null(access.sample.sheet)) {
+          print("I am in 3")
           dmp.sample.sheet <- dmp.sample.sheet
         } else{
+          print("I am in 4")
           dmp.sample.sheet <- NULL
         }
         if (!is.null(dmp.sample.sheet)) {
+          print("I am in 5")
           dmp.sample.sheet %>%
             mutate(
               cmo_patient_id = x,
@@ -191,7 +196,8 @@ compile_reads <- function(master.ref,
               dmp_patient_id = dmp_id
             )
         } else{
-          dmp.sample.shett <- NULL
+          print("I am in 6")
+          dmp.sample.sheet <- NULL
         }
       }
       print(dmp.sample.sheet)
