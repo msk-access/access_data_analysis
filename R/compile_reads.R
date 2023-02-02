@@ -56,12 +56,12 @@ compile_reads <- function(master.ref,
     ))
   }
 
-  if DMP.maf <-
+  DMP.maf <-
     fread(paste0(dmp.dir, "/data_mutations_extended.txt")) %>%
     filter(Mutation_Status != "GERMLINE") %>%
     data.table()
   DMP.RET.maf <-
-    DMP.maf[grepl(paste0(unique(master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id), collapse = "|"), Tumor_Sample_Barcode),]
+    DMP.maf[grepl(paste0(unique(master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id), collapse = "|"), Tumor_Sample_Barcode), ]
 
   # Pooled normal samples ---------------------------------------------------
   pooled.bams <-
@@ -427,7 +427,7 @@ compile_reads <- function(master.ref,
           HGVSp_Short,
           Reference_Allele,
           Tumor_Seq_Allele2
-        )])),] %>%
+        )])), ] %>%
         mutate(
           t_ref_count = 0,
           t_alt_count = 0,
@@ -552,7 +552,7 @@ compile_reads <- function(master.ref,
       HGVSp_Short,
       Reference_Allele,
       Tumor_Seq_Allele2
-    )]), ]
+    )]),]
   write.table(
     all.all.unique.mafs,
     paste0(results.dir, "/pooled/all_all_unique.maf"),
