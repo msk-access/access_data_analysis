@@ -41,25 +41,25 @@ compile_reads <- function(master.ref,
   # data from DMP -----------------------------------------------------------
   DMP.key <- fread(dmp.key.path)
   if (any(
-    !master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id %in% gsub("-T..-IH.|-T..-IM.|-T..-XS", "", DMP.key[grepl("IH|IM|XS", V1)]$V1)
+    !master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id %in% gsub("-T..-IH.|-T..-IM.", "", DMP.key[grepl("IH|IM", V1)]$V1)
   )) {
     message(paste0(
       "These DMP IDs are not found in DMP key file: ",
       paste0(master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id[which(
         !master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id %in%
-          gsub("-T..-IH.|-T..-IM.|-T..-XS", "", DMP.key[grepl("IH|IM|XS", V1)]$V1)
+          gsub("-T..-IH.|-T..-IM.", "", DMP.key[grepl("IH|IM", V1)]$V1)
       )], collapse = " ,")
     ))
   }
   access.key <- fread(access.key.path)
   if (any(
-    !master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id %in% gsub("-T..-IH.|-T..-IM.|-T..-XS", "", access.key[grepl("IH|IM|XS", V1)]$V1)
+    !master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id %in% gsub("-T..-XS.", "", access.key[grepl("XS", V1)]$V1)
   )) {
     message(paste0(
-      "These DMP IDs are not found in DMP key file: ",
+      "These DMP IDs are not found in DMP ACCESS key file: ",
       paste0(master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id[which(
         !master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id %in%
-          gsub("-T..-IH.|-T..-IM.|-T..-XS", "", access.key[grepl("IH|IM|XS", V1)]$V1)
+          gsub("-T..-XS.", "", access.key[grepl("XS", V1)]$V1)
       )], collapse = " ,")
     ))
   }
@@ -148,10 +148,6 @@ compile_reads <- function(master.ref,
             ), function(x) {
               paste0(x, collapse = "/")
             }))
-          print("ID\n")
-          print(all.dmp.ids.XS)
-          print("\nDIR\n")
-          print(access.bam.sub.dir)
           access.sample.sheet <- unique(
             data.frame(
               Sample_Barcode = all.dmp.ids.XS,
