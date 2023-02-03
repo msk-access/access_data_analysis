@@ -195,6 +195,7 @@ filter_calls = function(
 
     # germline filtering for matched and unmatched ----------------------------
     plasma.samples <- sample.sheet[Sample_Type %in% c('duplex')]$column.names
+    print(plasma.samples)
     normal.samples <- sample.sheet[Sample_Type %in% c('unfilterednormal','normal_DMP')]$column.names
     fillouts.dt[,c(
       paste0(plasma.samples,'.called')
