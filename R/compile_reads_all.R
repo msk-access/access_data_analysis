@@ -5,7 +5,7 @@
 
 
 #' @export
-compile_reads <- function(master.ref,
+compile_reads_all <- function(master.ref,
                           results.dir,
                           project.ID,
                           pooled.bam.dir = "/juno/work/access/production/resources/msk-access/current/novaseq_curated_duplex_bams_dmp/current/",
@@ -764,7 +764,7 @@ if (!interactive()) {
   print(dmp.key.path)
   print(access.key.path)
   suppressWarnings(
-    compile_reads(
+    compile_reads_all(
       fread(master.ref),
       results.dir,
       project.ID,
