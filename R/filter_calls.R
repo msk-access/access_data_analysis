@@ -51,11 +51,13 @@ filter_calls = function(
 
     # compiling a sample sheet with duplex, simplex, normal, DMP tumor and DMP normal
     sample.sheet <- fread(paste0(results.dir,'/',x,'/',x,'_sample_sheet.tsv'))[,.(Sample_Barcode,cmo_patient_id,Sample_Type)]
+    print(sample.sheet)
+    print("Duplex-SIMPEX")
     simplex.sample.sheet = sample.sheet[Sample_Type == 'duplex',.(Sample_Barcode,cmo_patient_id,Sample_Type = 'simplex')]
     sample.sheet = rbind(sample.sheet,simplex.sample.sheet) %>%
       mutate(column.names = paste0(Sample_Barcode,'___',Sample_Type)) %>%
       data.table()
-
+    print(sample.sheet)
     # compiling different genotype files from step 1
     fillouts.dt <- do.call(rbind,lapply(fillouts.filenames,function(y){
       sample.name = gsub('.*./|-ORG.*.','',y)
