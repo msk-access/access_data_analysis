@@ -102,7 +102,7 @@ compile_reads <- function(master.ref,
         all.dmp.bam.ids.XS <-
           gsub("-standard|-unfilter|-simplex|-duplex",
                "",
-               access.key[grepl(paste0(dmp_id, "-(T|N)..-XS."), V1)]$V2)
+               access.key[grepl(paste0(dmp_id, "-T..-XS."), V1)]$V2)
         all.dmp.bam.ids.normal.XS <-
           gsub("-standard|-unfilter|-simplex|-duplex",
                "",
