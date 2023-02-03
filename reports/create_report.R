@@ -4,7 +4,6 @@ library(knitr)
 library(rmarkdown)
 library(argparse)
 
-
 parser <- ArgumentParser()
 
 parser$add_argument("-t", "--template", required=T, help="Path to Rmarkdown template file.")
@@ -16,9 +15,11 @@ parser$add_argument("-m", "--metadata", required=T, help="Path to file containin
 parser$add_argument("-d", "--dmp-id", help="DMP patient ID (optional).")
 parser$add_argument("-ds", "--dmp-sample-id", help="DMP sample ID (optional).")
 parser$add_argument("-dm", "--dmp-maf", help="Path to DMP MAF file (optional).")
-parser$add_argument("-o", "--output", help="Output file")
+parser$add_argument("-o", "--output", help="Output file with .html extension")
 parser$add_argument(
-  "-ca", "--combine-access", help="Don't splite VAF plots by clonality.", action="store_true")
+  "-md", "--keep-rmarkdown", help="Dont make tmp file for markdown, keep it in the same directory", action="store_true")
+parser$add_argument(
+  "-ca", "--combine-access", help="Don't split VAF plots by clonality.", action="store_true")
 parser$add_argument(
   "-pi", "--plot-impact", help="Also plot VAFs from IMPACT samples.", action="store_true")
 
@@ -47,6 +48,12 @@ input_text <- knitr::knit_expand(
 tmp <- tempfile(fileext = ".Rmd")
 cat(input_text, file = tmp)
 
+if (args$keep_rmarkdown){
+  rmd_name <- gsub(".html",".Rmd", args$output)
+  output_cwd <- normalizePath(dirname(args$output)) 
+  output_rmd_path <- paste(output_cwd,"/",rmd_name, sep='')
+  file.copy(tmp,output_rmd_path)
+}
 rmarkdown::render(
   tmp,
   output_format = "html_document",

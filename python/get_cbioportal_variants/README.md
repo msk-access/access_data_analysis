@@ -13,7 +13,7 @@ Tool to do the following operations:
 ### Example command
 
 ```bash
-python get_cbioportal_variants.py  --id "Test1" --id "Test2" --id "Test3" 
+python get_cbioportal_variants.py  --sid "Test1" --sid "Test2" --sid "Test3" 
 ```
 
 ```bash
@@ -43,7 +43,7 @@ Options:
                         'Tumor_Sample_Barcode' column. Header of this file is
                         'sample_id'  [default: ]
 
-  --id TEXT             Identifiers to search for in the
+  --sid TEXT             Identifiers to search for in the
                         'Tumor_Sample_Barcode' column. Can be given multiple
                         times  [default: ]
 
