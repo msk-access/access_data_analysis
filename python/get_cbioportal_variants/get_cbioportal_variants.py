@@ -6,6 +6,7 @@ import pandas as pd
 
 app = typer.Typer()
 
+
 @app.command()
 def subset_cpt(
     cpt: Path = typer.Option(
@@ -45,7 +46,7 @@ def subset_cpt(
 ):
     """
     Subset data_clinical_patient.txt file for given set of patient ids.
-    
+
     Tool to do the following operations:
     A. Get subset of clinical information for samples based on PATIENT_ID in data_clinical_patient.txt file
 
@@ -63,7 +64,8 @@ def subset_cpt(
     ids_to_subset = read_ids(sid, ids)
     subset_tsv = filter_by_rows(ids_to_subset, cpt_df, col_name)
     subset_tsv.drop_duplicates().to_csv(output_file, sep="\t", index=False)
-    
+
+
 @app.command()
 def subset_cst(
     cst: Path = typer.Option(
@@ -103,7 +105,7 @@ def subset_cst(
 ):
     """
     Subset data_clinical_samples.txt file for given set of sample ids.
-    
+
     Tool to do the following operations:
     A. Get subset of clinical information for samples based on SAMPLE_ID in data_clinical_sample.txt file
 
@@ -121,6 +123,7 @@ def subset_cst(
     ids_to_subset = read_ids(sid, ids)
     subset_tsv = filter_by_rows(ids_to_subset, cst_df, col_name)
     subset_tsv.drop_duplicates().to_csv(output_file, sep="\t", index=False)
+
 
 @app.command()
 def subset_cna(
@@ -155,7 +158,7 @@ def subset_cna(
 ):
     """
     Subset data_CNA.txt file for given set of sample ids.
-    
+
     Tool to do the following operations:
     A. Get subset of samples based on column header in data_CNA.txt file
 
@@ -215,7 +218,7 @@ def subset_sv(
 ):
     """
     Subset data_sv.txt file for given set of sample ids.
-    
+
     Tool to do the following operations:
     A. Get subset of structural variants based on Sample_ID in data_sv.txt file
 
@@ -287,7 +290,7 @@ def subset_maf(
 
     """
     Subset MAF/TSV file and mark if an alteration is covered by BED file or not
-    
+
     Tool to do the following operations:
     A. Get subset of variants based on Tumor_Sample_Barcode in data_mutations_extended.txt file
     B. Mark the variants as overlapping with BED file as covered [yes/no], by appending "covered" column to the subset MAF
