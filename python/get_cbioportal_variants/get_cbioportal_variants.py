@@ -39,6 +39,8 @@ def subset_cna(
     ),
 ):
     """
+    Subset data_CNA.txt file for given set of sample ids.
+    
     Tool to do the following operations:
     A. Get subset of samples based on column header in data_CNA.txt file
 
@@ -97,6 +99,8 @@ def subset_sv(
     ),
 ):
     """
+    Subset data_sv.txt file for given set of sample ids.
+    
     Tool to do the following operations:
     A. Get subset of structural variants based on Sample_ID in data_sv.txt file
 
@@ -167,6 +171,8 @@ def subset_maf(
 ):
 
     """
+    Subset MAF/TSV file and mark if an alteration is covered by BED file or not
+    
     Tool to do the following operations:
     A. Get subset of variants based on Tumor_Sample_Barcode in data_mutations_extended.txt file
     B. Mark the variants as overlapping with BED file as covered [yes/no], by appending "covered" column to the subset MAF
