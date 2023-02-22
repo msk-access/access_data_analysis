@@ -383,7 +383,7 @@ def filter_by_rows(sid, tsv_df, col_name):
     """
     typer.echo("Subset based on rows...")
     ns = set(sid)
-    pattern = "|".join([f"\b{i}\b" for i in ns])
+    pattern = "|".join([r"\b{}\b".format(i) for i in ns])
     result = tsv_df[tsv_df[col_name].str.contains(pattern, regex=True)]
     return result.copy(deep=True)
 
