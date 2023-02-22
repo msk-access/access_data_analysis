@@ -7,7 +7,7 @@ import pandas as pd
 app = typer.Typer()
 
 @app.command()
-def subset_clinical_patient(
+def subset_cpt(
     cpt: Path = typer.Option(
         "/work/access/production/resources/cbioportal/current/msk_solid_heme/data_clinical_patient.txt",
         "--cpt",
@@ -65,7 +65,7 @@ def subset_clinical_patient(
     subset_tsv.drop_duplicates().to_csv(output_file, sep="\t", index=False)
     
 @app.command()
-def subset_clinical_sample(
+def subset_cst(
     cst: Path = typer.Option(
         "/work/access/production/resources/cbioportal/current/msk_solid_heme/data_clinical_sample.txt",
         "--cst",
