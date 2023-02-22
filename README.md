@@ -7,5 +7,4 @@ Scripts for downstream analysis plotting of pipeline output
 
 ## Documentation 
 
-https://msk-access.gitbook.io/access-data-analysis-v1/
-
+https://cmo-ci.gitbook.io/cmo-access-data-analysis/
