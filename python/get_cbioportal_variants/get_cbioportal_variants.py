@@ -180,8 +180,6 @@ def subset_cna(
     cna_df = read_tsv(cna)
     ids_to_subset = read_ids(sid, ids)
     ids_to_subset.insert(0, "Hugo_Symbol")
-    print(ids_to_subset.head())
-    print(type(ids_to_subset))
     subset_tsv = filter_by_columns(ids_to_subset, cna_df)
     subset_tsv.drop_duplicates().to_csv(output_file, sep="\t", index=False)
     typer.echo("Done!")
@@ -338,7 +336,7 @@ def read_tsv(tsv):
     """
     typer.echo("Read TSV file...")
     skip = get_row(tsv)
-    return pd.read_csv(tsv, sep="\t", skiprows=skip, low_memory=False)
+    return pd.read_csv(tsv, sep="\t", skiprows=skip, low_memory=False, chunksize=1000000)
 
 
 def read_ids(sid, ids):
