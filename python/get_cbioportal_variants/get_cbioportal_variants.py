@@ -32,7 +32,7 @@ def subset_cpt(
         help="Identifiers to search for in the 'PATIENT_ID' column. Can be given multiple times",
     ),
     output_file: str = typer.Option(
-        "output_sv.txt",
+        "output_clinical_patient.txt",
         "--name",
         "-n",
         help="Name of the output file",
@@ -54,6 +54,7 @@ def subset_cpt(
     pandas; typing; typer; bed_lookup(https://github.com/msk-access/python_bed_lookup)
 
     """
+    typer.echo("Subset Clinical Patients...")
     if not ids:
         typer.echo("Identifiers were not provided in a text file")
         if not sid:
@@ -64,6 +65,7 @@ def subset_cpt(
     ids_to_subset = read_ids(sid, ids)
     subset_tsv = filter_by_rows(ids_to_subset, cpt_df, col_name)
     subset_tsv.drop_duplicates().to_csv(output_file, sep="\t", index=False)
+    typer.echo("Done!")
 
 
 @app.command()
@@ -91,7 +93,7 @@ def subset_cst(
         help="Identifiers to search for in the 'SAMPLE_ID' column. Can be given multiple times",
     ),
     output_file: str = typer.Option(
-        "output_sv.txt",
+        "output_clinical_samples.txt",
         "--name",
         "-n",
         help="Name of the output file",
@@ -113,6 +115,7 @@ def subset_cst(
     pandas; typing; typer; bed_lookup(https://github.com/msk-access/python_bed_lookup)
 
     """
+    typer.echo("Subset Clinical Samples...")
     if not ids:
         typer.echo("Identifiers were not provided in a text file")
         if not sid:
@@ -123,6 +126,7 @@ def subset_cst(
     ids_to_subset = read_ids(sid, ids)
     subset_tsv = filter_by_rows(ids_to_subset, cst_df, col_name)
     subset_tsv.drop_duplicates().to_csv(output_file, sep="\t", index=False)
+    typer.echo("Done!")
 
 
 @app.command()
@@ -166,6 +170,7 @@ def subset_cna(
     pandas; typing; typer; bed_lookup(https://github.com/msk-access/python_bed_lookup)
 
     """
+    typer.echo("Subset Copy Number Variants...")
     if not ids:
         typer.echo("Identifiers were not provided in a text file")
         if not sid:
@@ -177,6 +182,7 @@ def subset_cna(
     all_headers = ids_to_subset.insert(0, "Hugo_Symbol")
     subset_tsv = filter_by_columns(all_headers, cna_df)
     subset_tsv.drop_duplicates().to_csv(output_file, sep="\t", index=False)
+    typer.echo("Done!")
 
 
 @app.command()
@@ -226,6 +232,7 @@ def subset_sv(
     pandas; typing; typer; bed_lookup(https://github.com/msk-access/python_bed_lookup)
 
     """
+    typer.echo("Subset Structural Variants...")
     if not ids:
         typer.echo("Identifiers were not provided in a text file")
         if not sid:
@@ -236,6 +243,7 @@ def subset_sv(
     ids_to_subset = read_ids(sid, ids)
     subset_tsv = filter_by_rows(ids_to_subset, sv_df, col_name)
     subset_tsv.drop_duplicates().to_csv(output_file, sep="\t", index=False)
+    typer.echo("Done!")
 
 
 @app.command()
@@ -299,6 +307,7 @@ def subset_maf(
     pandas; typing; typer; bed_lookup(https://github.com/msk-access/python_bed_lookup)
 
     """
+    typer.echo("Subset and Annotate MAF...")
     if not ids:
         typer.echo("Identifiers were not provided in a text file")
         if not sid:
@@ -311,7 +320,9 @@ def subset_maf(
     bed_obj = read_bed(bed)
     maf_with_covered_tag = check_if_covered(bed_obj, subset_maf)
     maf_with_covered_tag["Chromosome"] = maf_with_covered_tag["Chromosome"].apply(str)
+    typer.echo("Write Filtered and Annotated MAF...")
     maf_with_covered_tag.drop_duplicates().to_csv(output_file, sep="\t", index=False)
+    typer.echo("Done!")
 
 
 def read_tsv(maf):
@@ -337,6 +348,7 @@ def read_ids(sid, ids):
     Returns:
         list: List containing all ids
     """
+    typer.echo("Make a list of IDs...")
     if not sid:
         with open(ids) as file:
             sid = file.read().splitlines()[1:]
@@ -353,6 +365,7 @@ def filter_by_columns(sid, tsv_df):
     Returns:
         data_frame: A copy of the subset of the data_frame
     """
+    typer.echo("Subset based on columns...")
     subset_tsv = tsv_df.filter(items=sid)
     return subset_tsv.copy(deep=True)
 
@@ -368,6 +381,7 @@ def filter_by_rows(sid, tsv_df, col_name):
     Returns:
         data_frame: A copy of the subset of the data_frame
     """
+    typer.echo("Subset based on rows...")
     ns = set(sid)
     pattern = "|".join([f"\b{i}\b" for i in ns])
     result = tsv_df[tsv_df[col_name].str.contains(pattern, regex=True)]
@@ -383,6 +397,7 @@ def read_bed(bed):
     Returns:
         object : bed file object to use for filtering
     """
+    typer.echo("Reading the BED file...")
     return BedFile(bed.as_posix())
 
 
@@ -397,6 +412,7 @@ def check_if_covered(bedObj, mafObj):
         data_frame: _description_
     """
     # Our chromosome column is 'Chromosome' and position column is 'Start_Position'.
+    typer.echo("Annotating the MAF file...")
     mafObj["covered"] = bedObj.lookup_df(mafObj, "Chromosome", "Start_Position")
     mafObj.loc[mafObj["covered"].notnull(), "covered"] = "yes"
     mafObj.loc[mafObj["covered"].notna(), "covered"] = "yes"
