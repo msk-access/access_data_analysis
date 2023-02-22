@@ -414,6 +414,8 @@ def check_if_covered(bedObj, mafObj):
     # Our chromosome column is 'Chromosome' and position column is 'Start_Position'.
     typer.echo("Annotating the MAF file...")
     mafObj["covered"] = bedObj.lookup_df(mafObj, "Chromosome", "Start_Position")
+    print(mafObj.head())
+    print(mafObj["covered"].head())
     mafObj.loc[mafObj["covered"].notnull(), "covered"] = "yes"
     mafObj.loc[mafObj["covered"].notna(), "covered"] = "yes"
     mafObj.loc[mafObj["covered"].isnull(), "covered"] = "no"
