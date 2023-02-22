@@ -336,7 +336,7 @@ def read_tsv(tsv):
     """
     typer.echo("Read TSV file...")
     skip = get_row(tsv)
-    return pd.read_csv(tsv, sep="\t", skiprows=skip, low_memory=False, chunksize=1000000)
+    return pd.read_csv(tsv, sep="\t", skiprows=skip, low_memory=False)
 
 
 def read_ids(sid, ids):
