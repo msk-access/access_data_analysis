@@ -327,7 +327,7 @@ def subset_maf(
     typer.echo("Done!")
 
 
-def read_tsv(maf):
+def read_tsv(tsv):
     """Read a tsv file
 
     Args:
@@ -336,8 +336,9 @@ def read_tsv(maf):
     Returns:
         data_frame: Output a data frame containing the MAF/tsv
     """
-    skip = get_row(maf)
-    return pd.read_csv(maf, sep="\t", skiprows=skip, low_memory=False)
+    typer.echo("Read TSV file...")
+    skip = get_row(tsv)
+    return pd.read_csv(tsv, sep="\t", skiprows=skip, low_memory=False)
 
 
 def read_ids(sid, ids):
