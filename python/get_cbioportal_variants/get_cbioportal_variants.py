@@ -179,10 +179,10 @@ def subset_cna(
 
     cna_df = read_tsv(cna)
     ids_to_subset = read_ids(sid, ids)
-    all_headers = ids_to_subset.insert(0, "Hugo_Symbol")
-    print(all_headers.head())
-    print(type(all_headers))
-    subset_tsv = filter_by_columns(all_headers, cna_df)
+    ids_to_subset.insert(0, "Hugo_Symbol")
+    print(ids_to_subset.head())
+    print(type(ids_to_subset))
+    subset_tsv = filter_by_columns(ids_to_subset, cna_df)
     subset_tsv.drop_duplicates().to_csv(output_file, sep="\t", index=False)
     typer.echo("Done!")
 
