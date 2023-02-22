@@ -44,10 +44,10 @@ def subset_clinical_patient(
     ),
 ):
     """
-    Subset data_clinical_samples.txt file for given set of sample ids.
+    Subset data_clinical_patient.txt file for given set of patient ids.
     
     Tool to do the following operations:
-    A. Get subset of clinical information for samples based on SAMPLE_ID in data_clinical_sample.txt file
+    A. Get subset of clinical information for samples based on PATIENT_ID in data_clinical_patient.txt file
 
     Requirement:
     pandas; typing; typer; bed_lookup(https://github.com/msk-access/python_bed_lookup)
