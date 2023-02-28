@@ -32,7 +32,7 @@ compile_reads <- function(
   }
 
   # data from DMP -----------------------------------------------------------
-  DMP.key <- fread(dmp.key.path)
+  DMP.key <- as.data.table(read.csv(dmp.key.path, header = FALSE, sep = ","))
   if (any(!master.ref[grepl("^P-", dmp_patient_id)]$dmp_patient_id %in% gsub("-T..-IH.|-T..-IM.|-T..-XS", "", DMP.key[grepl("IH|IM|XS", V1)]$V1))) {
     stop(paste0(
       "These DMP IDs are not found in DMP key file: ",
