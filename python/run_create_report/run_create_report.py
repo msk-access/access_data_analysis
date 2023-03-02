@@ -45,7 +45,7 @@ def main(
         "",
         "--template-days",
         "-td",
-        help="If the `--repo` option is specified should we use the template_days RMarkdown file as the template",
+        help="If the `--repo` option is specified and if this is set to True then we will use the template_days RMarkdown file as the template",
     ),
     manifest: Path = typer.Option(
         "",
@@ -99,7 +99,6 @@ def main(
         "-t",
         help="Tumor type label for the report",
     ),
-
 ):
     """_summary_
 
@@ -121,44 +120,59 @@ def main(
     """
     if not repo_path:
         typer.secho(
-            "Path to access_data_analysis repo is not provided!", fg=typer.colors.BRIGHT_YELLOW
+            "Path to access_data_analysis repo is not provided!",
+            fg=typer.colors.BRIGHT_YELLOW,
         )
         if not script_path:
             typer.secho(
-                "Path to create_report.R script is not provided", err=True, fg=typer.colors.BRIGHT_RED,
+                "Path to create_report.R script is not provided",
+                err=True,
+                fg=typer.colors.BRIGHT_RED,
             )
             raise typer.Abort()
         else:
             typer.secho(
-                "Path to create_report.R script is provided as %s", script_path, fg=typer.colors.BRIGHT_GREEN,
+                "Path to create_report.R script is provided as %s",
+                script_path,
+                fg=typer.colors.BRIGHT_GREEN,
             )
         if not template_path:
             typer.secho(
-                "Path to RMarkdown template file is not provided", err=True, fg=typer.colors.BRIGHT_RED,
+                "Path to RMarkdown template file is not provided",
+                err=True,
+                fg=typer.colors.BRIGHT_RED,
             )
             raise typer.Abort()
         else:
             typer.secho(
-                "Path to RMarkdown template file is provided as %s", template_path, fg=typer.colors.BRIGHT_GREEN,
+                "Path to RMarkdown template file is provided as %s",
+                template_path,
+                fg=typer.colors.BRIGHT_GREEN,
             )
     else:
         typer.secho(
-            "Path to access_data_analysis repo is provided as %s", repo_path, fg=typer.colors.BRIGHT_GREEN
+            "Path to access_data_analysis repo is provided as %s",
+            repo_path,
+            fg=typer.colors.BRIGHT_GREEN,
         )
-        script_path = repo_path.joinpath("reports","create_report.R")
+        script_path = repo_path.joinpath("reports", "create_report.R")
         typer.secho(
             "Path to create_report.R is %s", script_path, fg=typer.colors.BRIGHT_GREEN
-        )       
+        )
         if template_days:
             template_path = repo_path.joinpath("reports", "template_days.Rmd")
             typer.secho(
-                "Path to template_days.Rmd is %s", template_path, fg=typer.colors.BRIGHT_GREEN
+                "Path to template_days.Rmd is %s",
+                template_path,
+                fg=typer.colors.BRIGHT_GREEN,
             )
         else:
             template_path = repo_path.joinpath("reports", "template.Rmd")
             typer.secho(
-                "Path to template.Rmd is %s", template_path, fg=typer.colors.BRIGHT_GREEN
-            ) 
+                "Path to template.Rmd is %s",
+                template_path,
+                fg=typer.colors.BRIGHT_GREEN,
+            )
 
 
 if __name__ == "__main__":
