@@ -122,7 +122,6 @@ def main(
     if not repo_path:
         typer.secho(
             "Path to access_data_analysis repo is not provided!", fg=typer.colors.BRIGHT_YELLOW
-            raise typer.Warning()
         )
         if not script_path:
             typer.secho(
