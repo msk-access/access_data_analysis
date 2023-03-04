@@ -57,6 +57,13 @@ def generate_repo_path(
             repo_path,
             fg=typer.colors.BRIGHT_GREEN,
         )
+        if script_path is not None or template_path is not None:
+            typer.secho(
+                "Both repo-path and script-path as well as template path cannot be provided, please use either repo-path or script-path along with template-path",
+                err=True,
+                fg=typer.colors.BRIGHT_RED,
+            )
+            raise typer.Abort()
         script_path = repo_path.joinpath("reports", "create_report.R")
         typer.secho(
             "Path to create_report.R is %s", script_path, fg=typer.colors.BRIGHT_GREEN
