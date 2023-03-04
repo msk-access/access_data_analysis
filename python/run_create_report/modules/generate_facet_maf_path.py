@@ -8,23 +8,25 @@ def generate_facet_maf_path(facet_path, patient_id, sample_id=None):
     """Get path of maf associated with facet-suite output
 
     Args:
-        facet_path (pathlib.PATH): path to search for the facet file
+        facet_path (pathlib.PATH|str): path to search for the facet file
         patient_id (str): patient id to be used to search, default is set to None
         sample_id (str): sample id to be used to search, default is set to None
 
     Returns:
         str: path of the facets maf
     """
-    print(facet_path, patient_id, sample_id)
+    if type(facet_path) == str:
+        facet_path = Path(facet_path)
+
     if sample_id:
         maf_path = facet_path.joinpath(
-            patient_id[:7], sample_id + "*", "default", "/*[0-9].ccf.maf"
+            patient_id[:7], f"{sample_id}*", "default", "/*[0-9].ccf.maf"
         )
-        
     else:
         maf_path = facet_path.joinpath(
-            patient_id[:7], patient_id + "*", "default", "/*[0-9].ccf.maf"
+            patient_id[:7], f"{patient_id}*", "default", "/*[0-9].ccf.maf"
         )
+
     print(maf_path)
     maf_list = glob.glob(maf_path.as_posix())
     print(maf_list)
