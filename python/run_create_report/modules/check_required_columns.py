@@ -27,7 +27,7 @@ def check_required_columns(manifest,template_days=None):
             fg=typer.colors.BRIGHT_RED,
         )
         raise typer.Abort()
-    if "cmo_sample_id" not in column_headers or "sample_id" not in column_headers:
+    if "cmo_sample_id" not in column_headers | "sample_id" not in column_headers:
         typer.secho(
             f"check_required_columns:Could not find cmo_sample_id or sample_id in {column_headers}",
             err=True,
