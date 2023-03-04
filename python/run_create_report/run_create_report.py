@@ -25,7 +25,7 @@ def main(
         help="Base path to where the git repository is located for access_data_analysis",
     ),
     template_days: bool = typer.Option(
-        "",
+        False,
         "--template-days",
         "-d",
         help="If the `--repo` option is specified and if this is set to True then we will use the template_days RMarkdown file as the template",
@@ -55,7 +55,7 @@ def main(
         help="Path to the create_report.R script",
     ),
     markdown: bool = typer.Option(
-        "",
+        False,
         "--generate-markdown",
         "-gm",
         help="If given, the create_report.R will be run with `-md` flag to generate markdown",
