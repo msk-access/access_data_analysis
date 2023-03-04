@@ -109,9 +109,7 @@ def main(
         cmo_patient_id = manifest_df.loc[i, "cmo_patient_id"]
         dmp_patient_id = manifest_df.loc[i, "dmp_patient_id"]
         typer.secho(
-            "Running for patient with CMO ID %s, and DMP ID %s",
-            cmo_patient_id,
-            dmp_patient_id,
+            f"Running for patient with CMO ID {cmo_patient_id}, and DMP ID {dmp_patient_id}",
             fg=typer.colors.BRIGHT_GREEN,
         )
         small_variants_path = get_small_variant_csv(cmo_patient_id, variant_path)
@@ -139,8 +137,7 @@ def main(
             tumor_type,
         )
         typer.secho(
-            "Command:%s",
-            create_report_cmd,
+            f"Command:{create_report_cmd}",
             fg=typer.colors.BRIGHT_MAGENTA,
         )
 

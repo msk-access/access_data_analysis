@@ -22,24 +22,21 @@ def check_required_columns(manifest,template_days=None):
     column_headers = list(manifest.columns.values)
     if "cmo_patient_id" not in column_headers:
         typer.secho(
-            "check_required_columns:Could not find cmo_patient_id in %s",
-            ",".join(column_headers),
+            f"check_required_columns:Could not find cmo_patient_id in {column_headers}",
             err=True,
             fg=typer.colors.BRIGHT_RED,
         )
         raise typer.Abort()
     if "cmo_sample_id" not in column_headers or "sample_id" not in column_headers:
         typer.secho(
-            "check_required_columns:Could not find cmo_sample_id or sample_id in %s",
-            ",".join(column_headers),
+            f"check_required_columns:Could not find cmo_sample_id or sample_id in {column_headers}",
             err=True,
             fg=typer.colors.BRIGHT_RED,
         )
         raise typer.Abort()
     if "dmp_patient_id" not in column_headers:
         typer.secho(
-            "check_required_columns:Could not find dmp_patient_id in %s",
-            ",".join(column_headers),
+            f"check_required_columns:Could not find dmp_patient_id in {column_headers}",
             err=True,
             fg=typer.colors.BRIGHT_RED,
         )
@@ -47,24 +44,21 @@ def check_required_columns(manifest,template_days=None):
     if template_days:
         if "collection_day" not in column_headers:
             typer.secho(
-                "check_required_columns:Could not find collection_day in %s",
-                ",".join(column_headers),
+                f"check_required_columns:Could not find collection_day in {column_headers}",
                 err=True,
                 fg=typer.colors.BRIGHT_RED,
             )
             raise typer.Abort()
     elif "collection_date" not in column_headers:
         typer.secho(
-            "check_required_columns:Could not find collection_date in %s",
-            ",".join(column_headers),
+            f"check_required_columns:Could not find collection_date in {column_headers}",
             err=True,
             fg=typer.colors.BRIGHT_RED,
         )
         raise typer.Abort()
     if "timepoint" not in column_headers:
         typer.secho(
-            "check_required_columns:Could not find timepoint in %s",
-            ",".join(column_headers),
+            f"check_required_columns:Could not find timepoint in {column_headers}",
             err=True,
             fg=typer.colors.BRIGHT_RED,
         )
