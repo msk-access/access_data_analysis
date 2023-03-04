@@ -1,7 +1,12 @@
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 import typer
 import pandas as pd
+from modules.run_cmd import run_cmd
+from modules.utils import read_manifest
+from modules.generate_facet_maf_path import generate_facet_maf_path
+from modules.get_small_variant_csv import get_small_variant_csv
+from modules.generate_create_report_cmd import generate_create_report_cmd
 
 
 def main(
@@ -47,8 +52,14 @@ def main(
         "-td",
         help="If the `--repo` option is specified and if this is set to True then we will use the template_days RMarkdown file as the template",
     ),
-    manifest: Path = typer.Option(
+    markdown: bool = typer.Option(
         "",
+        "--generate-markdown",
+        "-gm",
+        help="If given the create_report.R will be run with `-md` flag to generate markdown",
+    ),
+    manifest: Path = typer.Option(
+        ...,
         "--manifest",
         "-m",
         exists=True,
