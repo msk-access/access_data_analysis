@@ -24,10 +24,7 @@ def generate_facet_maf_path(facet_path, patient_id, sample_id=None):
         maf_path = facet_path.joinpath(
             patient_id[:7], f"{patient_id}*", "default", "*[0-9].ccf.maf"
         )
-
-    print(maf_path)
     maf_list = glob.glob(maf_path.as_posix())
-    print(maf_list)
     if len(maf_list) == 0:
         if patient_id:
             typer.secho(
@@ -51,15 +48,3 @@ def generate_facet_maf_path(facet_path, patient_id, sample_id=None):
         maf_list_sorted = maf_list
 
     return maf_list_sorted[0]
-
-
-def num_sort(test_string):
-    """Numeric sort of a list with 2-digit in the string
-
-    Args:
-        test_string (list[str]): list of string
-
-    Returns:
-        list: return a sorted list
-    """
-    return list(map(int, re.findall(r"\d[2]", test_string)))[0]

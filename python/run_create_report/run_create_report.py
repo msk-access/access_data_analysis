@@ -122,9 +122,7 @@ def main(
             facet_path = generate_facet_maf_path(facet_repo, dmp_patient_id, None)
             # Get the sample id from the Facet file
             facet_path = Path(facet_path)
-            print(type(facet_path),facet_path)
             maf_id = facet_path.stem
-            print(type(maf_id),maf_id)
             dmp_sample_id = maf_id.split("_", 1)[0]
         create_report_cmd = generate_create_report_cmd(
             script_path,
