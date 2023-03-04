@@ -43,15 +43,14 @@ def generate_facet_maf_path(facet_path, patient_id, sample_id=None):
                 fg=typer.colors.BRIGHT_RED,
             )
             raise typer.Abort()
+    elif len(maf_list) > 1:
+        maf_list = [Path(i) for i in maf_list]
+        maf_list_sorted = sorted(maf_list, key=lambda i: int(i.stem))
+        maf_list_sorted = [str(i) for i in maf_list]
     else:
-        if len(maf_list > 1):
-            maf_list = [Path(i) for i in maf_list]
-            maf_list_sorted = sorted(maf_list, key=lambda i: int(i.stem))
-            maf_list_sorted = [str(i) for i in maf_list]
-        else:
-            maf_list_sorted = maf_list
+        maf_list_sorted = maf_list
 
-        return maf_list_sorted[0]
+    return maf_list_sorted[0]
 
 
 def num_sort(test_string):
