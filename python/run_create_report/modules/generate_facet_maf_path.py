@@ -15,7 +15,7 @@ def generate_facet_maf_path(facet_path, patient_id, sample_id=None):
     Returns:
         str: path of the facets maf
     """
-    if type(facet_path) == str:
+    if isinstance(facet_path,str):
         facet_path = Path(facet_path)
     print(facet_path)
     if sample_id:
