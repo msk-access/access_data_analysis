@@ -51,7 +51,7 @@ def main(
     template_days: bool = typer.Option(
         "",
         "--template-days",
-        "-td",
+        "-d",
         help="If the `--repo` option is specified and if this is set to True then we will use the template_days RMarkdown file as the template",
     ),
     markdown: bool = typer.Option(
@@ -111,7 +111,7 @@ def main(
     tumor_type: str = typer.Option(
         "",
         "--tumor-type",
-        "-tt",
+        "-l",
         help="Tumor type label for the report",
     ),
 ):
