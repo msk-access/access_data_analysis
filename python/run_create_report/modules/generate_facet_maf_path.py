@@ -28,16 +28,14 @@ def generate_facet_maf_path(facet_path, patient_id, sample_id=None):
     if len(maf_list) == 0:
         if patient_id:
             typer.secho(
-                "Could not find the facets-suite MAF file using patient id. %s",
-                patient_id,
+                f"Could not find the facets-suite MAF file using patient id. {patient_id}",
                 err=True,
                 fg=typer.colors.BRIGHT_RED,
             )
             raise typer.Abort()
         if sample_id:
             typer.secho(
-                "Could not find the facets-suite MAF file using sample id. %s",
-                sample_id,
+                f"Could not find the facets-suite MAF file using sample id. {sample_id}",
                 err=True,
                 fg=typer.colors.BRIGHT_RED,
             )

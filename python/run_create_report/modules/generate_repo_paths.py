@@ -34,8 +34,7 @@ def generate_repo_path(
             raise typer.Abort()
         else:
             typer.secho(
-                "Path to create_report.R script is provided as %s",
-                script_path,
+                f"Path to create_report.R script is provided as {script_path}",
                 fg=typer.colors.BRIGHT_GREEN,
             )
         if not template_path:
@@ -47,14 +46,12 @@ def generate_repo_path(
             raise typer.Abort()
         else:
             typer.secho(
-                "Path to RMarkdown template file is provided as %s",
-                template_path,
+                f"Path to RMarkdown template file is provided as {template_path}",
                 fg=typer.colors.BRIGHT_GREEN,
             )
     else:
         typer.secho(
-            "Path to access_data_analysis repo is provided as %s",
-            repo_path,
+            f"Path to access_data_analysis repo is provided as {repo_path}",
             fg=typer.colors.BRIGHT_GREEN,
         )
         if script_path is not None or template_path is not None:
@@ -66,20 +63,19 @@ def generate_repo_path(
             raise typer.Abort()
         script_path = repo_path.joinpath("reports", "create_report.R")
         typer.secho(
-            "Path to create_report.R is %s", script_path, fg=typer.colors.BRIGHT_GREEN
+            f"Path to create_report.R is {script_path}", 
+            fg=typer.colors.BRIGHT_GREEN
         )
         if template_days:
             template_path = repo_path.joinpath("reports", "template_days.Rmd")
             typer.secho(
-                "Path to template_days.Rmd is %s",
-                template_path,
+                f"Path to template_days.Rmd is {template_path}",
                 fg=typer.colors.BRIGHT_GREEN,
             )
         else:
             template_path = repo_path.joinpath("reports", "template.Rmd")
             typer.secho(
-                "Path to template.Rmd is %s",
-                template_path,
+                f"Path to template.Rmd is {template_path}",
                 fg=typer.colors.BRIGHT_GREEN,
             )
     return (script_path.as_posix(), template_path.as_posix())
