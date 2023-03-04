@@ -15,14 +15,14 @@ def generate_facet_maf_path(facet_path, patient_id, sample_id=None):
     Returns:
         str: path of the facets maf
     """
-    print(type(facet_path))
+
     if sample_id:
         maf_path = facet_path.joinpath(
-            patient_id[:7], f"{sample_id}*", "default", "/*[0-9].ccf.maf"
+            patient_id[:7], f"{sample_id}*", "default", "*[0-9].ccf.maf"
         )
     else:
         maf_path = facet_path.joinpath(
-            patient_id[:7], f"{patient_id}*", "default", "/*[0-9].ccf.maf"
+            patient_id[:7], f"{patient_id}*", "default", "*[0-9].ccf.maf"
         )
 
     print(maf_path)
