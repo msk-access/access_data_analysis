@@ -23,7 +23,7 @@ def check_required_columns(manifest,template_days=None):
     if "cmo_patient_id" not in column_headers:
         typer.secho(
             "check_required_columns:Could not find cmo_patient_id in %s",
-            column_headers,
+            ",".join(column_headers.join),
             err=True,
             fg=typer.colors.BRIGHT_RED,
         )
@@ -31,7 +31,7 @@ def check_required_columns(manifest,template_days=None):
     if "cmo_sample_id" not in column_headers or "sample_id" not in column_headers:
         typer.secho(
             "check_required_columns:Could not find cmo_sample_id or sample_id in %s",
-            column_headers,
+            ",".join(column_headers.join),
             err=True,
             fg=typer.colors.BRIGHT_RED,
         )
@@ -39,7 +39,7 @@ def check_required_columns(manifest,template_days=None):
     if "dmp_patient_id" not in column_headers:
         typer.secho(
             "check_required_columns:Could not find dmp_patient_id in %s",
-            column_headers,
+            ",".join(column_headers.join),
             err=True,
             fg=typer.colors.BRIGHT_RED,
         )
@@ -48,7 +48,7 @@ def check_required_columns(manifest,template_days=None):
         if "collection_day" not in column_headers:
             typer.secho(
                 "check_required_columns:Could not find collection_day in %s",
-                column_headers,
+                ",".join(column_headers.join),
                 err=True,
                 fg=typer.colors.BRIGHT_RED,
             )
@@ -56,7 +56,7 @@ def check_required_columns(manifest,template_days=None):
     elif "collection_date" not in column_headers:
         typer.secho(
             "check_required_columns:Could not find collection_date in %s",
-            column_headers,
+            ",".join(column_headers.join),
             err=True,
             fg=typer.colors.BRIGHT_RED,
         )
@@ -64,7 +64,7 @@ def check_required_columns(manifest,template_days=None):
     if "timepoint" not in column_headers:
         typer.secho(
             "check_required_columns:Could not find timepoint in %s",
-            column_headers,
+            ",".join(column_headers.join),
             err=True,
             fg=typer.colors.BRIGHT_RED,
         )
