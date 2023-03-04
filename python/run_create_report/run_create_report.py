@@ -111,7 +111,7 @@ def main(
     tumor_type: str = typer.Option(
         "",
         "--tumor-type",
-        "-t",
+        "-tt",
         help="Tumor type label for the report",
     ),
 ):
