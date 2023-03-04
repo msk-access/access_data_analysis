@@ -138,7 +138,7 @@ def main(
             tumor_type,
         )
         typer.secho(
-            f"Command:{create_report_cmd}",
+            f"command: {create_report_cmd}",
             fg=typer.colors.BRIGHT_MAGENTA,
         )
 
