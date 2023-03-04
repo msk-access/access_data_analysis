@@ -83,7 +83,7 @@ def main(
         "-l",
         help="Tumor type label for the report",
     ),
-        template_days: bool = typer.Option(
+    template_days: bool = typer.Option(
         False,
         "--template-days",
         "-d",

@@ -1,7 +1,7 @@
 import typer
 
 
-def check_required_columns(manifest,template_days=None):
+def check_required_columns(manifest, template_days=None):
     """Check if all required columns are present in the sample manifest file
 
     Args:
@@ -27,10 +27,7 @@ def check_required_columns(manifest,template_days=None):
             fg=typer.colors.BRIGHT_RED,
         )
         raise typer.Abort()
-    if (
-        "cmo_sample_id" not in column_headers
-        and "sample_id" not in column_headers
-    ):
+    if "cmo_sample_id" not in column_headers and "sample_id" not in column_headers:
         typer.secho(
             f"check_required_columns:Could not find cmo_sample_id or sample_id in {column_headers}",
             err=True,
@@ -73,9 +70,8 @@ def check_required_columns(manifest,template_days=None):
         )
     else:
         typer.secho(
-            "check_required_columns:dmp_sample_id is not present, thus dmp_patient_id will be used for finding facet results in facet-rep",
+            "check_required_columns:dmp_sample_id is not present, thus dmp_patient_id will be used for finding facet results in facet-repo",
             fg=typer.colors.GREEN,
         )
-
 
     return column_headers
