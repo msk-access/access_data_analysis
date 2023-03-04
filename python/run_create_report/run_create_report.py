@@ -123,6 +123,7 @@ def main(
             # Get the sample id from the Facet file
         facet_path = Path(facet_path)
         dmp_sample_id = facet_path.stem()
+        print(dmp_sample_id,type(dmp_sample_id), type(facet_path))
         dmp_sample_id = dmp_sample_id.split("_", 1)[0]
         create_report_cmd = generate_create_report_cmd(
             script_path,
