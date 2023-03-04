@@ -12,19 +12,19 @@ from modules.generate_create_report_cmd import generate_create_report_cmd
 
 def main(
     repo_path: Path = typer.Option(
-        "",
+        None,
         "--repo",
         "-r",
         help="Base path to where the git repository is located for access_data_analysis",
     ),
     script_path: Path = typer.Option(
-        "",
+        None,
         "--script",
         "-s",
         help="Path to the create_report.R script, fall back if `--repo` is not given",
     ),
     template_path: Path = typer.Option(
-        "",
+        None,
         "--template",
         "-t",
         help="Path to the template.Rmd or template_days.Rmd to be used with create_report.R when `--repo` is not given",
