@@ -1,7 +1,7 @@
-from pathlib import Path
-from typing import Optional
 import typer
 import pandas as pd
+from pathlib import Path
+from typing import Optional
 from modules.run_cmd import run_cmd
 from modules.utils import read_manifest
 from modules.generate_facet_maf_path import generate_facet_maf_path
