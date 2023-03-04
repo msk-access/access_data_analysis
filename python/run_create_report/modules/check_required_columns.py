@@ -19,7 +19,7 @@ def check_required_columns(manifest,template_days=None):
         list: column name for the manifest file
     """
     # Get the list of all column names from headers
-    column_headers = manifest.columns.values.tolist()
+    column_headers = list(manifest.columns.values)
     if "cmo_patient_id" not in column_headers:
         typer.secho(
             "check_required_columns:Could not find cmo_patient_id in %s",
