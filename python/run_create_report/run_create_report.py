@@ -101,7 +101,6 @@ def main(
     # check required columns
     column_header = check_required_columns(manifest_df, template_days)
     # get general paths
-    print(repo_path, type(script_path), type(template_path), template_days)
     (script_path, template_path) = generate_repo_path(
         repo_path, script_path, template_path, template_days
     )

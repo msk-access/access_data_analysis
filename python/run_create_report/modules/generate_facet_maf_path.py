@@ -24,7 +24,9 @@ def generate_facet_maf_path(facet_path, patient_id, sample_id=None):
             patient_id[:7], f"{patient_id}*", "default", "/*[0-9].ccf.maf"
         )
     )
+    print(maf_path)
     maf_list = glob.glob(maf_path.as_posix())
+    print(maf_list)
     if len(maf_list) == 0:
         if patient_id:
             typer.secho(
