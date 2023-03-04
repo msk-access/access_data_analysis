@@ -7,12 +7,12 @@ def generate_create_report_cmd(
     template_file,
     cmo_patient_id,
     csv_file,
-    tumor_type,
     manifest,
     cnv_path,
     dmp_patient_id,
     dmp_sample_id,
     dmp_facet_maf,
+    tumor_type=None
 ):
     """Create the system command that should be run for create_report.R
 
@@ -33,9 +33,7 @@ def generate_create_report_cmd(
         str: system command to run for create_report.R
     """
     html_output = Path.cwd().joinpath(f"{cmo_patient_id}_report.html")
-
-    return (
-        (
+    cmd = (
             "Rscript "
             + str(script)
             + " -t "
@@ -46,8 +44,6 @@ def generate_create_report_cmd(
             + str(csv_file)
             + " -rc "
             + str(cnv_path.as_posix())
-            + " -tt "
-            + str(tumor_type)
             + " -m "
             + str(manifest.as_posix())
             + " -o "
@@ -59,30 +55,10 @@ def generate_create_report_cmd(
             + " -dm "
             + str(dmp_facet_maf)
         )
-        if markdown
-        else (
-            "Rscript "
-            + str(script)
-            + " -md"
-            + " -t "
-            + str(template_file)
-            + " -p "
-            + str(cmo_patient_id)
-            + " -r "
-            + str(csv_file)
-            + " -rc "
-            + str(cnv_path.as_posix())
-            + " -tt "
-            + str(tumor_type)
-            + " -m "
-            + str(manifest.as_posix())
-            + " -o "
-            + str(html_output)
-            + " -d "
-            + str(dmp_patient_id)
-            + " -ds "
-            + str(dmp_sample_id)
-            + " -dm "
-            + str(dmp_facet_maf)
+    if markdown:
+        cmd = (
+            f"{cmd} --md --tt {str(tumor_type)}"
+            if tumor_type is not None
+            else f"{cmd} --md"
         )
-    )
+    return (cmd)
