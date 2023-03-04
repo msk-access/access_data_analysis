@@ -1,7 +1,6 @@
 import typer
 import pandas as pd
 from pathlib import Path
-from typing import Optional
 from modules.run_cmd import run_cmd
 from modules.read_manifest import read_manifest
 from modules.check_required_columns import check_required_columns
