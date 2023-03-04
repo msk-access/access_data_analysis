@@ -87,7 +87,7 @@ def main(
     variant_path: Path = typer.Option(
         ...,
         "--variant-results",
-        "-c",
+        "-v",
         exists=True,
         file_okay=False,
         dir_okay=True,
