@@ -3,7 +3,7 @@ import pandas as pd
 from pathlib import Path
 from typing import Optional
 from modules.run_cmd import run_cmd
-from modules.utils import read_manifest
+from modules.read_manifest import read_manifest
 from modules.check_required_columns import check_required_columns
 from modules.generate_repo_paths import generate_repo_path
 from modules.get_small_variant_csv import get_small_variant_csv
