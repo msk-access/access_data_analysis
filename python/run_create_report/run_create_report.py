@@ -117,10 +117,10 @@ def main(
         if "dmp_sample_id" in column_header:
             dmp_sample_id = manifest_df.loc[i, "dmp_sample_id"]
             facet_path = generate_facet_maf_path(
-                facet_path, dmp_patient_id, dmp_sample_id
+                facet_repo, dmp_patient_id, dmp_sample_id
             )
         else:
-            facet_path = generate_facet_maf_path(facet_path, dmp_patient_id)
+            facet_path = generate_facet_maf_path(facet_repo, dmp_patient_id)
             # Get the sample id from the Facet file
             facet_path = Path(facet_path)
             dmp_sample_id = facet_path.stem().split("_", 1)[0]
