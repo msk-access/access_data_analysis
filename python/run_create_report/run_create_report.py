@@ -23,12 +23,6 @@ def main(
         resolve_path=True,
         help="Base path to where the git repository is located for access_data_analysis",
     ),
-    template_days: bool = typer.Option(
-        False,
-        "--template-days",
-        "-d",
-        help="If the `--repo` option is specified and if this is set to True then we will use the template_days RMarkdown file as the template",
-    ),
     script_path: Path = typer.Option(
         "",
         "--script",
@@ -53,12 +47,6 @@ def main(
         resolve_path=True,
         help="Path to the template.Rmd or template_days.Rmd to be used with create_report.R when `--repo` is not given",
     ),
-    markdown: bool = typer.Option(
-        False,
-        "--generate-markdown",
-        "-gm",
-        help="If given, the create_report.R will be run with `-md` flag to generate markdown",
-    ),
     manifest: Path = typer.Option(
         ...,
         "--manifest",
@@ -70,12 +58,6 @@ def main(
         readable=True,
         resolve_path=True,
         help="File containing meta information per sample.",
-    ),
-    tumor_type: str = typer.Option(
-        "",
-        "--tumor-type",
-        "-l",
-        help="Tumor type label for the report",
     ),
     variant_path: Path = typer.Option(
         ...,
@@ -112,6 +94,24 @@ def main(
         readable=True,
         resolve_path=True,
         help="Base path for all results of facets on Clinical MSK-IMPACT samples",
+    ),
+    tumor_type: str = typer.Option(
+        "",
+        "--tumor-type",
+        "-l",
+        help="Tumor type label for the report",
+    ),
+        template_days: bool = typer.Option(
+        False,
+        "--template-days",
+        "-d",
+        help="If the `--repo` option is specified and if this is set to True then we will use the template_days RMarkdown file as the template",
+    ),
+    markdown: bool = typer.Option(
+        False,
+        "--generate-markdown",
+        "-gm",
+        help="If given, the create_report.R will be run with `-md` flag to generate markdown",
     ),
 ):
     # Read the manifest file
