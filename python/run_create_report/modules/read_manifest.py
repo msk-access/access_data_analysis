@@ -10,4 +10,7 @@ def read_manifest(manifest):
     Returns:
         data_frame: _description_
     """
-    return pd.read_csv(manifest, sep="\t", low_memory=False)
+    if(manifest.suffix == ".csv"):
+        return pd.read_csv(manifest, sep=',', low_memory=False)
+    else:
+        return pd.read_csv(manifest, sep='\t', low_memory=False)
