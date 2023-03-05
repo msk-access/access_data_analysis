@@ -55,11 +55,9 @@ def generate_create_report_cmd(
         + str(dmp_sample_id)
         + " -dm "
         + str(dmp_facet_maf)
+        + " -tt "
+        + str(tumor_type)
     )
     if markdown:
-        cmd = (
-            f"{cmd} --md --tt {str(tumor_type)}"
-            if tumor_type is not None
-            else f"{cmd} --md"
-        )
+        cmd = f"{cmd} --md"
     return (cmd, html_output)
