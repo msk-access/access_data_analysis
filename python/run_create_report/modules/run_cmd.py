@@ -10,7 +10,8 @@ def run_cmd(cmd):
     Args:
         cmd (str): System command to be run as a string
     """
-    print("\nrun_cmd:Command:", cmd, "\n")
+    print("\nrun_cmd:Command:\n")
+    print(cmd)
     out = subprocess.Popen(
         (cmd),
         stdin=subprocess.PIPE,
@@ -21,9 +22,11 @@ def run_cmd(cmd):
     out.wait()
     stdout, stderr = out.communicate()
     if stderr is None:
-        print("run_cmd:stdout:\n", stdout)
+        print("run_cmd:stdout:\n")
+        print(stdout)
     else:
-        print("run_cmd:stderr:\n", stderr)
+        print("run_cmd:stderr:\n")
+        print(stderr)
     return out
 
 

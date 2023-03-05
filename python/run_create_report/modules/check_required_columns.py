@@ -73,5 +73,8 @@ def check_required_columns(manifest, template_days=None):
             "check_required_columns:dmp_sample_id is not present, thus dmp_patient_id will be used for finding facet results in facet-repo",
             fg=typer.colors.BRIGHT_GREEN,
         )
-
-    return column_headers
+    if "dmp_sample_id" in column_headers:
+        df_to_traverse = manifest[['cmo_patient_id','dmp_patient_id','dmp_sample_id']]
+    else:
+        df_to_traverse = manifest[['cmo_patient_id','dmp_patient_id']]
+    return column_headers,df_to_traverse.unique()

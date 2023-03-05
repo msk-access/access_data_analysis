@@ -128,13 +128,13 @@ def main(
     # Read the manifest file
     manifest_df = read_manifest(manifest)
     # check required columns
-    column_header = check_required_columns(manifest_df, template_days)
+    column_header,manifest_to_traverse = check_required_columns(manifest_df, template_days)
     # get general paths
     (script_path, template_path) = generate_repo_path(
         repo_path, script_path, template_path, template_days
     )
     # iterate through each row and select information needed to generate the command
-    for i in range(len(manifest_df)):
+    for i in range(len(manifest_to_traverse)):
         with Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
@@ -142,15 +142,15 @@ def main(
         ) as progress:
             typer.secho("\n")
             progress.add_task(description="##Processing##\n", total=None)
-            cmo_patient_id = manifest_df.loc[i, "cmo_patient_id"]
-            dmp_patient_id = manifest_df.loc[i, "dmp_patient_id"]
+            cmo_patient_id = manifest_to_traverse.loc[i, "cmo_patient_id"]
+            dmp_patient_id = manifest_to_traverse.loc[i, "dmp_patient_id"]
             typer.secho(
                 f"Running for patient with CMO ID {cmo_patient_id}, and DMP ID {dmp_patient_id}",
                 fg=typer.colors.BRIGHT_GREEN,
             )
             small_variants_path = get_small_variant_csv(cmo_patient_id, variant_path)
             if "dmp_sample_id" in column_header:
-                dmp_sample_id = manifest_df.loc[i, "dmp_sample_id"]
+                dmp_sample_id = manifest_to_traverse.loc[i, "dmp_sample_id"]
                 facet_path = generate_facet_maf_path(
                     facet_repo, dmp_patient_id, dmp_sample_id
                 )
