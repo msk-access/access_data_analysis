@@ -161,7 +161,7 @@ def main(
                 )
                 if not facet_path:
                     typer.secho(
-                        f"Skipping for patient with CMO ID {cmo_patient_id}, and DMP ID {dmp_patient_id}",
+                        f"Running for patient with CMO ID {cmo_patient_id}, and DMP ID {dmp_patient_id} without facets maf",
                         err=True,
                         fg=typer.colors.BRIGHT_RED,
                     )
@@ -177,12 +177,12 @@ def main(
                     facet_path = None
                 if not facet_path:
                     typer.secho(
-                        f"Skipping for patient with CMO ID {cmo_patient_id}, and DMP ID {dmp_patient_id}",
+                        f"Running for patient with CMO ID {cmo_patient_id}, and DMP ID {dmp_patient_id} without facets maf",
                         err=True,
                         fg=typer.colors.BRIGHT_RED,
                     )
                     skipped_ids.append(
-                        "\t".join([cmo_patient_id, dmp_patient_id, dmp_sample_id])
+                        "\t".join([cmo_patient_id, dmp_patient_id, None])
                     )
                 # Get the sample id from the Facet file
                 if facet_path:
@@ -244,6 +244,11 @@ def main(
 
     print("\nPatient ids that were skipped as facet maf could not be found\n")
     print(skipped_ids)
+    skip_file = Path.cwd().joinpath("skipped_ids.tsv")
+    with open(skip_file, 'w') as fp:
+        for item in skipped_ids:
+            # write each item on a new line
+            fp.write("%s\n" % item)
     typer.secho("Done!", fg=typer.colors.BRIGHT_GREEN)
 
 
