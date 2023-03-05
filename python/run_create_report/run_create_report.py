@@ -8,7 +8,7 @@ from modules.generate_repo_paths import generate_repo_path
 from modules.get_small_variant_csv import get_small_variant_csv
 from modules.generate_facet_maf_path import generate_facet_maf_path
 from modules.generate_create_report_cmd import generate_create_report_cmd
-
+from rich.progress import Progress, SpinnerColumn, TextColumn
 
 def main(
     repo_path: Path = typer.Option(
@@ -134,6 +134,12 @@ def main(
     )
     # iterate through each row and select information needed to generate the command
     for i in range(len(manifest_df)):
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            transient=True,
+            ) as progress:
+                progress.add_task(description="Processing...", total=None)
         cmo_patient_id = manifest_df.loc[i, "cmo_patient_id"]
         dmp_patient_id = manifest_df.loc[i, "dmp_patient_id"]
         typer.secho(
