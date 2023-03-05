@@ -8,6 +8,7 @@ def run_cmd(cmd):
     Args:
         cmd (str): System command to be run as a string
     """
+    print("\nCommand:",cmd,"\n")
     typer.secho(
         f"run_cmd: command: {shlex.split(cmd)} ",
         fg=typer.colors.BRIGHT_MAGENTA,
