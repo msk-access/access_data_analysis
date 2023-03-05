@@ -83,6 +83,18 @@ def main(
         "-l",
         help="Tumor type label for the report",
     ),
+    copy_facet: bool = typer.Option(
+        False,
+        "--copy-facet-maf",
+        "-cfm",
+        help="If this is set to True then we will copy the facet maf file in the directory specified in `copy_facet_dir`",
+    ),
+    copy_facet_dir: Path = typer.Option(
+        None,
+        "--copy-facet-dir",
+        "-cfd",
+        help="Directory path where the facet maf file should be copied.",
+    ),
     template_days: bool = typer.Option(
         False,
         "--template-days",
@@ -104,7 +116,7 @@ def main(
     (script_path, template_path) = generate_repo_path(
         repo_path, script_path, template_path, template_days
     )
-    # iterate through each row and select
+    # iterate through each row and select information needed to generate the command
     for i in range(len(manifest_df)):
         cmo_patient_id = manifest_df.loc[i, "cmo_patient_id"]
         dmp_patient_id = manifest_df.loc[i, "dmp_patient_id"]
@@ -124,7 +136,21 @@ def main(
             facet_path = Path(facet_path)
             maf_id = facet_path.stem
             dmp_sample_id = maf_id.split("_", 1)[0]
-        create_report_cmd = generate_create_report_cmd(
+        if copy_facet:
+            if not copy_facet_dir:
+                copy_facet_dir = Path.cwd() / 'facet_files'
+                copy_facet_dir.mkdir(parents=True, exist_ok=True)
+            cp_facet_cmd = (f"cp {facet_path} {copy_facet_dir.as_posix()}")
+            typer.secho(
+                f"command: {cp_facet_cmd}",
+                fg=typer.colors.BRIGHT_MAGENTA,
+                )
+            p1 = run_cmd(cp_facet_cmd)
+            typer.secho(
+            f"Done copying facet maf file for patient with CMO ID {cmo_patient_id}, and DMP ID {dmp_patient_id} and output is written in {copy_facet_dir}",
+            fg=typer.colors.BRIGHT_MAGENTA,
+            )
+        create_report_cmd,html_output = generate_create_report_cmd(
             script_path,
             markdown,
             template_path,
@@ -141,7 +167,11 @@ def main(
             f"command: {create_report_cmd}",
             fg=typer.colors.BRIGHT_MAGENTA,
         )
-
+        p2 = run_cmd(create_report_cmd)
+        typer.secho(
+            f"Done running create_report.R for patient with CMO ID {cmo_patient_id}, and DMP ID {dmp_patient_id} and output is written in {html_output}",
+            fg=typer.colors.BRIGHT_MAGENTA,
+        )
 
 if __name__ == "__main__":
     typer.run(main)

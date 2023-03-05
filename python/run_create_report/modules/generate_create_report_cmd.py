@@ -47,7 +47,7 @@ def generate_create_report_cmd(
             + " -m "
             + str(manifest.as_posix())
             + " -o "
-            + str(html_output)
+            + str(html_output.as_posix())
             + " -d "
             + str(dmp_patient_id)
             + " -ds "
@@ -61,4 +61,4 @@ def generate_create_report_cmd(
             if tumor_type is not None
             else f"{cmd} --md"
         )
-    return (cmd)
+    return (cmd,html_output)
