@@ -132,7 +132,7 @@ def main(
     column_header, manifest_to_traverse = check_required_columns(
         manifest_df, template_days
     )
-    print("\nTraversing through:", len(manifest_to_traverse),"patients to run create_report.R\n")
+    print("\nTraversing through", len(manifest_to_traverse),"patients to run create_report.R\n")
     # get general paths
     (script_path, template_path) = generate_repo_path(
         repo_path, script_path, template_path, template_days
@@ -145,7 +145,7 @@ def main(
         transient=True,
     ) as progress:
         print("\n")
-        progress.add_task(description="##Processing##\n", total=None)
+        progress.add_task(description="Processing\n", total=None)
         for i in range(len(manifest_to_traverse)):
             cmo_patient_id = manifest_to_traverse.loc[i, "cmo_patient_id"]
             dmp_patient_id = manifest_to_traverse.loc[i, "dmp_patient_id"]
