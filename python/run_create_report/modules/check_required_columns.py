@@ -18,6 +18,7 @@ def check_required_columns(manifest, template_days=None):
 
     Returns:
         list: column name for the manifest file
+        data_frame: data_frame with unique ids to traverse over
     """
     # Get the list of all column names from headers
     column_headers = list(manifest.columns.values)

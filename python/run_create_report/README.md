@@ -157,6 +157,7 @@ Check if all required columns are present in the sample manifest file
 **Returns**:
 
 - `list` - column name for the manifest file
+- `data_frame` - data_frame with unique ids to traverse over
 
 <a id="generate_repo_paths"></a>
 
