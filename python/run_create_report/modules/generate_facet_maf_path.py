@@ -40,7 +40,7 @@ def generate_facet_maf_path(facet_path, patient_id, sample_id=None):
         return None
     elif len(maf_list) > 1:
         maf_list = [Path(i) for i in maf_list]
-        maf_list_sorted = sorted(maf_list, key=lambda i: int(i.stem))
+        maf_list_sorted = sorted(maf_list, key=lambda i: str(i.stem))
         maf_list_sorted = [str(i) for i in maf_list]
         return maf_list_sorted[0]
     else:
