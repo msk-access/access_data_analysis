@@ -12,7 +12,7 @@ def generate_create_report_cmd(
     dmp_patient_id,
     dmp_sample_id,
     dmp_facet_maf,
-    tumor_type=None
+    tumor_type=None,
 ):
     """Create the system command that should be run for create_report.R
 
@@ -30,35 +30,36 @@ def generate_create_report_cmd(
         dmp_facet_maf (str): path to the clinical msk-impact maf file annotated for facets results
 
     Returns:
-        str: system command to run for create_report.R
+        cmd (str): system command to run for create_report.R
+        html_output (pathlib.Path): where the output file should be written
     """
     html_output = Path.cwd().joinpath(f"{cmo_patient_id}_report.html")
     cmd = (
-            "Rscript "
-            + str(script)
-            + " -t "
-            + str(template_file)
-            + " -p "
-            + str(cmo_patient_id)
-            + " -r "
-            + str(csv_file)
-            + " -rc "
-            + str(cnv_path.as_posix())
-            + " -m "
-            + str(manifest.as_posix())
-            + " -o "
-            + str(html_output.as_posix())
-            + " -d "
-            + str(dmp_patient_id)
-            + " -ds "
-            + str(dmp_sample_id)
-            + " -dm "
-            + str(dmp_facet_maf)
-        )
+        "Rscript "
+        + str(script)
+        + " -t "
+        + str(template_file)
+        + " -p "
+        + str(cmo_patient_id)
+        + " -r "
+        + str(csv_file)
+        + " -rc "
+        + str(cnv_path.as_posix())
+        + " -m "
+        + str(manifest.as_posix())
+        + " -o "
+        + str(html_output.as_posix())
+        + " -d "
+        + str(dmp_patient_id)
+        + " -ds "
+        + str(dmp_sample_id)
+        + " -dm "
+        + str(dmp_facet_maf)
+    )
     if markdown:
         cmd = (
             f"{cmd} --md --tt {str(tumor_type)}"
             if tumor_type is not None
             else f"{cmd} --md"
         )
-    return (cmd,html_output)
+    return (cmd, html_output)
