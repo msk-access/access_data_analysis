@@ -1,27 +1,28 @@
 # Table of Contents
 
 - [Table of Contents](#table-of-contents)
-- [run\_create\_report](#run_create_report)
+  - [run\_create\_report](#run_create_report)
       - [main](#main)
-- [check\_required\_columns](#check_required_columns)
+  - [Submodules](#submodules)
+    - [check\_required\_columns](#check_required_columns)
       - [check\_required\_columns](#check_required_columns-1)
-- [generate\_repo\_paths](#generate_repo_paths)
+    - [generate\_repo\_paths](#generate_repo_paths)
       - [generate\_repo\_path](#generate_repo_path)
-- [read\_manifest](#read_manifest)
+    - [read\_manifest](#read_manifest)
       - [read\_manifest](#read_manifest-1)
-- [get\_small\_variant\_csv](#get_small_variant_csv)
+    - [get\_small\_variant\_csv](#get_small_variant_csv)
       - [get\_small\_variant\_csv](#get_small_variant_csv-1)
-- [run\_cmd](#run_cmd)
+    - [run\_cmd](#run_cmd)
       - [run\_cmd](#run_cmd-1)
       - [run\_multiple\_cmd](#run_multiple_cmd)
-- [generate\_facet\_maf\_path](#generate_facet_maf_path)
+    - [generate\_facet\_maf\_path](#generate_facet_maf_path)
       - [generate\_facet\_maf\_path](#generate_facet_maf_path-1)
-- [generate\_create\_report\_cmd](#generate_create_report_cmd)
+    - [generate\_create\_report\_cmd](#generate_create_report_cmd)
       - [generate\_create\_report\_cmd](#generate_create_report_cmd-1)
 
 <a id="run_create_report"></a>
 
-# run\_create\_report
+## run\_create\_report
 
 <a id="run_create_report.main"></a>
 
@@ -100,9 +101,22 @@ Wrapper script to run create_report.R
 - `template_days` _bool, optional_ - "If the `--repo` option is specified and if this is set to True then we will use the template_days RMarkdown file as the template".
 - `markdown` _bool, optional_ - "If given, the create_report.R will be run with `-md` flag to generate markdown".
 
+**Usage**
+
+```bash
+> python python/run_create_report/run_create_report.py \
+-m /home/shahr2/bergerlab/Project_10619_D/small_variants/manifest_noDate_days.tsv \
+-r /home/shahr2/github/access_data_analysis \
+-v /home/shahr2/bergerlab/Project_10619_D/small_variants/results_20Jan2023/results_stringent/ \
+-c /home/shahr2/bergerlab/Project_10619_D/small_variants/results_20Jan2023/CNA_final_call_set \
+-l "Melanoma" -gm -d -cfm
+```
+
+## Submodules
+
 <a id="check_required_columns"></a>
 
-# check\_required\_columns
+### check\_required\_columns
 
 <a id="check_required_columns.check_required_columns"></a>
 
@@ -135,7 +149,7 @@ Check if all required columns are present in the sample manifest file
 
 <a id="generate_repo_paths"></a>
 
-# generate\_repo\_paths
+### generate\_repo\_paths
 
 <a id="generate_repo_paths.generate_repo_path"></a>
 
@@ -167,7 +181,7 @@ Generate path to create_report.R and template RMarkdown file
 
 <a id="read_manifest"></a>
 
-# read\_manifest
+### read\_manifest
 
 <a id="read_manifest.read_manifest"></a>
 
@@ -190,7 +204,7 @@ _summary_
 
 <a id="get_small_variant_csv"></a>
 
-# get\_small\_variant\_csv
+### get\_small\_variant\_csv
 
 <a id="get_small_variant_csv.get_small_variant_csv"></a>
 
@@ -220,7 +234,7 @@ Get the path to CSV file to be used for a given patient containing all variants
 
 <a id="run_cmd"></a>
 
-# run\_cmd
+### run\_cmd
 
 <a id="run_cmd.run_cmd"></a>
 
@@ -252,7 +266,7 @@ Given a system command run it using subprocess
 
 <a id="generate_facet_maf_path"></a>
 
-# generate\_facet\_maf\_path
+### generate\_facet\_maf\_path
 
 <a id="generate_facet_maf_path.generate_facet_maf_path"></a>
 
@@ -277,7 +291,7 @@ Get path of maf associated with facet-suite output
 
 <a id="generate_create_report_cmd"></a>
 
-# generate\_create\_report\_cmd
+### generate\_create\_report\_cmd
 
 <a id="generate_create_report_cmd.generate_create_report_cmd"></a>
 
