@@ -132,7 +132,7 @@ def main(
     column_header, manifest_to_traverse = check_required_columns(
         manifest_df, template_days
     )
-    print(manifest_to_traverse)
+    print("\nTraversing through:", len(manifest_to_traverse),"patients to run create_report.R\n")
     # get general paths
     (script_path, template_path) = generate_repo_path(
         repo_path, script_path, template_path, template_days
