@@ -1,6 +1,6 @@
 import typer
 import subprocess
-
+import shlex
 
 def run_cmd(cmd):
     """Given a system command run it using subprocess
@@ -9,7 +9,7 @@ def run_cmd(cmd):
         cmd (str): System command to be run as a string
     """
     typer.secho(
-        f"run_cmd: command: {cmd} ",
+        f"run_cmd: command: {shlex.split(cmd)} ",
         fg=typer.colors.BRIGHT_MAGENTA,
     )
     out = subprocess.Popen(
