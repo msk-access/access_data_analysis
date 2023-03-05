@@ -33,7 +33,7 @@ def generate_create_report_cmd(
         cmd (str): system command to run for create_report.R
         html_output (pathlib.Path): where the output file should be written
     """
-    html_output = Path.cwd().joinpath(f"{cmo_patient_id}_report.html")
+    html_output = f"{cmo_patient_id}_report.html"
     cmd = (
         "Rscript "
         + str(script)

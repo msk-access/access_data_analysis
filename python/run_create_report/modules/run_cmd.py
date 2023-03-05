@@ -1,6 +1,7 @@
 import typer
 import subprocess
 import shlex
+from rich import print
 
 def run_cmd(cmd):
     """Given a system command run it using subprocess
@@ -8,11 +9,7 @@ def run_cmd(cmd):
     Args:
         cmd (str): System command to be run as a string
     """
-    print("\nCommand:",cmd,"\n")
-    typer.secho(
-        f"run_cmd: command: {shlex.split(cmd)} ",
-        fg=typer.colors.BRIGHT_MAGENTA,
-    )
+    print("\nrun_cmd:Command:",cmd,"\n")
     out = subprocess.Popen(
         (cmd),
         stdin=subprocess.PIPE,
@@ -23,16 +20,9 @@ def run_cmd(cmd):
     out.wait()
     stdout, stderr = out.communicate()
     if stderr is None:
-        typer.secho(
-            f"run_cmd: {stdout} ",
-            fg=typer.colors.BRIGHT_GREEN,
-        )
+        print("run_cmd:stdout:\n",stdout)
     else:
-        typer.secho(
-            f"run_cmd: Could not run the command. {stderr} ",
-            err=True,
-            fg=typer.colors.BRIGHT_RED,
-        )
+        print("run_cmd:stderr:\n",stderr)
     return out
 
 
