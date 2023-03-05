@@ -80,4 +80,4 @@ def check_required_columns(manifest, template_days=None):
     else:
         df_to_traverse = manifest[["cmo_patient_id", "dmp_patient_id"]]
 
-    return column_headers, df_to_traverse.drop_duplicates()
+    return column_headers, df_to_traverse.drop_duplicates(ignore_index=True)
