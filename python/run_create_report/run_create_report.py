@@ -144,7 +144,7 @@ def main(
         TextColumn("[progress.description]{task.description}"),
         transient=True,
     ) as progress:
-        typer.secho("\n")
+        print("\n")
         progress.add_task(description="##Processing##\n", total=None)
         for i in range(len(manifest_to_traverse)):
             cmo_patient_id = manifest_to_traverse.loc[i, "cmo_patient_id"]
@@ -165,7 +165,7 @@ def main(
                         err=True,
                         fg=typer.colors.BRIGHT_RED,
                     )
-                    skipped_ids.append(cmo_patient_id, dmp_patient_id, dmp_sample_id)
+                    skipped_ids.append("\t".join([cmo_patient_id, dmp_patient_id, dmp_sample_id]))
                     continue
             else:
                 facet_path = generate_facet_maf_path(facet_repo, dmp_patient_id, None)
@@ -175,7 +175,7 @@ def main(
                         err=True,
                         fg=typer.colors.BRIGHT_RED,
                     )
-                    skipped_ids.append(cmo_patient_id, dmp_patient_id)
+                    skipped_ids.append("\t".join([cmo_patient_id, dmp_patient_id, dmp_sample_id]))
                     continue
                 # Get the sample id from the Facet file
                 facet_path = Path(facet_path)
@@ -209,7 +209,7 @@ def main(
                 f"Done running create_report.R for patient with CMO ID {cmo_patient_id}, and DMP ID {dmp_patient_id} and output is written in {html_output}",
                 fg=typer.colors.BRIGHT_GREEN,
             )
-    print("\n IDS that were skipped as facet maf could not be found")
+    print("\nPatient ids that were skipped as facet maf could not be found\n")
     print(skipped_ids)
     typer.secho("Done!", fg=typer.colors.BRIGHT_GREEN)
 
