@@ -66,12 +66,12 @@ def check_required_columns(manifest, template_days=None):
     if "dmp_sample_id" in column_headers:
         typer.secho(
             "check_required_columns:dmp_sample_id is present, thus dmp_sample_id will be used for finding facet results in facet-repo",
-            fg=typer.colors.GREEN,
+            fg=typer.colors.BRIGHT_GREEN,
         )
     else:
         typer.secho(
             "check_required_columns:dmp_sample_id is not present, thus dmp_patient_id will be used for finding facet results in facet-repo",
-            fg=typer.colors.GREEN,
+            fg=typer.colors.BRIGHT_GREEN,
         )
 
     return column_headers
