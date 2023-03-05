@@ -231,6 +231,9 @@ def main(
                         small_variants_path,
                         manifest,
                         cnv_path,
+                        dmp_patient_id,
+                        dmp_sample_id,
+                        facet_path,
                         tumor_type,
                     )
                     p3 = run_cmd(create_report_cmd)
