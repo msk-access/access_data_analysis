@@ -12,7 +12,7 @@ def generate_create_report_cmd(
     dmp_patient_id,
     dmp_sample_id,
     dmp_facet_maf,
-    tumor_type=None,
+    tumor_type,
 ):
     """Create the system command that should be run for create_report.R
 
