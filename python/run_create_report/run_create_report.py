@@ -9,7 +9,7 @@ from modules.get_small_variant_csv import get_small_variant_csv
 from modules.generate_facet_maf_path import generate_facet_maf_path
 from modules.generate_create_report_cmd import generate_create_report_cmd
 from rich.progress import Progress, SpinnerColumn, TextColumn
-
+from rich import print
 
 def main(
     repo_path: Path = typer.Option(
@@ -129,6 +129,7 @@ def main(
     manifest_df = read_manifest(manifest)
     # check required columns
     column_header,manifest_to_traverse = check_required_columns(manifest_df, template_days)
+    print(manifest_to_traverse)
     # get general paths
     (script_path, template_path) = generate_repo_path(
         repo_path, script_path, template_path, template_days
