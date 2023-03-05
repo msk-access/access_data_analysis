@@ -56,7 +56,7 @@ def generate_create_report_cmd(
         + " -dm "
         + str(dmp_facet_maf)
         + " -tt "
-        + str(tumor_type)
+        + f"'{tumor_type}'"
     )
     if markdown:
         cmd = f"{cmd} --md"

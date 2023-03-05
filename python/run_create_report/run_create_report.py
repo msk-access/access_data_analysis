@@ -140,7 +140,7 @@ def main(
             TextColumn("[progress.description]{task.description}"),
             transient=True,
         ) as progress:
-            progress.add_task(description="Processing...\n", total=None)
+            progress.add_task(description="\nProcessing...\n", total=None)
             cmo_patient_id = manifest_df.loc[i, "cmo_patient_id"]
             dmp_patient_id = manifest_df.loc[i, "dmp_patient_id"]
             typer.secho(
