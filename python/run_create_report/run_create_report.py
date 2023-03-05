@@ -185,7 +185,7 @@ def main(
             )
             p2 = run_cmd(create_report_cmd)
             typer.secho(
-                f"Done running create_report.R for patient with CMO ID {cmo_patient_id}, and DMP ID {dmp_patient_id} and output is written in {html_output.as_posix()}",
+                f"Done running create_report.R for patient with CMO ID {cmo_patient_id}, and DMP ID {dmp_patient_id} and output is written in {html_output}",
                 fg=typer.colors.BRIGHT_GREEN,
             )
         typer.secho("Done!", fg=typer.colors.BRIGHT_GREEN)

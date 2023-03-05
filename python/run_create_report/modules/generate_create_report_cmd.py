@@ -48,7 +48,7 @@ def generate_create_report_cmd(
         + " -m "
         + str(manifest.as_posix())
         + " -o "
-        + str(html_output.as_posix())
+        + str(html_output)
         + " -d "
         + str(dmp_patient_id)
         + " -ds "
