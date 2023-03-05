@@ -34,30 +34,50 @@ def generate_create_report_cmd(
         html_output (pathlib.Path): where the output file should be written
     """
     html_output = f"{cmo_patient_id}_report.html"
-    cmd = (
-        "Rscript "
-        + str(script)
-        + " -t "
-        + str(template_file)
-        + " -p "
-        + str(cmo_patient_id)
-        + " -r "
-        + str(csv_file)
-        + " -rc "
-        + str(cnv_path.as_posix())
-        + " -m "
-        + str(manifest.as_posix())
-        + " -o "
-        + str(html_output)
-        + " -d "
-        + str(dmp_patient_id)
-        + " -ds "
-        + str(dmp_sample_id)
-        + " -dm "
-        + str(dmp_facet_maf)
-        + " -tt "
-        + f"'{tumor_type}'"
-    )
+    if dmp_facet_maf:
+        cmd = (
+            "Rscript "
+            + str(script)
+            + " -t "
+            + str(template_file)
+            + " -p "
+            + str(cmo_patient_id)
+            + " -r "
+            + str(csv_file)
+            + " -rc "
+            + str(cnv_path.as_posix())
+            + " -m "
+            + str(manifest.as_posix())
+            + " -o "
+            + str(html_output)
+            + " -d "
+            + str(dmp_patient_id)
+            + " -ds "
+            + str(dmp_sample_id)
+            + " -dm "
+            + str(dmp_facet_maf)
+            + " -tt "
+            + f"'{tumor_type}'"
+        )
+    else:
+        cmd = (
+            "Rscript "
+            + str(script)
+            + " -t "
+            + str(template_file)
+            + " -p "
+            + str(cmo_patient_id)
+            + " -r "
+            + str(csv_file)
+            + " -rc "
+            + str(cnv_path.as_posix())
+            + " -m "
+            + str(manifest.as_posix())
+            + " -o "
+            + str(html_output)
+            + " -tt "
+            + f"'{tumor_type}'"
+        )
     if markdown:
         cmd = f"{cmd} -md"
     return (cmd, html_output)

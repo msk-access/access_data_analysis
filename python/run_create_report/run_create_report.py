@@ -165,50 +165,80 @@ def main(
                         err=True,
                         fg=typer.colors.BRIGHT_RED,
                     )
-                    skipped_ids.append("\t".join([cmo_patient_id, dmp_patient_id, dmp_sample_id]))
-                    continue
+                    skipped_ids.append(
+                        "\t".join([cmo_patient_id, dmp_patient_id, dmp_sample_id])
+                    )
             else:
-                facet_path = generate_facet_maf_path(facet_repo, dmp_patient_id, None)
+                if not dmp_patient_id or dmp_patient_id is not None:
+                    facet_path = generate_facet_maf_path(
+                        facet_repo, dmp_patient_id, None
+                    )
+                else:
+                    facet_path = None
                 if not facet_path:
                     typer.secho(
                         f"Skipping for patient with CMO ID {cmo_patient_id}, and DMP ID {dmp_patient_id}",
                         err=True,
                         fg=typer.colors.BRIGHT_RED,
                     )
-                    skipped_ids.append("\t".join([cmo_patient_id, dmp_patient_id, dmp_sample_id]))
-                    continue
+                    skipped_ids.append(
+                        "\t".join([cmo_patient_id, dmp_patient_id, dmp_sample_id])
+                    )
                 # Get the sample id from the Facet file
-                facet_path = Path(facet_path)
-                maf_id = facet_path.stem
-                dmp_sample_id = maf_id.split("_", 1)[0]
-            if copy_facet:
-                if not copy_facet_dir:
-                    copy_facet_dir = Path.cwd() / "facet_files"
-                    copy_facet_dir.mkdir(parents=True, exist_ok=True)
-                cp_facet_cmd = f"cp {facet_path} {copy_facet_dir.as_posix()}"
-                p1 = run_cmd(cp_facet_cmd)
-                typer.secho(
-                    f"Done copying facet maf file for patient with CMO ID {cmo_patient_id}, and DMP ID {dmp_patient_id} and output is written in {copy_facet_dir}",
-                    fg=typer.colors.BRIGHT_MAGENTA,
-                )
-            create_report_cmd, html_output = generate_create_report_cmd(
-                script_path,
-                markdown,
-                template_path,
-                cmo_patient_id,
-                small_variants_path,
-                manifest,
-                cnv_path,
-                dmp_patient_id,
-                dmp_sample_id,
-                facet_path,
-                tumor_type,
-            )
-            p2 = run_cmd(create_report_cmd)
-            typer.secho(
-                f"Done running create_report.R for patient with CMO ID {cmo_patient_id}, and DMP ID {dmp_patient_id} and output is written in {html_output}",
-                fg=typer.colors.BRIGHT_GREEN,
-            )
+                if facet_path:
+                    facet_path = Path(facet_path)
+                    maf_id = facet_path.stem
+                    dmp_sample_id = maf_id.split("_", 1)[0]
+                    if copy_facet:
+                        if not copy_facet_dir:
+                            copy_facet_dir = Path.cwd() / "facet_files"
+                            copy_facet_dir.mkdir(parents=True, exist_ok=True)
+                        cp_facet_cmd = f"cp {facet_path} {copy_facet_dir.as_posix()}"
+                        p1 = run_cmd(cp_facet_cmd)
+                        typer.secho(
+                            f"Done copying facet maf file for patient with CMO ID {cmo_patient_id}, and DMP ID {dmp_patient_id} and output is written in {copy_facet_dir}",
+                            fg=typer.colors.BRIGHT_GREEN,
+                        )
+                    create_report_cmd, html_output = generate_create_report_cmd(
+                        script_path,
+                        markdown,
+                        template_path,
+                        cmo_patient_id,
+                        small_variants_path,
+                        manifest,
+                        cnv_path,
+                        dmp_patient_id,
+                        dmp_sample_id,
+                        facet_path,
+                        tumor_type,
+                    )
+                    p2 = run_cmd(create_report_cmd)
+                    typer.secho(
+                        f"Done running create_report.R for patient with CMO ID {cmo_patient_id}, and DMP ID {dmp_patient_id} and output is written in {html_output}",
+                        fg=typer.colors.BRIGHT_GREEN,
+                    )
+                else:
+                    if copy_facet:
+                        typer.secho(
+                            f"No maf file to copy for patient with CMO ID {cmo_patient_id}, and DMP ID {dmp_patient_id} and thus skipping",
+                            fg=typer.colors.BRIGHT_RED,
+                        )
+                    create_report_cmd, html_output = generate_create_report_cmd(
+                        script_path,
+                        markdown,
+                        template_path,
+                        cmo_patient_id,
+                        small_variants_path,
+                        manifest,
+                        cnv_path,
+                        tumor_type,
+                    )
+                    p3 = run_cmd(create_report_cmd)
+                    typer.secho(
+                        f"Done running create_report.R for patient with CMO ID {cmo_patient_id} and output is written in {html_output}",
+                        fg=typer.colors.BRIGHT_GREEN,
+                    )
+
     print("\nPatient ids that were skipped as facet maf could not be found\n")
     print(skipped_ids)
     typer.secho("Done!", fg=typer.colors.BRIGHT_GREEN)
