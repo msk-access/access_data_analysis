@@ -1,4 +1,5 @@
 import typer
+import pandas as pd
 
 
 def check_required_columns(manifest, template_days=None):
@@ -74,7 +75,10 @@ def check_required_columns(manifest, template_days=None):
             fg=typer.colors.BRIGHT_GREEN,
         )
     if "dmp_sample_id" in column_headers:
-        df_to_traverse = manifest[['cmo_patient_id','dmp_patient_id','dmp_sample_id']]
+        df_to_traverse = pd.unique(
+            manifest[["cmo_patient_id", "dmp_patient_id", "dmp_sample_id"]]
+        )
     else:
-        df_to_traverse = manifest[['cmo_patient_id','dmp_patient_id']]
-    return column_headers,df_to_traverse.unique()
+        df_to_traverse = pd.unique(manifest[["cmo_patient_id", "dmp_patient_id"]])
+
+    return column_headers, df_to_traverse
