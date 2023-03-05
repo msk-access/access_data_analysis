@@ -1,6 +1,5 @@
 import typer
 import glob
-import re
 from pathlib import Path
 
 
@@ -32,19 +31,18 @@ def generate_facet_maf_path(facet_path, patient_id, sample_id=None):
                 err=True,
                 fg=typer.colors.BRIGHT_RED,
             )
-            raise typer.Abort()
         if sample_id:
             typer.secho(
                 f"Could not find the facets-suite MAF file using sample id. {sample_id}",
                 err=True,
                 fg=typer.colors.BRIGHT_RED,
             )
-            raise typer.Abort()
+        return None
     elif len(maf_list) > 1:
         maf_list = [Path(i) for i in maf_list]
         maf_list_sorted = sorted(maf_list, key=lambda i: int(i.stem))
         maf_list_sorted = [str(i) for i in maf_list]
+        return maf_list_sorted[0]
     else:
         maf_list_sorted = maf_list
-
-    return maf_list_sorted[0]
+        return maf_list_sorted[0]

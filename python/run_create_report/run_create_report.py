@@ -11,6 +11,7 @@ from modules.generate_create_report_cmd import generate_create_report_cmd
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich import print
 
+
 def main(
     repo_path: Path = typer.Option(
         None,
@@ -128,13 +129,16 @@ def main(
     # Read the manifest file
     manifest_df = read_manifest(manifest)
     # check required columns
-    column_header,manifest_to_traverse = check_required_columns(manifest_df, template_days)
+    column_header, manifest_to_traverse = check_required_columns(
+        manifest_df, template_days
+    )
     print(manifest_to_traverse)
     # get general paths
     (script_path, template_path) = generate_repo_path(
         repo_path, script_path, template_path, template_days
     )
     # iterate through each row and select information needed to generate the command
+    skipped_ids = []
     for i in range(len(manifest_to_traverse)):
         with Progress(
             SpinnerColumn(),
@@ -155,8 +159,24 @@ def main(
                 facet_path = generate_facet_maf_path(
                     facet_repo, dmp_patient_id, dmp_sample_id
                 )
+                if not facet_path:
+                    typer.secho(
+                        f"Skipping for patient with CMO ID {cmo_patient_id}, and DMP ID {dmp_patient_id}",
+                        err=True,
+                        fg=typer.colors.BRIGHT_RED,
+                    )
+                    skipped_ids.append([cmo_patient_id, dmp_patient_id, dmp_sample_id])
+                    continue
             else:
                 facet_path = generate_facet_maf_path(facet_repo, dmp_patient_id, None)
+                if not facet_path:
+                    typer.secho(
+                        f"Skipping for patient with CMO ID {cmo_patient_id}, and DMP ID {dmp_patient_id}",
+                        err=True,
+                        fg=typer.colors.BRIGHT_RED,
+                    )
+                    skipped_ids.append([cmo_patient_id, dmp_patient_id])
+                    continue
                 # Get the sample id from the Facet file
                 facet_path = Path(facet_path)
                 maf_id = facet_path.stem
@@ -189,7 +209,9 @@ def main(
                 f"Done running create_report.R for patient with CMO ID {cmo_patient_id}, and DMP ID {dmp_patient_id} and output is written in {html_output}",
                 fg=typer.colors.BRIGHT_GREEN,
             )
-        typer.secho("Done!", fg=typer.colors.BRIGHT_GREEN)
+    print("\n IDS that were skipped as facet maf could not be found")
+    print(skipped_ids)
+    typer.secho("Done!", fg=typer.colors.BRIGHT_GREEN)
 
 
 if __name__ == "__main__":
