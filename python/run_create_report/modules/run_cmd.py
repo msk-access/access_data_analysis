@@ -9,7 +9,7 @@ def run_cmd(cmd):
         cmd (str): System command to be run as a string
     """
     typer.secho(
-        f"run_cmd: command: {cmd} \n",
+        f"run_cmd: command: {cmd} ",
         fg=typer.colors.BRIGHT_MAGENTA,
     )
     out = subprocess.Popen(
@@ -23,12 +23,12 @@ def run_cmd(cmd):
     stdout, stderr = out.communicate()
     if stderr is None:
         typer.secho(
-            f"run_cmd: {stdout} \n",
+            f"run_cmd: {stdout} ",
             fg=typer.colors.BRIGHT_GREEN,
         )
     else:
         typer.secho(
-            f"run_cmd: Could not run the command. {stderr} \n",
+            f"run_cmd: Could not run the command. {stderr} ",
             err=True,
             fg=typer.colors.BRIGHT_RED,
         )

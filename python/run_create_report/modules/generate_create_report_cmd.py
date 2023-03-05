@@ -59,5 +59,5 @@ def generate_create_report_cmd(
         + f"'{tumor_type}'"
     )
     if markdown:
-        cmd = f"{cmd} --md"
+        cmd = f"{cmd} -md"
     return (cmd, html_output)
