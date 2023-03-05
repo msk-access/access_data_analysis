@@ -1,8 +1,9 @@
 # Table of Contents
 
 - [Table of Contents](#table-of-contents)
+  - [Requirements](#requirements)
   - [run\_create\_report](#run_create_report)
-      - [main](#main)
+    - [main](#main)
   - [Submodules](#submodules)
     - [check\_required\_columns](#check_required_columns)
       - [check\_required\_columns](#check_required_columns-1)
@@ -20,13 +21,23 @@
     - [generate\_create\_report\_cmd](#generate_create_report_cmd)
       - [generate\_create\_report\_cmd](#generate_create_report_cmd-1)
 
+## Requirements
+
+```bash
+access_data_analysis==0.1.2 # works with this repo tag
+typer==0.3.2
+typing_extensions==3.10.0.0
+pandas==1.2.5
+rich==12.1.0
+```
+
 <a id="run_create_report"></a>
 
 ## run\_create\_report
 
 <a id="run_create_report.main"></a>
 
-#### main
+### main
 
 ```bash
 Usage: run_create_report.py [OPTIONS]

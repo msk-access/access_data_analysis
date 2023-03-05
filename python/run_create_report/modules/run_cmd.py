@@ -10,7 +10,7 @@ def run_cmd(cmd):
     """
     typer.secho(
         f"run_cmd: run: the command line is {cmd}",
-        fg=typer.colors.BRIGHT_GREEN,
+        fg=typer.colors.BRIGHT_MAGENTA,
     )
     out = subprocess.Popen(
         (cmd),

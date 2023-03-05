@@ -139,7 +139,7 @@ def main(
             TextColumn("[progress.description]{task.description}"),
             transient=True,
             ) as progress:
-                progress.add_task(description="Processing...", total=None)
+                progress.add_task(description="Processing...\n", total=None)
                 cmo_patient_id = manifest_df.loc[i, "cmo_patient_id"]
                 dmp_patient_id = manifest_df.loc[i, "dmp_patient_id"]
                 typer.secho(
@@ -163,10 +163,10 @@ def main(
                         copy_facet_dir = Path.cwd() / "facet_files"
                         copy_facet_dir.mkdir(parents=True, exist_ok=True)
                     cp_facet_cmd = f"cp {facet_path} {copy_facet_dir.as_posix()}"
-                    typer.secho(
-                        f"command: {cp_facet_cmd}",
-                        fg=typer.colors.BRIGHT_MAGENTA,
-                    )
+                    #typer.secho(
+                    #    f"command: {cp_facet_cmd}",
+                    #    fg=typer.colors.BRIGHT_MAGENTA,
+                    #)
                     p1 = run_cmd(cp_facet_cmd)
                     typer.secho(
                         f"Done copying facet maf file for patient with CMO ID {cmo_patient_id}, and DMP ID {dmp_patient_id} and output is written in {copy_facet_dir}",
@@ -185,11 +185,11 @@ def main(
                     facet_path,
                     tumor_type,
                 )
-                typer.secho(
-                    f"command: {create_report_cmd}",
-                    fg=typer.colors.BRIGHT_MAGENTA,
-                )
-                #p2 = run_cmd(create_report_cmd)
+                #typer.secho(
+                #    f"command: {create_report_cmd}",
+                #    fg=typer.colors.BRIGHT_MAGENTA,
+                #)
+                p2 = run_cmd(create_report_cmd)
                 typer.secho(
                     f"Done running create_report.R for patient with CMO ID {cmo_patient_id}, and DMP ID {dmp_patient_id} and output is written in {html_output.as_posix()}",
                     fg=typer.colors.BRIGHT_GREEN,
