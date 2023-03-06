@@ -1,6 +1,5 @@
-import typer
 import subprocess
-import shlex
+import typer
 from rich import print
 
 
@@ -22,8 +21,10 @@ def run_cmd(cmd):
     out.wait()
     stdout, stderr = out.communicate()
     if stderr is None:
-        print("run_cmd:stdout:\n")
-        print(stdout)
+        if "Error" in stdout or "error" in stdout:
+            print("run_cmd:stdout:\n")
+            print(stdout)
+            raise typer.Abort()
     else:
         print("run_cmd:stderr:\n")
         print(stderr)
