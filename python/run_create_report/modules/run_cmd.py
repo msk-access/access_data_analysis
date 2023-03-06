@@ -20,7 +20,7 @@ def run_cmd(cmd):
     )
     out.wait()
     stdout, stderr = out.communicate()
-    if stderr is None:
+    if stderr is None and stdout is not None:
         if "Error" in stdout or "error" in stdout:
             print("run_cmd:stdout:\n")
             print(stdout)
