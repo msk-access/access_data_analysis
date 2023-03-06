@@ -161,7 +161,7 @@ treatment_plot <- function(treatment_table, xbreaks, xlimits, colors, ids=c("col
   return(fig)
 }
 
-cna_plot<-function(cna, xlimits, xbreaks){
+cna_plot<-function(cna, xlimits, xbreaks, xlabels){
   cna$fc<-round(cna$fc,2)
   fig<-ggplot(cna, aes(x=collection_day, sampleid=sample_id, gene=Hugo_Symbol)) +
     geom_bar(aes(y=1, fill=fc), stat="identity",width=10) +

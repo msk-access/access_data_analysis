@@ -24,7 +24,7 @@ def run_cmd(cmd):
         if "Error" in str(stdout) or "error" in str(stdout):
             print("run_cmd:stdout:\n")
             print(stdout)
-            exit(1)
+            raise typer.Abort
     else:
         print("run_cmd:stderr:\n")
         print(stderr)
