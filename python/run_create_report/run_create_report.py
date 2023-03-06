@@ -138,7 +138,9 @@ def main(
         repo_path, script_path, template_path, template_days
     )
     # iterate through each row and select information needed to generate the command
-    skipped_ids = []
+    skipped_ids = [
+        "\t".join(["cmo_patient_id", "dmp_patient_id", "dmp_sample_id"])
+    ]
     with Progress(
         SpinnerColumn(),
         TextColumn("[progress.description]{task.description}"),
@@ -182,7 +184,7 @@ def main(
                         fg=typer.colors.BRIGHT_RED,
                     )
                     skipped_ids.append(
-                        "\t".join([cmo_patient_id, dmp_patient_id, None])
+                        "\t".join([cmo_patient_id, dmp_patient_id, "NA"])
                     )
                 # Get the sample id from the Facet file
                 if facet_path:
