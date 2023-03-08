@@ -161,12 +161,12 @@ treatment_plot <- function(treatment_table, xbreaks, xlimits, colors, ids=c("col
   return(fig)
 }
 
-cna_plot<-function(cna, xlimits, xbreaks){
+cna_plot<-function(cna, xlimits, xbreaks, xlabels){
   cna$fc<-round(cna$fc,2)
   fig<-ggplot(cna, aes(x=collection_day, sampleid=sample_id, gene=Hugo_Symbol)) +
     geom_bar(aes(y=1, fill=fc), stat="identity",width=10) +
     scale_fill_gradient2(low="white",mid="red",high="red3",midpoint=1.5, limits=c(0,max(cna$fc))) +
-    theme(legend.title=element_blank(), panel.grid.major.y=element_blank(), strip.background = element_blank(), axis.text.x=element_text(angle=90), axis.ticks.y=element_blank(), axis.text.y=element_blank()) +
+    theme(legend.title=element_blank(), panel.grid.major.y=element_blank(), strip.background = element_blank(), axis.text.x=element_text(angle=45), axis.ticks.y=element_blank(), axis.text.y=element_blank()) +
     scale_x_continuous(breaks=xbreaks, limits=xlimits, labels=xlabels) +
     xlab("") + facet_grid(Hugo_Symbol~.)
   fig<-ggplotly(fig, tooltip=c("collection_day","CNA","sample_id","fc","Hugo_Symbol"))
