@@ -87,6 +87,10 @@ Options:
   -gm, --generate-markdown        If given, the create_report.R will be run
                                   with `-md` flag to generate markdown
                                   [default: False]
+  -ff, --force                    If this is set to True then we will not 
+                                  stop if an error is encountered in a given
+                                  sample but keep on running for the next sample
+                                  [default: False]
 
   --install-completion            Install completion for the current shell.
   --show-completion               Show completion for the current shell, to
@@ -111,8 +115,11 @@ Wrapper script to run create_report.R
 - `copy_facet_dir` _Path, optional_ - "Directory path where the facet maf file should be copied.".
 - `template_days` _bool, optional_ - "If the `--repo` option is specified and if this is set to True then we will use the template_days RMarkdown file as the template".
 - `markdown` _bool, optional_ - "If given, the create_report.R will be run with `-md` flag to generate markdown".
+- `force` _bool, optional_ - "If this is set to True then we will not stop if an error is encountered in a given sample but keep on running for the next sample".
 
 **Usage**
+
+- Using Generate Markdown, copy facet maf file, use template_days RMarkdown and force flag
 
 ```bash
 > python python/run_create_report/run_create_report.py \
@@ -120,7 +127,18 @@ Wrapper script to run create_report.R
 -r /home/shahr2/github/access_data_analysis \
 -v /home/shahr2/bergerlab/Project_10619_D/small_variants/results_20Jan2023/results_stringent/ \
 -c /home/shahr2/bergerlab/Project_10619_D/small_variants/results_20Jan2023/CNA_final_call_set \
--l "Melanoma" -gm -d -cfm
+-l "Melanoma" -gm -d -cfm -ff
+```
+
+- Using Generate Markdown and force flag
+
+```bash
+> python python/run_create_report/run_create_report.py \
+-m /home/shahr2/bergerlab/Project_10619_D/small_variants/manifest_noDate_days.tsv \
+-r /home/shahr2/github/access_data_analysis \
+-v /home/shahr2/bergerlab/Project_10619_D/small_variants/results_20Jan2023/results_stringent/ \
+-c /home/shahr2/bergerlab/Project_10619_D/small_variants/results_20Jan2023/CNA_final_call_set \
+-l "Melanoma" -gm -ff
 ```
 
 ## Submodules

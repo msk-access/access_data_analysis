@@ -109,6 +109,12 @@ def main(
         "-gm",
         help="If given, the create_report.R will be run with `-md` flag to generate markdown",
     ),
+    force: bool = typer.Option(
+        False,
+        "--force",
+        "-ff",
+        help="If this is set to True then we will not stop if an error is encountered in a given sample but keep on running for the next sample",
+    ),
 ):
     """Wrapper script to run create_report.R
 
@@ -125,6 +131,7 @@ def main(
         copy_facet_dir (Path, optional): "Directory path where the facet maf file should be copied.".
         template_days (bool, optional): "If the `--repo` option is specified and if this is set to True then we will use the template_days RMarkdown file as the template".
         markdown (bool, optional): "If given, the create_report.R will be run with `-md` flag to generate markdown".
+        force (bool, optional): "If this is set to True then we will not stop if an error is encountered in a given sample but keep on running for the next sample".
     """
     # Read the manifest file
     manifest_df = read_manifest(manifest)
@@ -196,7 +203,7 @@ def main(
                             copy_facet_dir = Path.cwd() / "facet_files"
                             copy_facet_dir.mkdir(parents=True, exist_ok=True)
                         cp_facet_cmd = f"cp {facet_path} {copy_facet_dir.as_posix()}"
-                        p1 = run_cmd(cp_facet_cmd)
+                        p1 = run_cmd(cp_facet_cmd, force)
                         typer.secho(
                             f"Done copying facet maf file for patient with CMO ID {cmo_patient_id}, and DMP ID {dmp_patient_id} and output is written in {copy_facet_dir}",
                             fg=typer.colors.BRIGHT_GREEN,
@@ -214,7 +221,7 @@ def main(
                         facet_path,
                         tumor_type,
                     )
-                    p2 = run_cmd(create_report_cmd)
+                    p2 = run_cmd(create_report_cmd, force)
                     typer.secho(
                         f"Done running create_report.R for patient with CMO ID {cmo_patient_id}, and DMP ID {dmp_patient_id} and output is written in {html_output}",
                         fg=typer.colors.BRIGHT_GREEN,
@@ -238,7 +245,7 @@ def main(
                         facet_path,
                         tumor_type,
                     )
-                    p3 = run_cmd(create_report_cmd)
+                    p3 = run_cmd(create_report_cmd, force)
                     typer.secho(
                         f"Done running create_report.R for patient with CMO ID {cmo_patient_id} and output is written in {html_output}",
                         fg=typer.colors.BRIGHT_GREEN,

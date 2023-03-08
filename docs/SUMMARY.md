@@ -20,7 +20,9 @@
 - [Create Patient Report](analysis/create-report.md)
 - [Intermediate File Organization](analysis/intermediate-file-organization.md)
 
-## Miscellaneous Utility Scripts
+## Miscellaneous Scripts for to unable data analysis
 
 - [Get cbioportal variants](../python/get_cbioportal_variants/README.md)
 - [Convert dates to days](../python/convert_dates_to_days/README.md)
+- [Conver CSV to MAF](../python/convert_csv_to_maf/README.md)
+- [Run create_report.R](../python/run_create_report/README.md)

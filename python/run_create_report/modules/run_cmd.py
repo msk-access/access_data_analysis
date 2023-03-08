@@ -3,7 +3,7 @@ import typer
 from rich import print
 
 
-def run_cmd(cmd):
+def run_cmd(cmd,force):
     """Given a system command run it using subprocess
 
     Args:
@@ -24,6 +24,8 @@ def run_cmd(cmd):
         if "Error" in str(stdout) or "error" in str(stdout):
             print("run_cmd:stdout:\n")
             print(stdout)
+            if not force:
+                raise typer.Abort()
     else:
         print("run_cmd:stderr:\n")
         print(stderr)
