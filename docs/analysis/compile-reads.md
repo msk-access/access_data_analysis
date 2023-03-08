@@ -4,9 +4,14 @@ description: Step 1 -- intra-patient genotyping
 
 # Compile Reads
 
+There are two variantion:
+
+* compile\_reads.R : Works with Research ACCESS and Clinical IMPACT
+* compile\_reads\_all.R: Works with Research ACCESS, Clinical ACCESS and Clinical IMPACT
+
 The first step of the pipeline is to genotype all the variants of interest in the included samples (this means plasma, buffy coat, DMP tumor, DMP normal, and donor samples). Once we obtained the read counts at every loci of every sample, we then generate a table of VAFs and call status for each variant in all samples within a patient in the next step.
 
-## Usage
+## Usage compile\_reads.R
 
 ```
 Rscript R/compile_reads.R -h                                        
@@ -35,11 +40,47 @@ optional arguments:
                         DMP mirror BAM key file [default]
 ```
 
+## Usage compile\_reads\_all.R
+
+```
+Rscript R/compile_reads_all.R -h
+usage: R/compile_reads_all.R [-h] [-m MASTERREF] [-o RESULTSDIR]
+                             [-pid PROJECTID] [-pb POOLEDBAMDIR]
+                             [-fa FASTAPATH] [-gt GENOTYPERPATH] [-dmp DMPDIR]
+                             [-mb MIRRORBAMDIR] [-mab MIRRORACCESSBAMDIR]
+                             [-dmpk DMPKEYPATH] [-dmpak DMPACCESSKEYPATH]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -m MASTERREF, --masterref MASTERREF
+                        File path to master reference file
+  -o RESULTSDIR, --resultsdir RESULTSDIR
+                        Output directory
+  -pid PROJECTID, --projectid PROJECTID
+                        Project ID for submitted jobs involved in this run
+  -pb POOLEDBAMDIR, --pooledbamdir POOLEDBAMDIR
+                        Directory for all pooled bams [default]
+  -fa FASTAPATH, --fastapath FASTAPATH
+                        Reference fasta path [default]
+  -gt GENOTYPERPATH, --genotyperpath GENOTYPERPATH
+                        Genotyper executable path [default]
+  -dmp DMPDIR, --dmpdir DMPDIR
+                        Directory of clinical DMP repository [default]
+  -mb MIRRORBAMDIR, --mirrorbamdir MIRRORBAMDIR
+                        Mirror BAM file directory [default]
+  -mab MIRRORACCESSBAMDIR, --mirroraccessbamdir MIRRORACCESSBAMDIR
+                        Mirror BAM file directory for MSK-ACCESS [default]
+  -dmpk DMPKEYPATH, --dmpkeypath DMPKEYPATH
+                        DMP mirror BAM key file [default]
+  -dmpak DMPACCESSKEYPATH, --dmpaccesskeypath DMPACCESSKEYPATH
+                        DMP mirror BAM key file for MSK-ACCESS [default]
+```
+
 ## Default
 
 Default options can be found [here](../setup/resources.md#compile-reads)
 
-## What `compile_reads.R` does
+## What `compile_reads` does
 
 ### [For each patient](https://github.com/msk-access/access\_data\_analysis/blob/17a26eea455707c82824493ebc597d9850d47e82/R/compile\_reads.R#L47)
 
