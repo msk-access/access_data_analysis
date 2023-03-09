@@ -23,6 +23,6 @@
 ## Miscellaneous Utility Scripts
 
 * [Convert CSV to MAF](miscellaneous-utility-scripts/convert-csv-to-maf.md)
-* [Get cbioportal variants](python/get\_cbioportal\_variants/README.md)
+* [Get cBioPortal Variants](miscellaneous-utility-scripts/get-cbioportal-variants.md)
 * [Convert dates to days](python/convert\_dates\_to\_days/README.md)
 * [Run create\_report.R](miscellaneous-utility-scripts/run-create\_report.r.md)
