@@ -26,7 +26,7 @@ Requirement:
 #### Example command
 
 ```bash
-python get_cbioportal_variants.py  subset-maf --id "Test1" --id "Test2" --id "Test3"
+python get_cbioportal_variants.py  subset-maf --sid "Test1" --sid "Test2" --sid "Test3"
 ```
 
 ```bash
