@@ -119,7 +119,7 @@ def get_best_fit_folder(facet_manifest_path):
     facet_manifest_path = Path(facet_manifest_path)
     base_path = facet_manifest_path.parent
     facet_manifest_all = read_manifest(facet_manifest_path)
-    facet_manifest = facet_manifest_all.loc(facet_manifest_all.facets_qc)
+    facet_manifest = facet_manifest_all.loc[facet_manifest_all.facets_qc]
     if facet_manifest.empty:
             return(base_path.joinpath("default", "*[0-9].ccf.maf")
         )
