@@ -120,14 +120,20 @@ def get_best_fit_folder(facet_manifest_path):
     facet_manifest_path = Path(facet_manifest_path)
     base_path = facet_manifest_path.parent
     facet_manifest_all = read_manifest(facet_manifest_path)
+    #split date_reviewed in two columns 
     facet_manifest_all[['date_reviewed', 'time_reviewed']] = facet_manifest_all.date_reviewed.str.split(" ", expand = True)
+    #convert date_reviewed to date
     facet_manifest_all['date_reviewed'] = pd.to_datetime(facet_manifest_all['date_reviewed'])
+    #get facets_qc == TRUE rows
     facet_manifest_true = facet_manifest_all.loc[facet_manifest_all.facets_qc]
-    facet_manifest = facet_manifest_true.query["review_status == reviewed_best_fit"]
+    #get review_status == reviewed_best_fit rows
+    facet_manifest = facet_manifest_true.query("review_status == reviewed_best_fit")
     if facet_manifest.empty:
             return(base_path.joinpath("default", "*[0-9].ccf.maf")
         )
+    #sort by date
     facet_manifest_sort = facet_manifest.sort_values(by='date_reviewed',ascending=False)
+    #take the first row
     folder_name = facet_manifest_sort['fit_name'].iloc[0]
     return (
         (base_path.joinpath(folder_name, "*[0-9].ccf.maf"))
