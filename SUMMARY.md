@@ -26,4 +26,3 @@
 * [Get cBioPortal Variants](miscellaneous-utility-scripts/get-cbioportal-variants.md)
 * [Convert dates to days](python/convert\_dates\_to\_days/README.md)
 * [Run create\_report.R](miscellaneous-utility-scripts/run-create\_report.r.md)
-* [Run create\_report.R](miscellaneous-utility-scripts/run-create\_report.r-1.md)

@@ -24,5 +24,5 @@ This gitbook will walk you through:
   * [Convert CSV to MAF](miscellaneous-utility-scripts/convert-csv-to-maf.md)
   * [Get cbioportal variants](broken-reference)
   * [Convert dates to days](python/convert\_dates\_to\_days/)
-  * [Run create\_report.R](miscellaneous-utility-scripts/run-create\_report.r.md)
+  * [Run create\_report.R](broken-reference)
 
