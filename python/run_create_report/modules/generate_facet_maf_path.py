@@ -4,7 +4,6 @@ import pandas as pd
 from pathlib import Path
 from modules.read_manifest import read_manifest
 
-
 def generate_facet_maf_path(facet_path, patient_id, sample_id, best_fit):
     """Get path of maf associated with facet-suite output
 
@@ -18,16 +17,27 @@ def generate_facet_maf_path(facet_path, patient_id, sample_id, best_fit):
         str: path of the facets maf
     """
 
-    if best_fit:
-        manifest_path = (
-            facet_path.joinpath(
+    if (not best_fit):
+        if sample_id:
+            maf_path = facet_path.joinpath(
+                patient_id[:7], f"{sample_id}*", "default", "*[0-9].ccf.maf"
+            )
+            maf_path = get_maf_path(maf_path, patient_id, sample_id)
+        else:
+            maf_path = facet_path.joinpath(
+                patient_id[:7], f"{patient_id}*", "default", "*[0-9].ccf.maf"
+            )
+            maf_path = get_maf_path(maf_path, patient_id, None)
+        return maf_path
+    else:
+        if sample_id:
+            manifest_path = facet_path.joinpath(
                 patient_id[:7], f"{sample_id}*", "facets_review.manifest"
             )
-            if sample_id
-            else facet_path.joinpath(
+        else:
+            manifest_path = facet_path.joinpath(
                 patient_id[:7], f"{patient_id}*", "facets_review.manifest"
             )
-        )
         manifest_path = glob.glob(manifest_path.as_posix())
         if len(manifest_path) == 0:        
             if sample_id:
@@ -48,35 +58,22 @@ def generate_facet_maf_path(facet_path, patient_id, sample_id, best_fit):
             manifest_path = [Path(i) for i in manifest_path]
             manifest_path = sorted(manifest_path, key=lambda i: str(i.stem))
             manifest_path_sorted = [str(i) for i in manifest_path]
-            maf_path = (
-                get_maf_path(best_fit_folder, patient_id, None)
-                if (
-                    best_fit_folder := get_best_fit_folder(
-                        manifest_path_sorted[0]
-                    )
-                )
-                else None
-            )
-        elif best_fit_folder := get_best_fit_folder(manifest_path[0]):
-            maf_path = get_maf_path(best_fit_folder, patient_id, None)
+            best_fit_folder = get_best_fit_folder(manifest_path_sorted[0])
+            if best_fit_folder:
+                maf_path = get_maf_path(maf_path, patient_id, None)
+            else:
+                maf_path = None
         else:
-            maf_path = None
+            best_fit_folder = get_best_fit_folder(manifest_path[0])
+            if best_fit_folder:
+                maf_path = get_maf_path(maf_path, patient_id, None)
+            else:
+                maf_path = None
 
-
-    elif sample_id:
-        maf_path = facet_path.joinpath(
-            patient_id[:7], f"{sample_id}*", "default", "*[0-9].ccf.maf"
-        )
-        maf_path = get_maf_path(maf_path, patient_id, sample_id)
-    else:
-        maf_path = facet_path.joinpath(
-            patient_id[:7], f"{patient_id}*", "default", "*[0-9].ccf.maf"
-        )
-        maf_path = get_maf_path(maf_path, patient_id, None)
-    return maf_path
+        return maf_path
 
 def get_maf_path(maf_path, patient_id, sample_id):
-    """Get the path to the maf file
+    """Get the maf file
 
     Args:
         maf_path (pathlib.Path): Base path of the maf file
