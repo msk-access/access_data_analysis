@@ -127,9 +127,6 @@ def get_best_fit_folder(facet_manifest_path):
             return(base_path.joinpath("default", "*[0-9].ccf.maf")
         )
     facet_manifest_sort = facet_manifest.sort_values(by='date_reviewed',ascending=False)
-    print("\nFacet Review Manifest\n")
-    print(facet_manifest_sort)
-    print("\n--------------------------------")
     folder_name = facet_manifest_sort['fit_name'].iloc[0]
     return (
         (base_path.joinpath(folder_name, "*[0-9].ccf.maf"))
