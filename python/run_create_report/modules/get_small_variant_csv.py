@@ -1,5 +1,6 @@
-import typer
 import glob
+
+import typer
 
 
 def get_small_variant_csv(patient_id, csv_path):

@@ -1,5 +1,4 @@
 import typer
-from pathlib import Path
 
 
 def generate_repo_path(
