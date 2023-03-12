@@ -310,7 +310,7 @@ def main(
                     fg=typer.colors.BRIGHT_GREEN,
                 )
 
-    print("\nPatient ids that were skipped as facet maf could not be found\n")
+    print("\nSummary for all patient processed..\n")
     print(summary)
     summary_file = Path.cwd().joinpath("run_create_report_summary.tsv")
     with open(summary_file, "w") as fp:
