@@ -10,7 +10,23 @@ def read_manifest(manifest):
     Returns:
         data_frame: _description_
     """
-    if(manifest.suffix == ".csv"):
-        return pd.read_csv(manifest, sep=',', low_memory=False)
+    skip_rows = get_row(manifest)
+    if manifest.suffix == ".csv":
+        return pd.read_csv(manifest, sep=",", skiprows=skip_rows, low_memory=False)
     else:
-        return pd.read_csv(manifest, sep='\t', low_memory=False)
+        return pd.read_csv(manifest, sep="\t", skiprows=skip_rows, low_memory=False)
+
+
+def get_row(tsv_file):
+    """Function to skip rows
+
+    Args:
+        tsv_file (file): file to be read
+
+    Returns:
+        list: lines to be skipped
+    """
+    skipped = []
+    with open(tsv_file, "r") as FH:
+        skipped.extend(i for i, line in enumerate(FH) if line.startswith("#"))
+    return skipped
