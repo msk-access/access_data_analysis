@@ -242,7 +242,7 @@ def main(
                                     cmo_patient_id,
                                     dmp_patient_id,
                                     dmp_sample_id,
-                                    facet_path,
+                                    facet_path.as_posix(),
                                     "create_report.R failed",
                                 ]
                             )
@@ -254,7 +254,7 @@ def main(
                                     cmo_patient_id,
                                     dmp_patient_id,
                                     dmp_sample_id,
-                                    facet_path,
+                                    facet_path.as_posix(),
                                     "create_report.R ran with facet maf",
                                 ]
                             )
