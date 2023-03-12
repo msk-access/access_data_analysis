@@ -6,8 +6,13 @@ description: Script to subset record from cBioPortal format files
 
 ## Table of Contents
 
-* [Table of Contents](broken-reference)
-* [get\_cbioportal\_variants](broken-reference) - [subset\_cpt](broken-reference) - [subset\_cst](broken-reference) - [subset\_cna](broken-reference) - [subset\_sv](broken-reference) - [subset\_maf](broken-reference) - [read\_tsv](broken-reference) - [read\_ids](broken-reference) - [filter\_by\_columns](broken-reference) - [filter\_by\_rows](broken-reference) - [read\_bed](broken-reference) - [check\_if\_covered](broken-reference) - [get\_row](broken-reference)
+* [get\_cbioportal\_variants](get-cbioportal-variants.md#get\_cbioportal\_variants)&#x20;
+  * [subset\_cpt](get-cbioportal-variants.md#subset\_cpt)&#x20;
+  * [subset\_cst](get-cbioportal-variants.md#subset\_cst)&#x20;
+  * [subset\_cna](get-cbioportal-variants.md#subset\_cna)&#x20;
+  * [subset\_sv](get-cbioportal-variants.md#subset\_sv)&#x20;
+  * [subset\_maf](get-cbioportal-variants.md#subset\_maf)&#x20;
+* [Sub-modules](get-cbioportal-variants.md#sub-modules)
 
 ## get\_cbioportal\_variants
 
@@ -18,10 +23,10 @@ Requirement:
 * typer
 * bed\_lookup([https://github.com/msk-access/python\_bed\_lookup](https://github.com/msk-access/python\_bed\_lookup))
 
-## Example command
+#### Example command
 
 ```bash
-python get_cbioportal_variants.py  subset-maf --id "Test1" --id "Test2" --id "Test3"
+python get_cbioportal_variants.py  subset-maf --sid "Test1" --sid "Test2" --sid "Test3"
 ```
 
 ```bash
@@ -48,7 +53,7 @@ Commands:
   subset-sv   Subset data_sv.txt file for given set of sample ids.
 ```
 
-**subset\_cpt**
+### **subset\_cpt**
 
 ```bash
 Usage: get_cbioportal_variants.py subset-cpt [OPTIONS]
@@ -81,7 +86,7 @@ Options:
   --help            Show this message and exit.
 ```
 
-**subset\_cst**
+### **subset\_cst**
 
 ```bash
 Usage: get_cbioportal_variants.py subset-cst [OPTIONS]
@@ -114,7 +119,7 @@ Options:
   --help            Show this message and exit.
 ```
 
-**subset\_cna**
+### **subset\_cna**
 
 ```bash
 Usage: get_cbioportal_variants.py subset-cna [OPTIONS]
@@ -142,7 +147,7 @@ Options:
   --help           Show this message and exit.
 ```
 
-**subset\_sv**
+### **subset\_sv**
 
 ```bash
 Usage: get_cbioportal_variants.py subset-sv [OPTIONS]
@@ -173,7 +178,7 @@ Options:
   --help            Show this message and exit.
 ```
 
-**subset\_maf**
+### **subset\_maf**
 
 ```bash
 Usage: get_cbioportal_variants.py subset-maf [OPTIONS]
@@ -212,7 +217,9 @@ Options:
   --help            Show this message and exit.
 ```
 
-**read\_tsv**
+### Sub-modules
+
+#### **read\_tsv**
 
 ```python
 def read_tsv(tsv)
@@ -228,7 +235,7 @@ Read a tsv file
 
 * `data_frame` - Output a data frame containing the MAF/tsv
 
-**read\_ids**
+#### **read\_ids**
 
 ```python
 def read_ids(sid, ids)
@@ -245,7 +252,7 @@ make a list of ids
 
 * `list` - List containing all ids
 
-**filter\_by\_columns**
+#### **filter\_by\_columns**
 
 ```python
 def filter_by_columns(sid, tsv_df)
@@ -262,7 +269,7 @@ Filter data by columns
 
 * `data_frame` - A copy of the subset of the data\_frame
 
-**filter\_by\_rows**
+#### **filter\_by\_rows**
 
 ```python
 def filter_by_rows(sid, tsv_df, col_name)
@@ -280,7 +287,7 @@ Filter the data by rows
 
 * `data_frame` - A copy of the subset of the data\_frame
 
-**read\_bed**
+#### **read\_bed**
 
 ```python
 def read_bed(bed)
@@ -296,7 +303,7 @@ Read BED file using bed\_lookup
 
 object : bed file object to use for filtering
 
-**check\_if\_covered**
+#### **check\_if\_covered**
 
 ```python
 def check_if_covered(bedObj, mafObj)
@@ -313,7 +320,7 @@ Function to check if a variant is covered in a given bed file
 
 * `data_frame` - _description_
 
-**get\_row**
+#### **get\_row**
 
 ```python
 def get_row(tsv_file)
