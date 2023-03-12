@@ -60,13 +60,13 @@ def generate_facet_maf_path(facet_path, patient_id, sample_id, best_fit):
             manifest_path_sorted = [str(i) for i in manifest_path]
             best_fit_folder = get_best_fit_folder(manifest_path_sorted[0])
             if best_fit_folder:
-                maf_path = get_maf_path(maf_path, patient_id, None)
+                maf_path = get_maf_path(best_fit_folder, patient_id, None)
             else:
                 maf_path = None
         else:
             best_fit_folder = get_best_fit_folder(manifest_path[0])
             if best_fit_folder:
-                maf_path = get_maf_path(maf_path, patient_id, None)
+                maf_path = get_maf_path(best_fit_folder, patient_id, None)
             else:
                 maf_path = None
 
