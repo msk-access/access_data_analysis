@@ -3,6 +3,7 @@ import glob
 import pandas as pd
 from pathlib import Path
 from modules.read_manifest import read_manifest
+from rich import print
 
 def generate_facet_maf_path(facet_path, patient_id, sample_id, best_fit):
     """Get path of maf associated with facet-suite output
@@ -122,6 +123,9 @@ def get_best_fit_folder(facet_manifest_path):
     facet_manifest_all[['date_reviewed', 'time_reviewed']] = facet_manifest_all.date_reviewed.str.split(" ", expand = True)
     facet_manifest_all['date_reviewed'] = pd.to_datetime(facet_manifest_all['date_reviewed'])
     facet_manifest = facet_manifest_all.loc[facet_manifest_all.facets_qc]
+    print("\nFacet Review Manifest\n")
+    print(facet_manifest)
+    print("\n--------------------------------")
     if facet_manifest.empty:
             return(base_path.joinpath("default", "*[0-9].ccf.maf")
         )
