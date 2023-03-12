@@ -122,7 +122,8 @@ def get_best_fit_folder(facet_manifest_path):
     facet_manifest_all = read_manifest(facet_manifest_path)
     facet_manifest_all[['date_reviewed', 'time_reviewed']] = facet_manifest_all.date_reviewed.str.split(" ", expand = True)
     facet_manifest_all['date_reviewed'] = pd.to_datetime(facet_manifest_all['date_reviewed'])
-    facet_manifest = facet_manifest_all.loc[facet_manifest_all.facets_qc]
+    facet_manifest_true = facet_manifest_all.loc[facet_manifest_all.facets_qc]
+    facet_manifest = facet_manifest_true.query["review_status == reviewed_best_fit"]
     if facet_manifest.empty:
             return(base_path.joinpath("default", "*[0-9].ccf.maf")
         )
