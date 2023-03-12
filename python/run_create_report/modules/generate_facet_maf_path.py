@@ -127,7 +127,7 @@ def get_best_fit_folder(facet_manifest_path):
     #get facets_qc == TRUE rows
     facet_manifest_true = facet_manifest_all.loc[facet_manifest_all.facets_qc]
     #get review_status == reviewed_best_fit rows
-    facet_manifest = facet_manifest_true.query("review_status == reviewed_best_fit")
+    facet_manifest = facet_manifest_true.filter["review_status" == "reviewed_best_fit"]
     if facet_manifest.empty:
             return(base_path.joinpath("default", "*[0-9].ccf.maf")
         )
