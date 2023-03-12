@@ -1,5 +1,5 @@
-import typer
 import pandas as pd
+import typer
 
 
 def check_required_columns(manifest, template_days=None):

@@ -1,9 +1,10 @@
-import typer
 import glob
-import pandas as pd
 from pathlib import Path
+
+import pandas as pd
+import typer
 from modules.read_manifest import read_manifest
-from rich import print
+
 
 def generate_facet_maf_path(facet_path, patient_id, sample_id, best_fit):
     """Get path of maf associated with facet-suite output
