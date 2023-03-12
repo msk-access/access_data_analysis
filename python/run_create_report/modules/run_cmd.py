@@ -26,10 +26,12 @@ def run_cmd(cmd,force):
             print(stdout)
             if not force:
                 raise typer.Abort()
+            else:
+                return stdout
     else:
         print("run_cmd:stderr:\n")
         print(stderr)
-    return out
+        return stderr
 
 
 def run_multiple_cmd(commands, parallel_process=None):

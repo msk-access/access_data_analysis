@@ -1,9 +1,9 @@
-# Table of Contents
+# Run Create Report
 
-- [Table of Contents](#table-of-contents)
+- [Run Create Report](#run-create-report)
   - [Requirements](#requirements)
   - [run\_create\_report](#run_create_report)
-    - [main](#main)
+    - [Main Script (run\_create\_report.py)](#main-script-run_create_reportpy)
   - [Submodules](#submodules)
     - [check\_required\_columns](#check_required_columns)
       - [check\_required\_columns](#check_required_columns-1)
@@ -11,6 +11,7 @@
       - [generate\_repo\_path](#generate_repo_path)
     - [read\_manifest](#read_manifest)
       - [read\_manifest](#read_manifest-1)
+      - [get\_row](#get_row)
     - [get\_small\_variant\_csv](#get_small_variant_csv)
       - [get\_small\_variant\_csv](#get_small_variant_csv-1)
     - [run\_cmd](#run_cmd)
@@ -18,13 +19,15 @@
       - [run\_multiple\_cmd](#run_multiple_cmd)
     - [generate\_facet\_maf\_path](#generate_facet_maf_path)
       - [generate\_facet\_maf\_path](#generate_facet_maf_path-1)
+      - [get\_maf\_path](#get_maf_path)
+      - [get\_best\_fit\_folder](#get_best_fit_folder)
     - [generate\_create\_report\_cmd](#generate_create_report_cmd)
       - [generate\_create\_report\_cmd](#generate_create_report_cmd-1)
 
 ## Requirements
 
 ```bash
-access_data_analysis==0.1.2 # works with this repo tag
+access_data_analysis=>0.1.2 # works with this repo tag
 typer==0.3.2
 typing_extensions==3.10.0.0
 pandas==1.2.5
@@ -37,7 +40,7 @@ rich==12.1.0
 
 <a id="run_create_report.main"></a>
 
-### main
+### Main Script (run\_create\_report.py)
 
 ```bash
 Usage: run_create_report.py [OPTIONS]
@@ -54,7 +57,17 @@ Options:
                                   create_report.R when `--repo` is not given
 
   -m, --manifest FILE             File containing meta information per sample.
-                                  [required]
+                                  Require following columns in the header:
+                                  cmo_patient_id, sample_id, dmp_patient_id,
+                                  collection_date or collection_day,
+                                  timepoint. If dmp_sample_id column is given
+                                  and has information that will be used to run
+                                  facets. If dmp_sample_id is not given and
+                                  dmp_patient_id is given than it will be used
+                                  to get the Tumor sample with lowest number.
+                                  If dmp_sample_id or dmp_patient_id is not
+                                  given then it will run without the facet maf
+                                  file  [required]
 
   -v, --variant-results DIRECTORY
                                   Base path for all results of small variants
@@ -70,6 +83,11 @@ Options:
                                   Clinical MSK-IMPACT samples  [default: /juno
                                   /work/ccs/shared/resources/impact/facets/all
                                   /]
+
+  -bf, --best-fit                 If this is set to True then we will attempt
+                                  to parse `facets_review.manifest` file to
+                                  pick the best fit for a given dmp_sample_id
+                                  [default: False]
 
   -l, --tumor-type TEXT           Tumor type label for the report  [required]
   -cfm, --copy-facet-maf          If this is set to True then we will copy the
@@ -87,10 +105,12 @@ Options:
   -gm, --generate-markdown        If given, the create_report.R will be run
                                   with `-md` flag to generate markdown
                                   [default: False]
-  -ff, --force                    If this is set to True then we will not 
-                                  stop if an error is encountered in a given
-                                  sample but keep on running for the next sample
-                                  [default: False]
+
+  -ff, --force                    If this is set to True then we will not stop
+                                  if an error is encountered in a given sample
+                                  while running create_report.R but keep on
+                                  running for the next sample  [default:
+                                  False]
 
   --install-completion            Install completion for the current shell.
   --show-completion               Show completion for the current shell, to
@@ -106,10 +126,11 @@ Wrapper script to run create_report.R
 - `repo_path` _Path, optional_ - "Base path to where the git repository is located for access_data_analysis".
 - `script_path` _Path, optional_ - "Path to the create_report.R script, fall back if `--repo` is not given".
 - `template_path` _Path, optional_ - "Path to the template.Rmd or template_days.Rmd to be used with create_report.R when `--repo` is not given".
-- `manifest` _Path, required_ - "File containing meta information per sample.".
+- `manifest` _Path, required_ - "File containing meta information per sample. Require following columns in the header: `cmo_patient_id`, `sample_id`, `dmp_patient_id`, `collection_date` or `collection_day`, `timepoint`. If dmp_sample_id column is given and has information that will be used to run facets. if dmp_sample_id is not given and dmp_patient_id is given than it will be used to get the Tumor sample with lowest number.If dmp_sample_id or dmp_patient_id is not given then it will run without the facet maf file".
 - `variant_path` _Path, required_ - "Base path for all results of small variants as generated by filter_calls.R script in access_data_analysis (Make sure only High Confidence calls are included)".
 - `cnv_path` _Path, required_ - "Base path for all results of CNV as generated by CNV_processing.R script in access_data_analysis".
 - `facet_repo` _Path, required_ - "Base path for all results of facets on Clinical MSK-IMPACT samples".
+- `best_fit` _bool, optional_ - "If this is set to True then we will attempt to parse `facets_review.manifest` file to pick the best fit for a given dmp_sample_id".
 - `tumor_type` _str, required_ - "Tumor type label for the report".
 - `copy_facet` _bool, optional_ - "If this is set to True then we will copy the facet maf file in the directory specified in `copy_facet_dir`".
 - `copy_facet_dir` _Path, optional_ - "Directory path where the facet maf file should be copied.".
@@ -119,7 +140,7 @@ Wrapper script to run create_report.R
 
 **Usage**
 
-- Using Generate Markdown, copy facet maf file, use template_days RMarkdown and force flag
+- Using Generate Markdown, copy facet maf file, use template_days RMarkdown, force flag and best fit for facets
 
 ```bash
 > python python/run_create_report/run_create_report.py \
@@ -127,10 +148,10 @@ Wrapper script to run create_report.R
 -r /home/shahr2/github/access_data_analysis \
 -v /home/shahr2/bergerlab/Project_10619_D/small_variants/results_20Jan2023/results_stringent/ \
 -c /home/shahr2/bergerlab/Project_10619_D/small_variants/results_20Jan2023/CNA_final_call_set \
--l "Melanoma" -gm -d -cfm -ff
+-l "Melanoma" -gm -d -cfm -ff -bf
 ```
 
-- Using Generate Markdown and force flag
+- Using Generate Markdown, force flag and default fit for facets
 
 ```bash
 > python python/run_create_report/run_create_report.py \
@@ -221,7 +242,7 @@ Generate path to create_report.R and template RMarkdown file
 def read_manifest(manifest)
 ```
 
-_summary_
+Read manifest file
 
 **Arguments**:
 
@@ -231,6 +252,24 @@ _summary_
 **Returns**:
 
 - `data_frame` - _description_
+
+<a id="read_manifest.get_row"></a>
+
+#### get\_row
+
+```python
+def get_row(tsv_file)
+```
+
+Function to skip rows
+
+**Arguments**:
+
+- `tsv_file` _file_ - file to be read
+  
+**Returns**:
+
+- `list` - lines to be skipped
 
 <a id="get_small_variant_csv"></a>
 
@@ -318,6 +357,44 @@ Get path of maf associated with facet-suite output
 **Returns**:
 
 - `str` - path of the facets maf
+
+<a id="generate_facet_maf_path.get_maf_path"></a>
+
+#### get\_maf\_path
+
+```python
+def get_maf_path(maf_path, patient_id, sample_id)
+```
+
+Get the path to the maf file
+
+**Arguments**:
+
+- `maf_path` _pathlib.Path_ - Base path of the maf file
+- `patient_id` _str_: DMP Patient ID for facets
+- `sample_id` _str_ - DMP Sample ID if any for facets
+  
+**Returns**:
+
+- `str` - Path to the maf file
+
+<a id="generate_facet_maf_path.get_best_fit_folder"></a>
+
+#### get\_best\_fit\_folder
+
+```python
+def get_best_fit_folder(facet_manifest_path)
+```
+
+Get the best fit folder for the given facet manifest path
+
+**Arguments**:
+
+- `facet_manifest_path` _str_ - manifest path to be used for determining best fit
+  
+**Returns**:
+
+- `pathlib.Path` - path to the folder containing best fit maf files
 
 <a id="generate_create_report_cmd"></a>
 
