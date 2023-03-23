@@ -43,8 +43,10 @@ if (dmp_id != "") {
 }
 if (dmp_id != "") {
   page_title = "{{PATIENT_ID}} ({{DMP_ID}})"
+  cna_patters <- "{{PATIENT_ID}}|{{DMP_ID}}"
 } else {
   page_title = "{{PATIENT_ID}}"
+  cna_patters <- "{{PATIENT_ID}}"
 }
 ```
 
@@ -164,7 +166,7 @@ treatment_plot <- function(treatment_table, xbreaks, xlimits, colors, ids=c("col
 cna_plot<-function(cna, xlimits, xbreaks, xlabels){
   cna$fc<-round(cna$fc,2)
   fig<-ggplot(cna, aes(x=collection_day, sampleid=sample_id, gene=Hugo_Symbol)) +
-    geom_bar(aes(y=1, fill=fc), stat="identity",width=10) +
+    geom_bar(aes(y=1, fill=fc), stat="identity",width=5) +
     scale_fill_gradient2(low="white",mid="red",high="red3",midpoint=1.5, limits=c(0,max(cna$fc))) +
     theme(legend.title=element_blank(), panel.grid.major.y=element_blank(), strip.background = element_blank(), axis.text.x=element_text(angle=45), axis.ticks.y=element_blank(), axis.text.y=element_blank()) +
     scale_x_continuous(breaks=xbreaks, limits=xlimits, labels=xlabels) +
@@ -232,7 +234,7 @@ if (nrow(dmp) > 0) {
 }
 
 ## read CNA files ##
-all.cna.files <- list.files(path = access_data_analysis_cna_dir, pattern = sample, full.names=TRUE)
+all.cna.files <- list.files(path = access_data_analysis_cna_dir, pattern = cna_pattern, full.names=TRUE)
 cna<-do.call('rbind', lapply(all.cna.files,fread)) %>% rename(sample_id=Tumor_Sample_Barcode)
 
 if( nrow(cna) > 0){
@@ -309,7 +311,7 @@ if (nrow(final_sv) > 0) {
   final_sv[which(final_sv$DMP=="Signed out"),"clonality"]="IMPACT"
 }
 
-xlimits<-c(min(final$collection_day), max(final$collection_day))
+xlimits<-c(min(final$collection_day)-10, max(final$collection_day)+10)
 xbreaks<-final$collection_day
 xlabels <- final$timepoint
 ```
