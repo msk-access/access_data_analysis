@@ -181,6 +181,8 @@ def main(
                 f"Running for patient with CMO ID {cmo_patient_id}, and DMP ID {dmp_patient_id}",
                 fg=typer.colors.BRIGHT_GREEN,
             )
+            if dmp_patient_id is '' or bool(dmp_patient_id) == False:
+                dmp_patient_id = None
             small_variants_path = get_small_variant_csv(cmo_patient_id, variant_path)
             if "dmp_sample_id" in column_header:
                 dmp_sample_id = manifest_to_traverse.loc[i, "dmp_sample_id"]
