@@ -25,11 +25,13 @@ def generate_facet_maf_path(facet_path, patient_id, sample_id, best_fit):
                 patient_id[:7], f"{sample_id}*", "default", "*[0-9].ccf.maf"
             )
             maf_path = get_maf_path(maf_path, patient_id, sample_id)
-        else:
+        elif patient_id:
             maf_path = facet_path.joinpath(
                 patient_id[:7], f"{patient_id}*", "default", "*[0-9].ccf.maf"
             )
             maf_path = get_maf_path(maf_path, patient_id, None)
+        else:
+            maf_path = None
         return maf_path
     else:
         if sample_id:
