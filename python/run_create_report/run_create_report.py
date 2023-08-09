@@ -191,7 +191,7 @@ def main(
                 )
             else:
                 dmp_sample_id = None
-                if not dmp_patient_id or dmp_patient_id is not None or pd.notna(dmp_patient_id):
+                if not dmp_patient_id or dmp_patient_id is not None or pd.notna(dmp_patient_id) or pd.notnull(dmp_patient_id):
                     facet_path = generate_facet_maf_path(
                         facet_repo, dmp_patient_id, dmp_sample_id, best_fit
                     )
