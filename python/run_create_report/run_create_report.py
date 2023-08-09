@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import typer
+import pandas as pd
 from modules.check_required_columns import check_required_columns
 from modules.generate_create_report_cmd import generate_create_report_cmd
 from modules.generate_facet_maf_path import generate_facet_maf_path
@@ -182,8 +183,6 @@ def main(
                 fg=typer.colors.BRIGHT_GREEN,
             )
             print("dmp pid:", dmp_patient_id)
-            if dmp_patient_id == '' or bool(dmp_patient_id) == False or dmp_patient_id is None:
-                dmp_patient_id = None
             small_variants_path = get_small_variant_csv(cmo_patient_id, variant_path)
             if "dmp_sample_id" in column_header:
                 dmp_sample_id = manifest_to_traverse.loc[i, "dmp_sample_id"]
@@ -192,7 +191,7 @@ def main(
                 )
             else:
                 dmp_sample_id = None
-                if not dmp_patient_id or dmp_patient_id is not None:
+                if not dmp_patient_id or dmp_patient_id is not None or !pd.isna(dmp_patient_id):
                     facet_path = generate_facet_maf_path(
                         facet_repo, dmp_patient_id, dmp_sample_id, best_fit
                     )
