@@ -190,7 +190,7 @@ def main(
                 )
             else:
                 dmp_sample_id = None
-                if not dmp_sample_id or dmp_sample_id is not None or dmp_sample_id is not '':
+                if not dmp_sample_id or dmp_sample_id != None or dmp_sample_id != '':
                     facet_path = generate_facet_maf_path(
                         facet_repo, dmp_patient_id, dmp_sample_id, best_fit
                     )
