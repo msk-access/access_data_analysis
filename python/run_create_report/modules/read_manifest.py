@@ -12,9 +12,9 @@ def read_manifest(manifest):
     """
     skip_rows = get_row(manifest)
     if manifest.suffix == ".csv":
-        return pd.read_csv(manifest, sep=",", skiprows=skip_rows, low_memory=False)
+        return pd.read_csv(manifest, sep=",", skiprows=skip_rows, low_memory=False, keep_default_na=False)
     else:
-        return pd.read_csv(manifest, sep="\t", skiprows=skip_rows, low_memory=False)
+        return pd.read_csv(manifest, sep="\t", skiprows=skip_rows, low_memory=False, keep_default_na=False)
 
 
 def get_row(tsv_file):
