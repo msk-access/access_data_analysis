@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import typer
+import numpy as np
 from modules.check_required_columns import check_required_columns
 from modules.generate_create_report_cmd import generate_create_report_cmd
 from modules.generate_facet_maf_path import generate_facet_maf_path
@@ -189,7 +190,7 @@ def main(
                 )
             else:
                 dmp_sample_id = None
-                if not dmp_patient_id or dmp_patient_id is not None:
+                if not dmp_sample_id or dmp_sample_id != None or dmp_sample_id != '':
                     facet_path = generate_facet_maf_path(
                         facet_repo, dmp_patient_id, dmp_sample_id, best_fit
                     )
