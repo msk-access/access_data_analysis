@@ -79,7 +79,7 @@ def main(
             csv_df = csv_df.loc[:, ~csv_df.columns.str.contains("duplex_support_num")]
             # filter csv of "normal" samples if normal is not wanted
             if not normal:
-                csv_df = csv_df.loc[:, ~csv_df.columns.str.contains("normal")]
+                csv_df = csv_df.loc[:, ~csv_df.columns.str.contains("normal|Normal")]
             # filter rows that have call_confidence == "Drop"
             csv_df = csv_df[
                 csv_df["call_confidence"]
