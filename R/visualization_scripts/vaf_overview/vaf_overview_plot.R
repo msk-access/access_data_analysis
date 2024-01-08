@@ -3,7 +3,6 @@
 # Date: 11/30/2023
 
 # load libraries
-library(magrittr)
 library(ggplot2)
 library(gridExtra)
 library(tidyr)
@@ -12,22 +11,21 @@ library(sqldf)
 library(RSQLite)
 library(readr)
 library(argparse)
-library(data.table)
+library(plotly)
+library(htmlwidgets)
+library(purrr) 
 
-if (!requireNamespace("argparse", quietly = TRUE)) {
-  install.packages("argparse")
-}
 
 # Add arguments
 
 suppressPackageStartupMessages(library("argparse"))
+
 parser <- ArgumentParser(description = "Script creates VAF overview plots")
 
 parser$add_argument("-m", "--manifest", type = "character", help = "File path to manifest file")
 parser$add_argument("-o", "--resultsdir", type = "character", help = "Output directory")
 parser$add_argument("-v", "--variants", type = "character", help = "File path to maf file")
 parser$add_argument("-c", "--clinical", type = "character", help = "File path to clinical file")
-
 args = parser$parse_args()
 
 # Access the arguments
@@ -42,8 +40,6 @@ cat("Results Directory:", results.dir, "\n")
 cat("Variants File:", variants.file, "\n")
 cat("Clinical File:", clinical.file, "\n")
 
-
-
 # load files
 manifest_data <- read.csv(manifest.file)
 clinical_data <- read_tsv(clinical.file)
@@ -53,7 +49,6 @@ variants_data <- read_csv(variants.file)
 variants_data$gene_variant = paste(variants_data$Hugo_Symbol, variants_data$HGVSp_Short)
 variants_data$assay <- ifelse(grepl("^C-", variants_data$Tumor_Sample_Barcode), "ACCESS",
                     ifelse(grepl("*IM*", variants_data$Tumor_Sample_Barcode), "IMPACT", NA))
-
 
 
 as.data.frame(variants_data)
@@ -71,9 +66,9 @@ if ("covered" %in% colnames(variants_data)) {
 # combine
 clinical.combined <- merge(manifest_data, clinical_data, by.x = "cmoSampleName" , by.y = "cmo_sample_id_plasma")
 variant.clinical.combined <- merge(clinical.combined, access.variants, by.x = "cmoSampleName" , by.y = "Tumor_Sample_Barcode")
-print(colnames(variant.clinical.combined))
+
 keep.necessary <- variant.clinical.combined[, c("cmoSampleName", "cmoPatientId", "investigatorSampleId", "DMP_PATIENT_ID", "collection_date", "collection_in_days", "timepoint", "treatment_length", "treatmentName", "reason_for_tx_stop", "t_alt_freq", "DMP", "gene_variant")]
-print(keep.necessary)
+
 
 #get average vaf for each patient
 keep.necessary$reason_for_tx_stop[is.na(keep.necessary$reason_for_tx_stop)] <- "NA"
@@ -133,26 +128,40 @@ tx.stop.plot <- ggplot(data = vaf.av, aes(y = 1, x = 0)) +
   plot.title = element_text(size = 12))
 
 
-
-#pdf(results.dir, "VAF_overview_plot.pdf",width=14, height = 10)
+# arrange all plots into a single plot
 plot1 <- grid.arrange(init.vaf.plot, vaf.grid, treatment.length.plot, tx.stop.plot, ncol = 4, widths = c(0.2, 0.45, 0.2, 0.15))
-dev.off()
+
 
 # Create the output PDF file path 1
 output_pdf1 <- file.path(results.dir, "VAF_overview_plot.pdf")
-
-
 # Save the plot as a PDF in the specified output directory 1
 ggsave(output_pdf1, plot1)
 
-#pdf(results.dir,"VAF_overview_plot_relative.pdf",width=14, height = 10)
+
+# Save the plot1 as an HTML file 
+combined_plot1 <- subplot(init.vaf.plot, vaf.grid, treatment.length.plot, tx.stop.plot, nrows = 1, margin= 0.01, widths = rep(1/4, 4))
+html_file1 <- file.path(results.dir, "VAF_overview_plot.html")
+saveWidget(combined_plot1, html_file1, selfcontained = TRUE)
+
+
+# arrange all plots into a single plot
 plot2 <- grid.arrange(init.vaf.plot, vaf.grid.relative, treatment.length.plot, tx.stop.plot, ncol = 4, widths = c(0.2, 0.45, 0.2, 0.15))
-dev.off()
+
 
 # Create the output PDF file path 2
 output_pdf2 <- file.path(results.dir, "VAF_overview_plot_relative.pdf")
-
 # Save the plot as a PDF in the specified output directory 2
 ggsave(output_pdf2, plot2)
 
-print("variant plots have been created")
+# Save the plot2 as an HTML file 
+combined_plot2 <- subplot(init.vaf.plot, vaf.grid.relative, treatment.length.plot, tx.stop.plot, nrows = 1, margin= 0.01, widths = rep(1/4, 4))
+html_file2 <- file.path(results.dir, "VAF_overview_plot_relative.html")
+saveWidget(combined_plot2, html_file2, selfcontained = TRUE)
+
+
+print("variant overview plots have been created in pdf and html format")
+
+# save vaf average table
+write.table(vaf.av, file.path(results.dir, "vaf_average.txt"), sep = "\t", row.names = FALSE)
+print("VAF average table saved")
+
