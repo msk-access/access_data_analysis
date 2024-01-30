@@ -16,8 +16,8 @@ parser$add_argument("-o", "--output", required = TRUE, help = "File path for the
 # Parse the arguments
 args <- parser$parse_args()
 
-# Read the data from the input file (assuming a tabular format like CSV)
-data <- read_delim(args$input, delim = "\t", show_col_types = FALSE) # Adjust delimiter if necessary
+# Read the data from the input file 
+data <- read_delim(args$input, delim = "\t", show_col_types = FALSE) 
 
 # Process the data
 data_processed <- data %>%
@@ -36,7 +36,7 @@ data_processed <- data %>%
   ) %>%
   ungroup()
 
-# Save the processed data to the output file 
+# Save the output to file
 write_delim(data_processed, args$output, delim = "\t") # Adjust delimiter if necessary
 
 # Confirm saved file
