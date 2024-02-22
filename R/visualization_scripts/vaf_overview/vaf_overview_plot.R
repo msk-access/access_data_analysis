@@ -74,6 +74,7 @@ keep.necessary <- variant.clinical.combined[, c("cmoSampleName", "cmoPatientId",
 keep.necessary$reason_for_tx_stop[is.na(keep.necessary$reason_for_tx_stop)] <- "NA"
 vaf.av <- aggregate(t_alt_freq ~ cmoSampleName + cmoPatientId + collection_in_days + DMP_PATIENT_ID + treatment_length + reason_for_tx_stop, data = keep.necessary, FUN = mean)
 vaf.av$reason_for_tx_stop[vaf.av$reason_for_tx_stop == "NA"] <- NA
+vaf.av$t_alt_freq <- vaf.av$t_alt_freq * 100
 
 #get initial and relative vaf values
 vaf.av <- vaf.av %>% group_by(cmoPatientId) %>% mutate(init_vaf = t_alt_freq[which.min(collection_in_days)])
@@ -89,8 +90,8 @@ names(dmp.cmo.key) <- unique(vaf.av$cmoPatientId) %>% as.vector()
 
 #plots
 init.vaf.plot <- ggplot(data = unique(vaf.av[c("cmoPatientId", "init_vaf")]), aes(x = init_vaf, y = NA)) + 
-  geom_col(fill = "cadetblue1") + theme_classic() + xlab("VAF") + 
-  geom_text(aes(x = init_vaf * 0.7, label = round(init_vaf, digits = 3)), nudge_x = -0.02, fontface = "bold") + 
+  geom_col(fill = "cadetblue1") + theme_classic() + xlab("VAF (%)") + 
+  geom_text(aes(x = init_vaf * 0.7, label = round(init_vaf, digits = 3)), fontface = "bold") + 
   facet_grid(rows = vars(cmoPatientId)) + ylab(element_blank()) + 
   scale_y_discrete(position = "right") + scale_x_reverse() + labs(title = "Initial VAF") +
   theme(panel.spacing = unit(0.5, "lines"), strip.text = element_blank(), axis.text.y = element_blank(), 
