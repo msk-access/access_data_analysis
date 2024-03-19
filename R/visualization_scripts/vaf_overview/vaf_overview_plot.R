@@ -22,28 +22,32 @@ suppressPackageStartupMessages(library("argparse"))
 
 parser <- ArgumentParser(description = "Script creates VAF overview plots")
 
-parser$add_argument("-m", "--manifest", type = "character", help = "File path to manifest file")
 parser$add_argument("-o", "--resultsdir", type = "character", help = "Output directory")
 parser$add_argument("-v", "--variants", type = "character", help = "File path to maf file")
 parser$add_argument("-c", "--clinical", type = "character", help = "File path to clinical file")
 args = parser$parse_args()
 
 # Access the arguments
-manifest.file <- args$manifest
 results.dir <- args$resultsdir
 variants.file <- args$variants
 clinical.file <- args$clinical
 
 # Display inputs
-cat("Manifest File:", manifest.file, "\n")
 cat("Results Directory:", results.dir, "\n")
 cat("Variants File:", variants.file, "\n")
 cat("Clinical File:", clinical.file, "\n")
 
 # load files
-manifest_data <- read.csv(manifest.file)
 clinical_data <- read_tsv(clinical.file)
-variants_data <- read_csv(variants.file)
+variants_data <- read_tsv(variants.file)
+
+
+# Check if Hugo_Symbol and HGVSp_Short columns exist
+if("Hugo_Symbol" %in% colnames(variants_data) & "HGVSp_Short" %in% colnames(variants_data)) {
+  variants_data$gene_variant <- paste(variants_data$Hugo_Symbol, variants_data$HGVSp_Short)
+} else {
+  stop("Required columns 'Hugo_Symbol' and/or 'HGVSp_Short' are missing in variants_data.")
+}
 
 # Concat gene-variant and categorize assay type
 variants_data$gene_variant = paste(variants_data$Hugo_Symbol, variants_data$HGVSp_Short)
@@ -64,17 +68,33 @@ if ("covered" %in% colnames(variants_data)) {
 #Create combined file
 
 # combine
-clinical.combined <- merge(manifest_data, clinical_data, by.x = "cmoSampleName" , by.y = "cmo_sample_id_plasma")
-variant.clinical.combined <- merge(clinical.combined, access.variants, by.x = "cmoSampleName" , by.y = "Tumor_Sample_Barcode")
+if("cmoSampleName" %in% colnames(clinical_data) && "Tumor_Sample_Barcode" %in% colnames(access.variants)) {
+  variant.clinical.combined <- merge(clinical_data, access.variants, by.x = "cmoSampleName", by.y = "Tumor_Sample_Barcode")
+} else {
+  stop("Columns for merging not found or not unique in one of the data frames")
+}
 
-keep.necessary <- variant.clinical.combined[, c("cmoSampleName", "cmoPatientId", "investigatorSampleId", "DMP_PATIENT_ID", "collection_date", "collection_in_days", "timepoint", "treatment_length", "treatmentName", "reason_for_tx_stop", "t_alt_freq", "DMP", "gene_variant")]
+#clinical.combined <- merge(manifest_data, clinical_data, by.x = "cmoSampleName" , by.y = "cmo_sample_id_plasma")
+variant.clinical.combined <- merge(clinical_data, access.variants, by.x = "cmoSampleName" , by = "Tumor_Sample_Barcode")
+
+keep.necessary <- variant.clinical.combined[, c("cmoSampleName", "cmoPatientId", "PatientId", "collection_date", "collection_in_days", "timepoint", "treatment_length", "treatmentName", "reason_for_tx_stop", "t_alt_freq", "DMP", "gene_variant")]
 
 
 #get average vaf for each patient
 keep.necessary$reason_for_tx_stop[is.na(keep.necessary$reason_for_tx_stop)] <- "NA"
-vaf.av <- aggregate(t_alt_freq ~ cmoSampleName + cmoPatientId + collection_in_days + DMP_PATIENT_ID + treatment_length + reason_for_tx_stop, data = keep.necessary, FUN = mean)
+vaf.av <- aggregate(t_alt_freq ~ cmoSampleName + cmoPatientId + collection_in_days + PatientId + treatment_length + reason_for_tx_stop, data = keep.necessary, FUN = mean)
 vaf.av$reason_for_tx_stop[vaf.av$reason_for_tx_stop == "NA"] <- NA
 vaf.av$t_alt_freq <- vaf.av$t_alt_freq * 100
+
+# Calculating the required statistics
+vaf_stats <- keep.necessary %>%
+  group_by(cmoSampleName) %>%
+  summarise(
+    AverageVAF = mean(t_alt_freq, na.rm = TRUE),
+    MinVAF = min(t_alt_freq, na.rm = TRUE),
+    SDVAF = sd(t_alt_freq, na.rm = TRUE),
+    MaxVAF = max(t_alt_freq, na.rm = TRUE)
+  )
 
 #get initial and relative vaf values
 vaf.av <- vaf.av %>% group_by(cmoPatientId) %>% mutate(init_vaf = t_alt_freq[which.min(collection_in_days)])
@@ -85,7 +105,7 @@ vaf.av <- vaf.av[order(vaf.av$treatment_length, decreasing = TRUE),]
 vaf.av$cmoPatientId <- factor(vaf.av$cmoPatientId, levels = unique(vaf.av$cmoPatientId))
 
 #CMO and DMP IDs for labeling
-dmp.cmo.key <- paste0(unique(vaf.av$cmoPatientId), "\n\n", unique(vaf.av$DMP_PATIENT_ID)) %>% as.vector()
+dmp.cmo.key <- paste0(unique(vaf.av$cmoPatientId), "\n\n", unique(vaf.av$PatientId)) %>% as.vector()
 names(dmp.cmo.key) <- unique(vaf.av$cmoPatientId) %>% as.vector()
 
 #plots
@@ -163,6 +183,7 @@ saveWidget(combined_plot2, html_file2, selfcontained = TRUE)
 print("variant overview plots have been created in pdf and html format")
 
 # save vaf average table
-write.table(vaf.av, file.path(results.dir, "vaf_average.txt"), sep = "\t", row.names = FALSE)
-print("VAF average table saved")
+write.table(vaf_stats, file = paste0(results.dir, "/vaf_statistics.txt"), sep = "\t", row.names = FALSE)
+print("VAF statistics table saved")
+
 
