@@ -398,6 +398,7 @@ def filter_by_rows(sid, tsv_df, col_name):
     ns = set(sid)
     #pattern = "|".join([r"\b{}\b".format(i) for i in ns])
     pattern = "|".join([f"\b{i}\b" for i in ns])
+    print(pattern)
     result = tsv_df[tsv_df[col_name].str.contains(pattern, regex=True)]
     print(result)
     return result.copy(deep=True)
