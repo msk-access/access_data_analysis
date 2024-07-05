@@ -93,7 +93,7 @@ def subset_cst(
     sid: Optional[List[str]] = typer.Option(
         None,
         "--sid",
-        "-s",
+        "-si",
         help="Identifiers to search for in the 'SAMPLE_ID' column. Can be given multiple times",
     ),
     output_file: str = typer.Option(
@@ -127,6 +127,7 @@ def subset_cst(
             raise typer.Abort()
 
     cst_df = read_tsv(cst)
+    print(cst_df)
     ids_to_subset = read_ids(sid, ids)
     subset_tsv = filter_by_rows(ids_to_subset, cst_df, col_name)
     subset_tsv.drop_duplicates().to_csv(output_file, sep="\t", index=False)
