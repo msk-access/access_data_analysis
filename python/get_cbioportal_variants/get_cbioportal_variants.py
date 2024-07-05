@@ -30,7 +30,7 @@ def subset_cpt(
     sid: Optional[List[str]] = typer.Option(
         None,
         "--sid",
-        "-s",
+        "-si",
         help="Identifiers to search for in the 'PATIENT_ID' column. Can be given multiple times",
     ),
     output_file: str = typer.Option(
@@ -93,7 +93,7 @@ def subset_cst(
     sid: Optional[List[str]] = typer.Option(
         None,
         "--sid",
-        "-s",
+        "-si",
         help="Identifiers to search for in the 'SAMPLE_ID' column. Can be given multiple times",
     ),
     output_file: str = typer.Option(
@@ -156,7 +156,7 @@ def subset_cna(
     sid: Optional[List[str]] = typer.Option(
         None,
         "--sid",
-        "-s",
+        "-si",
         help="Identifiers to search for in the 'header' of the file. Can be given multiple times",
     ),
     output_file: str = typer.Option(
@@ -214,7 +214,7 @@ def subset_sv(
     sid: Optional[List[str]] = typer.Option(
         None,
         "--sid",
-        "-s",
+        "-si",
         help="Identifiers to search for in the 'Sample_ID' column. Can be given multiple times",
     ),
     output_file: str = typer.Option(
@@ -277,7 +277,7 @@ def subset_maf(
     sid: Optional[List[str]] = typer.Option(
         None,
         "--sid",
-        "-s",
+        "-si",
         help="Identifiers to search for in the 'Tumor_Sample_Barcode' column. Can be given multiple times",
     ),
     bed: Path = typer.Option(
