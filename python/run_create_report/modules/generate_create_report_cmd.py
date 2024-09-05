@@ -33,7 +33,9 @@ def generate_create_report_cmd(
         cmd (str): system command to run for create_report.R
         html_output (pathlib.Path): where the output file should be written
     """
-    html_output = f"{cmo_patient_id}_report.html"
+    cohort = 'KRAS'
+    stage = 'final'
+    html_output = f'/juno/cmo/bergerlab/access_projects/EDD_R01/{cohort}_Mutations/results/{cmo_patient_id}_results/{cmo_patient_id}_{stage}_report.html'
     if dmp_facet_maf:
         cmd = (
             "Rscript "

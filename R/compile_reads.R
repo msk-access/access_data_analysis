@@ -9,8 +9,8 @@ compile_reads <- function(
                           master.ref, results.dir, project.ID, pooled.bam.dir = "/juno/work/access/production/resources/msk-access/current/novaseq_curated_duplex_bams_dmp/current/",
                           fasta.path = "/juno/work/access/production/resources/reference/current/Homo_sapiens_assembly19.fasta",
                           genotyper.path = "/work/access/production/resources/tools/GetBaseCountsMultiSample/current/GetBaseCountsMultiSample",
-                          dmp.dir = "/juno/work/access/production/resources/cbioportal/current/msk_solid_heme", mirror.bam.dir = "/juno/res/dmpcollab/dmpshare/share/irb12_245",
-                          dmp.key.path = "/juno/res/dmpcollab/dmprequest/12-245/key.txt") {
+                          dmp.dir = "/juno/work/access/production/resources/cbioportal/current/msk_solid_heme", mirror.bam.dir = "/juno/dmp/share/irb12_245",
+                          dmp.key.path = "/juno/dmp/request/12-245/key.txt") {
   # # test input section -----------------------------------------------------------
   # master.ref = fread('/juno/work/bergerm1/bergerlab/zhengy1/access_data_analysis/data/example_master_file.csv')
   # results.dir = paste0('/juno/work/bergerm1/MSK-ACCESS/ACCESS-Projects/test_access/access_data_analysis/output_',format(Sys.time(),'%m%d%y'))
@@ -140,7 +140,7 @@ compile_reads <- function(
       " -P ", project.ID, " -J ", x, "_tag_hotspot ",
       " python /work/access/production/workflows/access_workflows/v1/pipeline_2.0.0/ACCESS-Pipeline/cwl_tools/hotspots/tag_hotspots.py ",
       " -m ", results.dir, "/", x, "/", x, "_all_unique_calls.maf",
-      " -itxt /work/access/production/resources/msk-access/current/regions_of_interest/current/hotspot-list-union-v1-v2_with_TERT.txt ",
+      " -itxt /juno/cmo/access/production/resources/msk-access/v1.0/regions_of_interest/versions/v1.0/hotspot-list-union-v1-v2_with_TERT.txt ",
       " -o ", results.dir, "/", x, "/", x, "_all_unique_calls_hotspots.maf",
       " -outdir ", results.dir, "/", x, "/", x
     ))
@@ -235,11 +235,11 @@ if (!interactive()) {
     help = "Directory of clinical DMP repository [default]"
   )
   parser$add_argument("-mb", "--mirrorbamdir",
-    type = "character", default = "/juno/res/dmpcollab/dmpshare/share/irb12_245",
+    type = "character", default = "/juno/dmp/share/irb12_245/",
     help = "Mirror BAM file directory [default]"
   )
   parser$add_argument("-dmpk", "--dmpkeypath",
-    type = "character", default = "/juno/res/dmpcollab/dmprequest/12-245/key.txt",
+    type = "character", default = "/juno/dmp/request/12-245/key.txt",
     help = "DMP mirror BAM key file [default]"
   )
   args <- parser$parse_args()

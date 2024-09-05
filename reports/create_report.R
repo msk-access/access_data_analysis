@@ -25,6 +25,7 @@ parser$add_argument(
 
 args <- parser$parse_args()
 
+
 dmp_maf <- NULL
 if (!is.null(args$dmp_maf)) {
   dmp_maf <- normalizePath(args$dmp_maf)
@@ -42,11 +43,14 @@ input_text <- knitr::knit_expand(
   DMP_MAF_PATH=dmp_maf,
   METADATA=normalizePath(args$metadata),
   COMBINE_ACCESS=args$combine_access,
-  PLOT_IMPACT=args$plot_impact
+  PLOT_IMPACT=args$plot_impact,
+  OUTPUT_DIR=normalizePath(dirname(args$output))
 )
+
 
 tmp <- tempfile(fileext = ".Rmd")
 cat(input_text, file = tmp)
+
 
 if (args$keep_rmarkdown){
   rmd_name <- gsub(".html",".Rmd", args$output)
@@ -54,8 +58,11 @@ if (args$keep_rmarkdown){
   output_rmd_path <- paste(output_cwd,"/",rmd_name, sep='')
   file.copy(tmp,output_rmd_path)
 }
+
 rmarkdown::render(
   tmp,
   output_format = "html_document",
   output_dir = normalizePath(dirname(args$output)),
   output_file=args$output)
+
+

@@ -7,7 +7,7 @@
 SV_incorporation = function(
   master.ref,results.dir,
   dmp.dir = '/juno/work/access/production/resources/cbioportal/current/mskimpact',
-  access.genes = '/work/access/production/resources/msk-access/current/regions_of_interest/current/MSK-ACCESS-v1_0-target_genes.list',
+  access.genes = '/juno/work/access/production/resources/msk-access/v1.0/regions_of_interest/versions/v1.0/MSK-ACCESS-v1_0-target_genes.list',
   criteria = 'stringent'
 ){
   # # test input section -----------------------------------------------------------
@@ -142,7 +142,6 @@ SV_incorporation = function(
       write.csv(rbind(SNV.table,SV.table),snv.sv.table.directory,quote = F,row.names = F)
     }
   })
-
 }
 
 # Executable -----------------------------------------------------------------------------------------------------------
@@ -161,7 +160,7 @@ if (!interactive()) {
   parser$add_argument('-o', '--resultsdir', type='character', help='Output directory')
   parser$add_argument('-dmp', '--dmpdir', type='character', default = '/juno/work/access/production/resources/cbioportal/current/msk_solid_heme',
                       help='Directory of clinical DMP IMPACT repository [default]')
-  parser$add_argument('-genes', '--genelist', type='character', default = '/work/access/production/resources/msk-access/current/regions_of_interest/current/MSK-ACCESS-v1_0-target_genes.list',
+  parser$add_argument('-genes', '--genelist', type='character', default = '/juno/work/access/production/resources/msk-access/v1.0/regions_of_interest/versions/v1.0/MSK-ACCESS-v1_0-target_genes.list',
                       help='File path to genes covered by ACCESS [default]')
   parser$add_argument('-c', '--criteria', type='character', default = 'stringent',
                       help='Calling criteria [default]')
