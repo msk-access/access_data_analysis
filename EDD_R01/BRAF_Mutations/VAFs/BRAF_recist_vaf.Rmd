@@ -1,0 +1,284 @@
+---
+title: "BRAF Radiology Timepoint Analysis"
+output: html_document
+---
+
+```{r}
+library(magrittr)
+library(ggplot2)
+library(gridExtra)
+library(tidyr)
+library(dplyr)
+library(patchwork)
+```
+
+```{r}
+recist.tab <- read.csv("./recist_table.csv", header = TRUE)
+vaf.tab <- read.csv("./BRAF_vaf_final.csv", header = TRUE)
+```
+
+```{r}
+#multiply VAF by 100 to get percentage values
+vaf.tab$VAF <- vaf.tab$VAF * 100
+
+#get average vaf for each patient
+vaf.tab$reason_for_tx_stop[is.na(vaf.tab$reason_for_tx_stop)] <- "NA"
+vaf.av <- aggregate(VAF ~ cmoSampleName + cmoPatientId + collection_day + DMP.ID + treatment_length + reason_for_tx_stop, data = vaf.tab, FUN = mean)
+vaf.av$reason_for_tx_stop[vaf.av$reason_for_tx_stop == "NA"] <- NA
+
+#get initial and relative vaf values
+#initial timepoint is wheen collection day = 0, otherwise initial timepoint is minimum collection day
+vaf.av <- vaf.av %>% group_by(cmoPatientId) %>% mutate(init_vaf = ifelse(any(collection_day == 0), VAF[which(collection_day == 0)], 
+  VAF[which.min(collection_day)]))
+vaf.av$relative_vaf <- vaf.av$VAF / vaf.av$init_vaf
+
+#order patients based on earliest collection date
+vaf.av <- vaf.av[order(vaf.av$treatment_length, decreasing = TRUE),]
+vaf.av$cmoPatientId <- factor(vaf.av$cmoPatientId, levels = unique(vaf.av$cmoPatientId))
+
+#CMO and DMP IDs for labeling
+dmp.cmo.key <- paste0(unique(vaf.av$cmoPatientId), "\n\n", unique(vaf.av$DMP.ID)) %>% as.vector()
+names(dmp.cmo.key) <- unique(vaf.av$cmoPatientId) %>% as.vector()
+```
+
+```{r}
+#filter vaf timepoints within range
+vaf.av <- vaf.av[vaf.av$collection_day <= 450,]
+
+#filter recist data for timepoints within range and patients within VAF data
+recist.tab <- recist.tab[recist.tab$exam_day <= 450,]
+recist.tab <- recist.tab[recist.tab$cmoPatientId %in% unique(vaf.av$cmoPatientId),]
+recist.tab$cmoPatientId <- factor(recist.tab$cmoPatientId, levels = unique(vaf.av$cmoPatientId))
+
+#merge initial vaf into recist table for plotting
+recist.tab <- merge(recist.tab, unique(vaf.av[,c("cmoPatientId", "init_vaf")]), by = "cmoPatientId")
+
+#set levels for response
+recist.tab$Timepoint.Response <- factor(recist.tab$Timepoint.Response, levels = "SD")
+
+#get initial and relative recist measurements
+recist.tab <- recist.tab %>% group_by(cmoPatientId) %>% mutate(init_diam = Total.Diameter[which.min(exam_day)])
+recist.tab$Total.Diameter %<>% as.numeric()
+recist.tab$init_diam %<>% as.numeric()
+recist.tab$relative_diam <- recist.tab$Total.Diameter / recist.tab$init_diam
+```
+
+```{r}
+#scale initial VAF for plotting
+vaf.av$init_vaf_scaled <- vaf.av$init_vaf / max(vaf.av$init_vaf)
+recist.tab$init_diam_scaled <- recist.tab$init_diam / max(recist.tab$init_diam)
+
+#create new long table where vaf and recist are stored for each patient to create side by side bars
+init_vaf_tab <- unique(vaf.av[,c("cmoPatientId", "init_vaf", "init_vaf_scaled")])
+names(init_vaf_tab)[2:3] <- c("unscaled", "scaled")
+init_vaf_tab$type <- "Initial VAF"
+init_diam_tab <- unique(recist.tab[,c("cmoPatientId", "init_diam", "init_diam_scaled")])
+names(init_diam_tab)[2:3] <- c("unscaled", "scaled")
+init_diam_tab$type <- "Initial Diameter Total (mm)"
+init.scaled <- rbind(init_diam_tab, init_vaf_tab)
+init.scaled <- init.scaled %>% ungroup()
+init.scaled <- init.scaled  %>% 
+  add_row(cmoPatientId = "C-96JR4P", scaled = 0, type = "Initial Diameter Total (mm)") %>%
+  add_row(cmoPatientId = "C-7KRV2L", scaled = 0, type = "Initial Diameter Total (mm)")
+init.scaled$cmoPatientId <- factor(init.scaled$cmoPatientId, levels = unique(vaf.av$cmoPatientId))
+```
+
+```{r}
+#add blank radiology row for C-96JR4P
+recist.tab1 <- recist.tab %>% ungroup() %>% 
+  add_row(cmoPatientId = "C-96JR4P", Total.Diameter = 100, exam_day = 0, init_diam = 0) %>%
+  add_row(cmoPatientId = "C-7KRV2L", Total.Diameter = 100, exam_day = 0, init_diam = 0)
+recist.tab1$cmoPatientId <- factor(recist.tab1$cmoPatientId, levels = unique(vaf.av$cmoPatientId))
+recist.tab1$remove <- ifelse(recist.tab1$cmoPatientId %in% c("C-96JR4P", "C-7KRV2L"), "yes", "no")
+```
+
+```{r, fig.width = 14, fig.height = 10}
+#plots
+init.vaf.diam <- ggplot(data = init.scaled, aes(x = scaled, y = NA, fill = type)) + 
+  geom_bar(stat = "identity", position = position_dodge(width = 1)) + theme_classic() + xlab("VAF / Total Diameter (mm)") + 
+  geom_text(aes(x = scaled * 0.7 + 0.03, label = ifelse(unscaled < 0.001, round(unscaled,4), round(unscaled,3))), 
+  position = position_dodge(width = 1)) +
+  scale_fill_manual(values = c("#ea9999", "cadetblue1")) +
+  facet_grid(rows = vars(cmoPatientId)) + ylab(element_blank()) + 
+  scale_y_discrete(position = "right") + scale_x_reverse() + labs(title = "Initial VAF / Initial Lesion Size") +
+  theme(panel.spacing = unit(0.5, "lines"), strip.text = element_blank(), axis.text.y = element_blank(), 
+  axis.ticks = element_blank(), axis.text.x = element_blank(), legend.position = c(0.33,0.83), legend.title = element_blank(), 
+  legend.text = element_text(size = 7.5))
+
+init.vaf.plot <- ggplot(data = unique(vaf.av[c("cmoPatientId", "init_vaf")]), aes(x = init_vaf, y = NA)) + 
+  geom_col(fill = "cadetblue1") + theme_classic() + xlab("VAF") + 
+  geom_text(aes(x = init_vaf * 0.7, label = round(init_vaf, digits = 3)), nudge_x = -0.02, fontface = "bold") + 
+  facet_grid(rows = vars(cmoPatientId)) + ylab(element_blank()) + 
+  scale_y_discrete(position = "right") + scale_x_reverse() + labs(title = "Initial VAF") +
+  theme(panel.spacing = unit(0.5, "lines"), strip.text = element_blank(), axis.text.y = element_blank(), 
+  axis.ticks = element_blank())
+
+init.diam.plot <- ggplot(data = unique(recist.tab1[c("cmoPatientId", "init_diam")]), aes(x = init_diam, y = NA)) + 
+  geom_col(fill = "#ea9999") + theme_classic() + xlab("Total Diameter (mm)") + 
+  geom_text(aes(x = init_diam * 0.7, label = round(init_diam, digits = 3)), nudge_x = -0.02, fontface = "bold") + 
+  facet_grid(rows = vars(cmoPatientId)) + ylab(element_blank()) + 
+  scale_y_discrete(position = "right") + scale_x_reverse() + labs(title = "Initial Total Lesion Size") +
+  theme(panel.spacing = unit(0.5, "lines"), strip.text = element_blank(), axis.text.y = element_blank(), 
+  axis.ticks = element_blank())
+
+vaf.grid <- ggplot(data = vaf.av, aes(x = collection_day, y = VAF, group = cmoPatientId)) + 
+  geom_line(color = "darkslategray", size = 0.75) + geom_point(color = "darkslategray", size = 1.2) +
+  geom_point(data = subset(vaf.av, VAF == 0), color = "white", size = 0.5) + theme_classic() +
+  theme(legend.position = "none", panel.background = element_rect(fill = "aliceblue", colour = "aliceblue")) + 
+  xlab("Treatment Day") + ylab("") + labs(title = "Average VAF") + 
+  coord_cartesian(ylim = c(0, NA)) + facet_grid(rows = vars(cmoPatientId), scales = "free_y") + 
+  theme(panel.spacing = unit(0.5, "lines"), strip.text = element_blank())
+
+vaf.grid.relative <- ggplot(data = vaf.av, aes(x = collection_day, y = relative_vaf, group = cmoPatientId)) + 
+  geom_line(color = "darkslategray", size = 0.75) + geom_point(color = "darkslategray", size = 1.2) +
+  geom_line(data = recist.tab1, aes(x = exam_day, y = relative_diam, group = cmoPatientId), color = "black", 
+  size = 0.6, linetype = "dashed") + 
+  geom_point(data = recist.tab1, aes(x = exam_day, y = relative_diam, group = cmoPatientId, color = Timepoint.Response), 
+  size = 2) +
+  geom_text(data = recist.tab1, aes(x = exam_day - 4, y = relative_diam - 0.1, group = cmoPatientId, label = Timepoint.Response, 
+  color = Timepoint.Response), size = 2.5) +
+  scale_color_manual(values = "#ff702f") +
+  geom_point(data = subset(vaf.av, VAF == 0), color = "white", size = 0.5) + theme_classic() + 
+  theme(legend.position = "none", panel.background = element_rect(fill = "aliceblue", colour = "aliceblue")) + 
+  xlab("Treatment Day") + ylab("") + labs(title = "Average VAF / Total Lesion Size (Scaled)") + 
+  scale_y_continuous(limits = c(0, NA)) + facet_grid(rows = vars(cmoPatientId), scales = "free_y") + 
+  theme(panel.spacing = unit(0.5, "lines"), strip.text = element_blank())
+
+recist.grid <- ggplot(data = recist.tab1, aes(x = exam_day, y = Total.Diameter, group = cmoPatientId)) + 
+  geom_line(color = "darkslategray", size = 0.75, linetype = "dashed") + 
+  geom_point(aes(color = Timepoint.Response, alpha = remove), size = 2) + scale_alpha_manual(values = c(100,0)) +
+  geom_text(aes(x = exam_day - 4, y = floor(Total.Diameter*0.8), group = cmoPatientId, label = Timepoint.Response, 
+  color = Timepoint.Response), size = 2.5) + scale_color_manual(values = "#ff702f") +
+  theme(legend.position = "none", panel.background = element_rect(fill = "aliceblue", colour = "aliceblue")) + 
+  xlab("Treatment Day") + ylab("") + labs(title = "Total Lesion Size") + 
+  coord_cartesian(ylim = c(0, NA)) + facet_grid(rows = vars(cmoPatientId), scales = "free_y") + 
+  theme(panel.spacing = unit(0.5, "lines"), strip.text = element_blank(), legend.position = "none")
+
+treatment.length.plot <- ggplot(data = unique(vaf.av[c("cmoPatientId", "treatment_length")]), 
+  aes(x = treatment_length, y = NA)) + geom_col(fill = "gold3") + theme_classic() + xlab("Days") + 
+  geom_text(aes(x = treatment_length * 0.8, label = treatment_length, fontface = "bold")) + 
+  facet_grid(rows = vars(cmoPatientId)) + ylab(element_blank()) + labs(title = "Treatment Duration") +
+  theme(strip.text = element_blank(), axis.text.y = element_blank(), axis.ticks = element_blank())
+
+colors.tx <- c("#06509D", "#3083BD", "#6AADD5", "#BCD6E7", "#EFF3FF")
+names(colors.tx) <- c("Death", "PD", "Toxicity", "Unknown", "Withdrew")
+palette.tx <- colors.tx[names(colors.tx) %in% vaf.av$reason_for_tx_stop]
+
+tx.stop.plot <- ggplot(data = vaf.av, aes(y = 1, x = 0)) + 
+  geom_tile(aes(fill = reason_for_tx_stop)) + scale_fill_manual(values = palette.tx, na.value = "white") +
+  geom_text(aes(label = reason_for_tx_stop), size = 3.5) + theme_classic() + 
+  labs(x = "", y = NULL, title = "Reason for Stopping Tx") + 
+  facet_grid(rows = vars(cmoPatientId), labeller = labeller(cmoPatientId = dmp.cmo.key)) +
+  theme(legend.position = "none", axis.text.y = element_blank(), axis.text.x = element_text(color = "white"), 
+  axis.ticks = element_blank(), strip.text.y = element_text(size = 7, face = "bold", angle = 0), 
+  plot.title = element_text(size = 12))
+
+grid.arrange(init.vaf.diam, vaf.grid.relative, treatment.length.plot, tx.stop.plot, ncol = 4, widths = c(0.2, 0.45, 0.2, 0.15))
+grid.arrange(init.vaf.plot, vaf.grid, treatment.length.plot, tx.stop.plot, ncol = 4, widths = c(0.2, 0.45, 0.2, 0.15))
+grid.arrange(init.diam.plot, recist.grid, treatment.length.plot, tx.stop.plot, ncol = 4, widths = c(0.2, 0.45, 0.2, 0.15))
+```
+
+Absolute Combined Plot
+
+```{r}
+#get scalar for each patient to scale lesion size to VAF
+max.vaf <- vaf.av %>% summarise(maxvaf = max(VAF))
+max.diam <- recist.tab %>% summarise(maxdiam = max(Total.Diameter))
+max.vals <- merge(max.vaf, max.diam, by = "cmoPatientId")
+max.vals$scalar <- max.vals$maxdiam / max.vals$maxvaf
+
+vaf.av <- merge(vaf.av, max.vals[,c("cmoPatientId", "scalar")], by = "cmoPatientId", all.x = TRUE)
+recist.tab <- merge(recist.tab, max.vals[,c("cmoPatientId", "scalar")], by = "cmoPatientId")
+```
+
+
+```{r}
+get_color_palette <- function(response.cat){
+  colors <- c("#f40000", "#ff702f", "#3ecd00")
+  names(colors) <- c("PD", "SD", "PR")
+  palette <- colors[names(colors) %in% response.cat]
+  return(palette)
+}
+
+#generate list of timepoint plots to later combine using patchwork
+generate_abs_plot <- function(patients){
+  #first plot includes title
+  plot_first <- ggplot(data = subset(vaf.av, cmoPatientId == patients[1]), aes(x = collection_day, y = VAF)) +
+    geom_line(color = "darkslategray", size = 0.75) + geom_point(color = "darkslategray", size = 1.2) +
+    geom_line(data = subset(recist.tab, cmoPatientId == patients[1]), aes(x = exam_day, y = Total.Diameter / scalar, 
+              group = cmoPatientId), color = "black", size = 0.6, linetype = "dashed") +
+    geom_point(data = subset(recist.tab, cmoPatientId == patients[1]), aes(x = exam_day, y = Total.Diameter / scalar, 
+              group = cmoPatientId, color = Timepoint.Response), size = 1.5) +
+    geom_text(data = subset(recist.tab, cmoPatientId == patients[1]), aes(x = exam_day - 4, 
+              y = (Total.Diameter / scalar) * 0.75, label = Timepoint.Response, color = Timepoint.Response), size = 2.5) +
+    scale_color_manual(values = get_color_palette(recist.tab[recist.tab$cmoPatientId == patients[1], "Timepoint.Response"])) +
+    geom_point(data = subset(vaf.av, cmoPatientId == patients[1] & VAF == 0), color = "white", size = 0.5) +
+    theme_classic() + labs(title = "Average VAF (%) / Total Lesion Size (mm)") +
+    theme(legend.position = "none", panel.background = element_rect(fill = "aliceblue", colour = "aliceblue"),
+          axis.text.x = element_blank(), axis.title.x = element_blank(), axis.text.y = element_text(size = 7),
+          plot.margin = margin(0,0,1.5,0, "pt"), axis.line.x = element_blank(), axis.ticks.x = element_blank()) +
+    ylab("") + scale_y_continuous(limits = c(0, NA), 
+    sec.axis = sec_axis(~.*vaf.av[vaf.av$cmoPatientId == patients[1], "scalar"][1])) + coord_cartesian(xlim = c(-30, 125))
+
+  plot_middle <- lapply(patients[-c(1,length(patients))], function(patient_id) {
+    if(is.na(vaf.av[vaf.av$cmoPatientId == patient_id, "scalar"][1])){
+    ggplot(data = subset(vaf.av, cmoPatientId == patient_id), aes(x = collection_day, y = VAF)) +
+      geom_line(color = "darkslategray", size = 0.75) + geom_point(color = "darkslategray", size = 1.2) +
+      geom_point(data = subset(vaf.av, cmoPatientId == patient_id & VAF == 0), color = "white", size = 0.5) +
+      theme_classic() +
+      theme(legend.position = "none", panel.background = element_rect(fill = "aliceblue", colour = "aliceblue"),
+            axis.text.x = element_blank(), axis.title.x = element_blank(), plot.title = element_blank(),
+            axis.text.y = element_text(size = 7), plot.margin = margin(1.5,0,1.5,0, "pt"), axis.line.x = element_blank(), 
+            axis.ticks.x = element_blank()) +
+      ylab("") + scale_y_continuous(limits = c(0, NA)) + coord_cartesian(xlim = c(-30, 125))  
+    }
+    
+    else {
+    ggplot(data = subset(vaf.av, cmoPatientId == patient_id), aes(x = collection_day, y = VAF)) +
+      geom_line(color = "darkslategray", size = 0.75) + geom_point(color = "darkslategray", size = 1.2) +
+      geom_line(data = subset(recist.tab, cmoPatientId == patient_id), aes(x = exam_day, y = Total.Diameter / scalar, 
+                group = cmoPatientId), color = "black", size = 0.6, linetype = "dashed") +
+      geom_point(data = subset(recist.tab, cmoPatientId == patient_id), aes(x = exam_day, y = Total.Diameter / scalar, 
+                group = cmoPatientId, color = Timepoint.Response), size = 1.5) +
+      geom_text(data = subset(recist.tab, cmoPatientId == patient_id), aes(x = exam_day - 4, 
+                y = (Total.Diameter / scalar) * 0.75, label = Timepoint.Response, color = Timepoint.Response), size = 2.5) +
+      scale_color_manual(values = get_color_palette(recist.tab[recist.tab$cmoPatientId == patient_id, "Timepoint.Response"])) +
+      geom_point(data = subset(vaf.av, cmoPatientId == patient_id & VAF == 0), color = "white", size = 0.5) +
+      theme_classic() +
+      theme(legend.position = "none", panel.background = element_rect(fill = "aliceblue", colour = "aliceblue"),
+            axis.text.x = element_blank(), axis.title.x = element_blank(), plot.title = element_blank(),
+            axis.text.y = element_text(size = 7), plot.margin = margin(1.5,0,1.5,0, "pt"), axis.line.x = element_blank(), 
+            axis.ticks.x = element_blank()) +
+      ylab("") + scale_y_continuous(limits = c(0, NA),
+      sec.axis = sec_axis(~.*vaf.av[vaf.av$cmoPatientId == patient_id, "scalar"][1])) + coord_cartesian(xlim = c(-30, 125))
+    }
+  })
+  
+  #last plot includes X-axis with ticks and labels
+  plot_last <- ggplot(data = subset(vaf.av, cmoPatientId == patients[length(patients)]), aes(x = collection_day, y = VAF)) +
+      geom_line(color = "darkslategray", size = 0.75) + geom_point(color = "darkslategray", size = 1.2) +
+      geom_point(data = subset(vaf.av, cmoPatientId == patients[length(patients)] & VAF == 0), color = "white", size = 0.5) +
+      theme_classic() + xlab("Treatment Day") +
+      theme(legend.position = "none", panel.background = element_rect(fill = "aliceblue", colour = "aliceblue"),
+            axis.text.y = element_text(size = 7), plot.margin = margin(1.5,0,0,0, "pt")) +
+      ylab("") + scale_y_continuous(limits = c(0, NA)) + coord_cartesian(xlim = c(-30, 125))
+
+  plot_list <- c(list(plot_first), plot_middle, list(plot_last))
+  return(plot_list)  
+}
+
+
+```
+
+```{r, fig.width = 14, fig.height = 10}
+patients <- levels(unique(vaf.av$cmoPatientId))
+
+vaf.recist.plots <- generate_abs_plot(patients)
+
+# Combine plots using patchwork
+vaf.recist.combined <- wrap_plots(plotlist = vaf.recist.plots, ncol = 1)
+
+# Print the combined plot
+init.vaf.diam + vaf.recist.combined + treatment.length.plot + tx.stop.plot + plot_layout(widths = c(0.2, 0.5, 0.2, 0.1))
+ggsave("BRAF_recist_vaf.png")
+```
