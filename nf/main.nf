@@ -44,10 +44,57 @@ process CheckPaths {
     """
 }
 
+process GenerateClinicalPaths {
+    input:
+    path samples
+    path id_mapping
+    val dmp_dir
+    val mirror_bam_dir
+    val mirror_access_bam_dir
+
+    path dmp_key_path, name: "dmp_key.txt"
+    path access_key_path, name: "access_key.txt"
+
+    output:
+    path "${params.clinical_bams}"
+
+    script:
+    """
+    python3 ${baseDir}/scripts/generate_clinical_paths.py \\
+        --samples $samples \\
+        --id_mapping $id_mapping \\
+        --dmp_dir $dmp_dir \\
+        --mirror_bam_dir $mirror_bam_dir \\
+        --mirror_access_bam_dir $mirror_access_bam_dir \\
+        --dmp_key_path dmp_key.txt \\
+        --access_key_path access_key.txt \\
+        --output "${params.clinical_bams}"
+    """
+
+
+}
+
 workflow {
     samples_ch = file(params.samples)
+    id_ch = file(params.id_mapping)
+
+    dmp_dir = params.dmp_dir
+    mirror_bam_dir = params.mirror_bam_dir
+    mirror_access_bam_dir = params.mirror_access_bam_dir
+    dmp_key_path = file(params.dmp_key_path)
+    access_key_path = file(params.access_key_path)
 
     GeneratePaths(samples_ch)
     UnlinkPaths(GeneratePaths.out)
     CheckPaths(UnlinkPaths.out)
+
+    GenerateClinicalPaths(
+        samples = samples_ch, 
+        id_mapping = id_ch, 
+        dmp_dir = dmp_dir,
+        mirror_bam_dir = mirror_bam_dir,
+        mirror_access_bam_dir = mirror_access_bam_dir,
+        dmp_key_path = dmp_key_path,
+        access_key_path = access_key_path)
+
 }
