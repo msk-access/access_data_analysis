@@ -12,6 +12,7 @@ def generateClinicalPaths(samples, id_mapping, dmp_dir, mirror_bam_dir, mirror_a
     ids_df = pd.read_csv(id_mapping)
 
     sample_sheet = []
+    impact_calls = []
 
     for cmo_patient in unique_patient_ids:
         matching_rows = ids_df.loc[ids_df['cmo_patient_id'] == cmo_patient, 'dmp_patient_id']
@@ -50,10 +51,37 @@ def generateClinicalPaths(samples, id_mapping, dmp_dir, mirror_bam_dir, mirror_a
 )
         sample_sheet_df.to_csv(output, index=False)
 
-
         # combine with the research bam paths to make complete sample sheet
         # split by patient
 
+        with open(f'{dmp_dir}/data_mutations_extended.txt', 'r') as impact:
+            print(dmp_id)
+            for line in impact:
+                if re.search(rf"{dmp_id}", line) and not re.search("GERMINLINE", line) and not re.search('sequenced_samples:', line):
+                    cols = line.split(sep='\t')
+
+                    impact_calls.append({'Hugo_Symbol': cols[0], 
+                                         'Chromosome': cols[4], 
+                                         'Start_Position': cols[5], 
+                                         'End_Position': cols[6], 
+                                         'Reference_Allele': cols[11], 
+                                         'Tumor_Seq_Allele1': cols[12], 
+                                         'Tumor_Seq_Allele2': cols[13],
+                                         'Tumor_Sample_Barcode': cols[16],
+                                         'Matched_Norm_Sample_Barcode': 'NA',
+                                         't_ref_count': 0,
+                                         't_alt_count': 0,
+                                         'n_ref_count': 0,
+                                         'n_alt_count': 0,
+                                         'Variant_Classification': cols[9]})
+        
+        # combine impact MAF with duplex MAF to make all_unique_calls.maf (split by patient)
+        
+    impact_calls_df = pd.DataFrame(impact_calls)
+    impact_calls_df.to_csv("impact_calls.csv", index=False)
+
+                    
+                
 
     # for each patient
         # Hugo_Symbol, Chromosome, Start_Position, End_Position, Reference_Allele, Tumor_Seq_Allele1, Tumor_Seq_Allele2, Tumor_Sample_Barcode, Matched_Norm_Sample_Barcode, t_ref_count, t_alt_count, n_ref_count, n_alt_count, Variant_Classification
