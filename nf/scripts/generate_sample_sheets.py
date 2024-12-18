@@ -151,7 +151,7 @@ def generateClinicalPaths(samples,
     sample_sheet_df = (sample_sheet_df.groupby('sample_id', as_index=False)
                      .agg(lambda x: next((val for val in x if val != 'NA'), 'NA')))
     sample_sheet_df.to_csv("sample_sheet.csv", index=False)
-    return(sample_sheet)
+    return(sample_sheet_df)
 
 def getClinicalBam(line, mirror):
 
@@ -164,7 +164,36 @@ def getClinicalBam(line, mirror):
 
     return sample_id, bam_path
 
-def getAllCalls(samples,
+def getPlasmaCalls(tumor_df):
+    plasma_calls = []
+    for path in tumor_df["maf_path"]:
+        with open(path, 'r') as maf:
+            reader = csv.DictReader(maf, delimiter='\t')
+            for row in reader:
+                if not row['Status']:
+                    continue
+                plasma_calls.append({'Hugo_Symbol': row['Hugo_Symbol'], 
+                    'Chromosome': row['Chromosome'], 
+                    'Start_Position': row['Start_Position'], 
+                    'End_Position': row['End_Position'], 
+                    'Reference_Allele': row['Reference_Allele'], 
+                    'Tumor_Seq_Allele1': row['Tumor_Seq_Allele1'], 
+                    'Tumor_Seq_Allele2': row['Tumor_Seq_Allele2'],
+                    'Tumor_Sample_Barcode': row['Tumor_Sample_Barcode'],
+                    'Matched_Norm_Sample_Barcode': row['Matched_Norm_Sample_Barcode'],
+                    't_ref_count': row['D_t_ref_count_fragment'],
+                    't_alt_count': row['D_t_alt_count_fragment'],
+                    'n_ref_count': row['n_ref_count_fragment'],
+                    'n_alt_count': row['n_alt_count_fragment'],
+                    'Variant_Classification': row['Variant_Classification']})
+                #plasma_calls.append({"patient_id": patient, "sample_id": sample_id, "hugo_symbol": hugo, "site": site, "fold_change": fc, "p_val": p_val})
+
+    plasma_calls_df = pd.DataFrame(plasma_calls)
+    #plasma_calls_df["CNA_tumor"] = np.where(plasma_calls_df["fold_change"] > "0", "AMP", "HOMDEL")
+    plasma_calls_df.to_csv("plasma_calls.csv", index=False)
+    return(plasma_calls_df)
+
+def getDMPCalls(samples,
                 id_mapping,
                 dmp_dir):
 
@@ -216,8 +245,7 @@ def getAllCalls(samples,
     dmp_calls_df = pd.DataFrame(dmp_calls)
     dmp_calls_df.to_csv("dmp_calls.csv", index=False)
 
-    dmp_CNA_calls_df = pd.DataFrame(dmp_CNA_calls)
-    dmp_CNA_calls_df.to_csv("dmp_CNA_calls.csv", index=False)
+    return(dmp_calls_df)
 
 def getDMPCNACalls(samples, id_mapping, dmp_dir):
     
@@ -354,7 +382,45 @@ def getMSIScores(samples, id_mapping):
     MSI_scores_df = pd.DataFrame(MSI_scores)
     MSI_scores_df.to_csv("MSI_scores.csv", index=False)
 
+def aggregateSampleSheet(research_df, clinical_df, maf_paths):
     
+    # remove some columns in the research
+    research_df = research_df[['cmo_patient_id', "bam_path_plasma_duplex", "bam_path_plasma_simplex"]].copy()
+    research_df.rename(columns={'bam_path_plasma_duplex': 'duplex_bam', 'bam_path_plasma_simplex': 'simplex_bam'}, inplace=True)
+    research_df.insert(1, 'standard_bam', 'NA')
+    research_df['maf'] = 'NA'
+
+    # keep cmo_patient_id, standard bam is na, duplex bam is bam_path_plasma_duplex, simplex is bam_path_plasma simplex 
+    # keep the clincal as is, or remove the dmp_id column 
+    clinical_df.drop('dmp_patient_id', axis=1, inplace=True)
+    clinical_df.drop('sample_id', axis=1, inplace=True)
+
+    combined_sample_sheet = pd.concat([research_df, clinical_df], ignore_index=True)
+    for patient, group in combined_sample_sheet.groupby(['cmo_patient_id']):
+        patient_string = str(patient).strip("()").replace(",", "").replace("'", "")
+        print(f'Processing {patient_string} sample sheet')
+        maf_path = maf_paths[patient_string]
+        group['maf'] =  os.path.abspath(maf_path)
+        group.to_csv(f'./{patient_string}_sample_sheet.csv', index=False)
+    
+    return(combined_sample_sheet)
+
+def generateMAFs(plasma_calls, dmp_calls):
+    all_small_calls = pd.concat([plasma_calls, dmp_calls], ignore_index=True)
+    all_small_calls['cmo_patient_id'] = all_small_calls['Tumor_Sample_Barcode'].str.split('-').str[:2].str.join('-')
+    all_small_calls = all_small_calls.drop_duplicates(keep='first')
+    mafs = {}
+    
+
+    for patient, group in all_small_calls.groupby(['cmo_patient_id']):
+        patient_string = str(patient).strip("()").replace(",", "").replace("'", "")
+        print(f'Processing {patient_string} sample sheet')
+        maf_path = f'./{patient_string}_all_calls.maf'
+        group.to_csv(maf_path, index=False)
+        mafs[patient_string] = maf_path
+
+    return(mafs)
+
 
 
 
@@ -381,9 +447,14 @@ if __name__ == "__main__":
 
     
     masterfile = generateResearchPaths(args.samples, args.bam_path_normal, args.bam_path_plasma_duplex, args.bam_path_plasma_simplex, args.bam_path_index_normal, args.bam_path_index_duplex, args.bam_path_index_simplex, args.maf_path, args.cna_path, args.sv_path)
-    #generateClinicalPaths(args.samples, args.id_mapping, args.dmp_dir, args.mirror_bam_dir, args.mirror_access_bam_dir, args.dmp_key_path, args.access_key_path)
-    getPlasmaCNACalls(masterfile)
-    getPlasmaSVCalls(masterfile)
-    getDMPSVCalls(args.samples, args.id_mapping, args.dmp_dir)
-    getMSIScores(args.samples, args.id_mapping)
+    clincal_sample_sheet = generateClinicalPaths(args.samples, args.id_mapping, args.dmp_dir, args.mirror_bam_dir, args.mirror_access_bam_dir, args.dmp_key_path, args.access_key_path)
+    #getPlasmaCNACalls(masterfile)
+    #getPlasmaSVCalls(masterfile)
+    #getDMPSVCalls(args.samples, args.id_mapping, args.dmp_dir)
+    #getMSIScores(args.samples, args.id_mapping)
     #getDMPCNACalls(args.samples, args.id_mapping, args.dmp_dir)
+
+    plasma_calls = getPlasmaCalls(masterfile)
+    DMP_calls = getDMPCalls(args.samples, args.id_mapping, args.dmp_dir)
+    maf_paths = generateMAFs(plasma_calls, DMP_calls)
+    sample_sheet = aggregateSampleSheet(masterfile, clincal_sample_sheet, maf_paths)

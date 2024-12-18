@@ -22,7 +22,7 @@ process GenerateBamPaths {
 
     script:
     """
-    python3 ${baseDir}/scripts/per_patient.py \\
+    python3 ${baseDir}/scripts/generate_sample_sheets.py \\
         --samples $samples \\
         --id_mapping $id_mapping \\
         --bam_path_normal $bam_path_normal \\
