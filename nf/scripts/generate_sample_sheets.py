@@ -126,31 +126,35 @@ def generateClinicalPaths(samples,
         with open(dmp_key_path, 'r') as impact_key:
             for line in impact_key:
                 if re.search(rf"{dmp_id}-T.*-IM.*", line):
-                    sample_id, standard_bam = getClinicalBam(line, mirror_bam_dir)
-                    sample_sheet.append({'cmo_patient_id': cmo_patient, 'dmp_patient_id': dmp_id, 'sample_id': sample_id, 'standard_bam': standard_bam, 'duplex_bam': 'NA', 'simplex_bam': 'NA', 'maf': 'NA'})
+                    sample_id, standard_bam, standard_bai = getClinicalBam(line, mirror_bam_dir)
+                    sample_sheet.append({'cmo_patient_id': cmo_patient, 'dmp_patient_id': dmp_id, 'sample_id': sample_id, 'standard_bam': standard_bam, 'standard_bai': standard_bai, 'duplex_bam': '', 'duplex_bai': '', 'simplex_bam': '', 'simplex_bai': '', 'maf': ''})
 
                 if re.search(rf"{dmp_id}-N.*-IM.*", line):
-                    sample_id, standard_bam = getClinicalBam(line, mirror_bam_dir)
-                    sample_sheet.append({'cmo_patient_id': cmo_patient, 'dmp_patient_id': dmp_id, 'sample_id': sample_id, 'standard_bam': standard_bam, 'duplex_bam': 'NA', 'simplex_bam': 'NA', 'maf': 'NA'})
+                    sample_id, standard_bam, standard_bai = getClinicalBam(line, mirror_bam_dir)
+                    sample_sheet.append({'cmo_patient_id': cmo_patient, 'dmp_patient_id': dmp_id, 'sample_id': sample_id, 'standard_bam': standard_bam, 'standard_bai': standard_bai, 'duplex_bam': '', 'duplex_bai': '', 'simplex_bam': '', 'simplex_bai': '', 'maf': ''})
 
         with open(access_key_path, 'r') as access_key:
             for line in access_key:
                 if re.search(rf"{dmp_id}.*-T.*-XS.*simplex.*", line):
-                    sample_id, simplex_bam = getClinicalBam(line, mirror_access_bam_dir)
-                    sample_sheet.append({'cmo_patient_id': cmo_patient, 'dmp_patient_id': dmp_id, 'sample_id': sample_id, 'standard_bam': 'NA', 'duplex_bam': 'NA', 'simplex_bam': simplex_bam, 'maf': 'NA'})
+                    sample_id, simplex_bam, simplex_bai = getClinicalBam(line, mirror_access_bam_dir)
+                    sample_sheet.append({'cmo_patient_id': cmo_patient, 'dmp_patient_id': dmp_id, 'sample_id': sample_id, 'standard_bam': '', 'standard_bai': '', 'duplex_bam': '', 'duplex_bai': '', 'simplex_bam': simplex_bam, 'simplex_bai': simplex_bai, 'maf': ''})
 
                 if re.search(rf"{dmp_id}.*-T.*-XS.*duplex.*", line):
-                    sample_id, duplex_bam = getClinicalBam(line, mirror_access_bam_dir)
-                    sample_sheet.append({'cmo_patient_id': cmo_patient, 'dmp_patient_id': dmp_id, 'sample_id': sample_id, 'standard_bam': 'NA', 'duplex_bam': duplex_bam, 'simplex_bam': 'NA', 'maf': 'NA'})
+                    sample_id, duplex_bam, duplex_bai = getClinicalBam(line, mirror_access_bam_dir)
+                    sample_sheet.append({'cmo_patient_id': cmo_patient, 'dmp_patient_id': dmp_id, 'sample_id': sample_id, 'standard_bam': '', 'standard_bai': '', 'duplex_bam': duplex_bam, 'duplex_bai': duplex_bai, 'simplex_bam': '', 'simplex_bai': '', 'maf': ''})
 
                 if re.search(rf"{dmp_id}.*-N.*-XS.*unfilter.*", line):
-                    sample_id, standard_bam = getClinicalBam(line, mirror_access_bam_dir)
-                    sample_sheet.append({'cmo_patient_id': cmo_patient, 'dmp_patient_id': dmp_id, 'sample_id': sample_id, 'standard_bam': standard_bam, 'duplex_bam': 'NA', 'simplex_bam': 'NA', 'maf': 'NA'})
+                    sample_id, standard_bam, standard_bai = getClinicalBam(line, mirror_access_bam_dir)
+                    sample_sheet.append({'cmo_patient_id': cmo_patient, 'dmp_patient_id': dmp_id, 'sample_id': sample_id, 'standard_bam': standard_bam, 'standard_bai': standard_bai, 'duplex_bam': '', 'duplex_bai': '', 'simplex_bam': '', 'simplex_bai': '', 'maf': ''})
     
     sample_sheet_df = pd.DataFrame(sample_sheet)
     sample_sheet_df = (sample_sheet_df.groupby('sample_id', as_index=False)
-                     .agg(lambda x: next((val for val in x if val != 'NA'), 'NA')))
-    sample_sheet_df.to_csv("sample_sheet.csv", index=False)
+                     .agg(lambda x: next((val for val in x if val != ''), '')))
+    sample_sheet_df = sample_sheet_df[['cmo_patient_id', 'dmp_patient_id', 'sample_id', 
+                                   'standard_bam', 'standard_bai', 
+                                   'duplex_bam', 'duplex_bai', 
+                                   'simplex_bam', 'simplex_bai', 'maf']]
+    sample_sheet_df.to_csv("clinical_sheet.csv", index=False)
     return(sample_sheet_df)
 
 def getClinicalBam(line, mirror):
@@ -161,8 +165,9 @@ def getClinicalBam(line, mirror):
     fl = base_bam[0]
     sl = base_bam[1]
     bam_path = f'{mirror}/{fl}/{sl}/{base_bam}.bam'
+    bai_path = f'{mirror}/{fl}/{sl}/{base_bam}.bai'
 
-    return sample_id, bam_path
+    return sample_id, bam_path, bai_path
 
 def getPlasmaCalls(tumor_df):
     plasma_calls = []
@@ -233,7 +238,7 @@ def getDMPCalls(samples,
                                             'Tumor_Seq_Allele1': cols[12], 
                                             'Tumor_Seq_Allele2': cols[13],
                                             'Tumor_Sample_Barcode': cols[16],
-                                            'Matched_Norm_Sample_Barcode': 'NA',
+                                            'Matched_Norm_Sample_Barcode': '',
                                             't_ref_count': 0,
                                             't_alt_count': 0,
                                             'n_ref_count': 0,
@@ -385,18 +390,21 @@ def getMSIScores(samples, id_mapping):
 def aggregateSampleSheet(research_df, clinical_df, maf_paths):
     
     # remove some columns in the research
-    research_df = research_df[['cmo_patient_id', "bam_path_plasma_duplex", "bam_path_plasma_simplex"]].copy()
-    research_df.rename(columns={'bam_path_plasma_duplex': 'duplex_bam', 'bam_path_plasma_simplex': 'simplex_bam'}, inplace=True)
-    research_df.insert(1, 'standard_bam', 'NA')
-    research_df['maf'] = 'NA'
+    research_df = research_df[['cmo_patient_id', 'cmo_sample_id', "bam_path_plasma_duplex", "bam_path_index_plasma_duplex", "bam_path_plasma_simplex", "bam_path_index_plasma_simplex"]].copy()
+    research_df.rename(columns={'cmo_patient_id': 'patient_id', 'cmo_sample_id': 'sample_id', 'bam_path_plasma_duplex': 'duplex_bam', 'bam_path_index_plasma_duplex': 'duplex_bai', 'bam_path_plasma_simplex': 'simplex_bam', 'bam_path_index_plasma_simplex': 'simplex_bai'}, inplace=True)
+    research_df.insert(2, 'standard_bam', '')
+    research_df.insert(3, 'standard_bai', '')
+    research_df['maf'] = ''
+    #research_df.drop('sample_id', axis=1, inplace=True)
 
     # keep cmo_patient_id, standard bam is na, duplex bam is bam_path_plasma_duplex, simplex is bam_path_plasma simplex 
     # keep the clincal as is, or remove the dmp_id column 
     clinical_df.drop('dmp_patient_id', axis=1, inplace=True)
-    clinical_df.drop('sample_id', axis=1, inplace=True)
+    clinical_df.rename(columns={'cmo_patient_id': 'patient_id'}, inplace=True)
+    #clinical_df.drop('sample_id', axis=1, inplace=True)
 
     combined_sample_sheet = pd.concat([research_df, clinical_df], ignore_index=True)
-    for patient, group in combined_sample_sheet.groupby(['cmo_patient_id']):
+    for patient, group in combined_sample_sheet.groupby(['patient_id']):
         patient_string = str(patient).strip("()").replace(",", "").replace("'", "")
         print(f'Processing {patient_string} sample sheet')
         maf_path = maf_paths[patient_string]
