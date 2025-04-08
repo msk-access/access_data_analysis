@@ -11,7 +11,8 @@ from rich.console import Console
 from rich.panel import Panel
 import arrow
 from datetime import datetime
-
+import numpy as np
+from rich import print
 app = typer.Typer()
 console = Console()
 
@@ -121,25 +122,39 @@ def generate_paths(row):
 
 
 def create_new_dataframe(df, sample_type="Normal"):
-    """Creates a new DataFrame with specified columns for normal or non-normal samples."""
-    subset_df = df[df["Sample Type"] == sample_type].copy()
-    new_df = pd.DataFrame()
-    new_df["cmo_patient_id"] = subset_df["CMO Patient ID"]
-    new_df["cmo_sample_id_plasma"] = subset_df["CMO Sample Name"]
-    new_df["cmo_sample_id_normal"] = subset_df["CMO Sample Name"]
-    new_df["bam_path_normal"] = subset_df["bam_path_normal"]
-    new_df["sex"] = subset_df["Sex"]
-    new_df["collection_date"] = subset_df["Collection Date"]
-    new_df["dmp_patient_id"] = subset_df["DMP_PATIENT_ID"]
+    """
+    Creates a new DataFrame with specified columns for normal or non-normal samples.
+    If sample_type is "Normal", it subsets for normal samples.
+    If sample_type is not "Normal", it subsets for all non-normal samples.
+    """
+    if sample_type == "Normal":
+        subset_df = df[df["Sample Type"] == sample_type].copy()
+    else:
+        subset_df = df[df["Sample Type"] != "Normal"].copy()  # Exclude "Normal"
 
-    if sample_type != "Normal":
-        new_df["bam_path_plasma_duplex"] = subset_df["bam_path_plasma_duplex"]
-        new_df["bam_path_plasma_simplex"] = subset_df["bam_path_plasma_simplex"]
-        new_df["maf_path"] = subset_df["maf_path"]
-        new_df["cna_path"] = subset_df["cna_path"]
-        new_df["sv_path"] = subset_df["sv_path"]
+    new_df = pd.DataFrame()
+    if not subset_df.empty:  # Check if subset_df is not empty
+        new_df["cmo_patient_id"] = subset_df["CMO Patient ID"]
+        new_df["cmo_sample_id_plasma"] = subset_df["CMO Sample Name"]
+        new_df["cmo_sample_id_normal"] = subset_df["CMO Sample Name"]
+        new_df["bam_path_normal"] = subset_df["bam_path_normal"]
+        new_df["sex"] = subset_df["Sex"]
+        new_df["collection_date"] = subset_df["Collection Date"]
+        new_df["dmp_patient_id"] = subset_df["DMP_PATIENT_ID"]
+
+        if sample_type != "Normal":
+            new_df["bam_path_plasma_duplex"] = subset_df["bam_path_plasma_duplex"]
+            new_df["bam_path_plasma_simplex"] = subset_df["bam_path_plasma_simplex"]
+            new_df["maf_path"] = subset_df["maf_path"]
+            new_df["cna_path"] = subset_df["cna_path"]
+            new_df["sv_path"] = subset_df["sv_path"]
+
     return new_df
 
+# Define a function to convert datetime values to None
+def scrub_datetime(value):
+    # Convert all values to None to scrub PHI
+    return None  # or return pd.NaT if you prefer
 
 @app.command()
 def make_manifest(
@@ -159,6 +174,11 @@ def make_manifest(
         "-o",
         help="Prefix name for the output files (without extension)",
     ),
+    remove_collection_date: bool = typer.Option(
+        False,
+        "--remove-collection-date",
+        help="Remove collection date from the output manifest (PHI).",
+    ),
 ):
     """
     Processes the input manifest file to generate paths for various data types
@@ -167,14 +187,25 @@ def make_manifest(
     Args:
         input_file (Path): Path to the input manifest file.
         output_prefix (str): Prefix name for the output files.
+        remove_collection_date (bool): If True, the collection date column will be removed from the output.
     """
     console.rule("[bold blue]Making Manifest File[/]")
+
+    console.print(
+        Panel(
+            "[bold yellow]Warning:[/bold yellow] The 'Collection Date' column contains Protected Health Information (PHI). This tool should only be used on systems that are compliant with HIPAA and other relevant privacy regulations.",
+            title="PHI Warning",
+            border_style="yellow",
+        )
+    )
 
     try:
         # Load input manifest
         console.log(f"Loading manifest file: {input_file}")
-        df = pd.read_excel(input_file, converters={"Collection Date": validate_date})
-
+        if remove_collection_date:
+            df = pd.read_excel(input_file, converters={"Collection Date":scrub_datetime})
+        else:
+            df = pd.read_excel(input_file, converters={"Collection Date": validate_date})
         # Check if required columns exist and have values
         required_columns = ["CMO Patient ID", "CMO Sample Name", "Sample Type"]
         for col in required_columns:
@@ -186,7 +217,7 @@ def make_manifest(
 
         # Create new DataFrames for normal and non-normal samples
         new_normal_df = create_new_dataframe(df, "Normal")
-        new_non_normal_df = create_new_dataframe(df, "Plasma")
+        new_non_normal_df = create_new_dataframe(df, "")
 
         # Create a list to store new rows for multiple normals
         new_rows = []
@@ -218,7 +249,6 @@ def make_manifest(
 
         # Concatenate the two dataframes
         final_df = new_non_normal_df
-
         # Group and expand DataFrame for plasma samples with normal samples
         grouped = final_df.groupby(["cmo_sample_id_plasma", "cmo_patient_id"])
 
@@ -249,7 +279,7 @@ def make_manifest(
             processed_rows.append(processed_row)
 
         # Create the final DataFrame from the processed rows
-        final_df = pd.DataFrame(processed_rows)
+        t_final_df = pd.DataFrame(processed_rows)
 
         # Define the desired column order
         column_order = [
@@ -268,16 +298,16 @@ def make_manifest(
         ]
 
         # Reorder the columns
-        final_df = final_df[column_order]
+        t_final_df = t_final_df[column_order]
 
         # Save the updated manifest to both Excel and CSV formats
         output_file_path_xlsx = f"{output_prefix}.xlsx"
         output_file_path_csv = f"{output_prefix}.csv"
 
         console.log(f"Saving updated manifest to: {output_file_path_xlsx}")
-        final_df.to_excel(output_file_path_xlsx, index=False)
+        t_final_df.to_excel(output_file_path_xlsx, index=False)
         console.log(f"Saving updated manifest to: {output_file_path_csv}")
-        final_df.to_csv(output_file_path_csv, index=False)
+        t_final_df.to_csv(output_file_path_csv, index=False)
 
         console.print(
             Panel(
