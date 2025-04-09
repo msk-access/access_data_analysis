@@ -75,7 +75,7 @@ compile_reads_all <- function(master.ref,
   # x = 'C-YW82CY'
   print("Compiling reads per patient")
 
-  # Function to validate BAM file paths and error if they don't exist for master.ref, warn and filter otherwise
+ # Function to validate BAM file paths and error if they don't exist for master.ref, warn and filter otherwise
   validate_bam_paths <- function(bam_paths, bam_type, sample_ids, is_master_ref = FALSE) {
     print(paste0("Validating BAM paths for type: ", bam_type))
     print(paste0("Number of BAM paths to validate: ", length(bam_paths)))
@@ -135,7 +135,8 @@ compile_reads_all <- function(master.ref,
           Sample_Barcode = as.character(all.dmp.ids),
           standard_bam = as.character(dmp_bam_paths),
           duplex_bam = as.character(rep(NA, length(all.dmp.ids))),
-          simplex_bam = as.character(rep(NA, length(all.dmp.ids)))
+          simplex_bam = as.character(rep(NA, length(all.dmp.ids))),
+          stringsAsFactors = FALSE
         ) %>%
           mutate(
             cmo_patient_id = as.character(x),
@@ -182,7 +183,8 @@ compile_reads_all <- function(master.ref,
         Sample_Barcode = as.character(c(all.dmp.ids.XS, all.dmp.ids.normal.XS)),
         standard_bam = as.character(c(rep(NA, length(all.dmp.ids.XS)), access_normal_bam_paths)),
         duplex_bam = as.character(c(access_duplex_bam_paths, rep(NA, length(all.dmp.ids.normal.XS)))),
-        simplex_bam = as.character(c(access_simplex_bam_paths, rep(NA, length(all.dmp.ids.normal.XS))))
+        simplex_bam = as.character(c(access_simplex_bam_paths, rep(NA, length(all.dmp.ids.normal.XS)))),
+        stringsAsFactors = FALSE
       ) %>%
         mutate(
           cmo_patient_id = as.character(x),
@@ -236,16 +238,17 @@ compile_reads_all <- function(master.ref,
 
     # Validate plasma BAM paths
     print("Validating plasma BAM paths")
-    plasma_bam_paths <- data.frame( # Modified to data.frame
-      Sample_Barcode = as.character(master.ref[cmo_patient_id == x, cmo_sample_id_plasma]),
-      duplex_bam = as.character(master.ref[cmo_patient_id == x, bam_path_plasma_duplex]),
-      simplex_bam = as.character(master.ref[cmo_patient_id == x, bam_path_plasma_simplex]),
-      cmo_patient_id = as.character(master.ref[cmo_patient_id == x, cmo_patient_id]),
-      Sample_Type = as.character("duplex"),
-      dmp_patient_id = as.character(master.ref[cmo_patient_id == x, dmp_patient_id]),
-      stringsAsFactors = FALSE # Add this line
-    )
-    
+      # Ensure that the columns are explicitly named and cast to character
+      plasma_bam_paths <- data.frame(
+        Sample_Barcode = as.character(master.ref[cmo_patient_id == x, cmo_sample_id_plasma]),
+        duplex_bam = as.character(master.ref[cmo_patient_id == x, bam_path_plasma_duplex]),
+        simplex_bam = as.character(master.ref[cmo_patient_id == x, bam_path_plasma_simplex]),
+        cmo_patient_id = as.character(master.ref[cmo_patient_id == x, cmo_patient_id]),
+        Sample_Type = as.character(rep("duplex", .N)),
+        dmp_patient_id = as.character(master.ref[cmo_patient_id == x, dmp_patient_id]),
+        stringsAsFactors = FALSE
+      )
+      
     plasma_bam_paths$duplex_bam <- validate_bam_paths(plasma_bam_paths$duplex_bam, "plasma duplex", plasma_bam_paths$Sample_Barcode, is_master_ref = TRUE)
     plasma_bam_paths$simplex_bam <- validate_bam_paths(plasma_bam_paths$simplex_bam, "plasma simplex", plasma_bam_paths$Sample_Barcode, is_master_ref = TRUE)
 
@@ -273,6 +276,13 @@ compile_reads_all <- function(master.ref,
 
     # Combine all sample sheets
     print("Combining all sample sheets")
+    
+    # Convert all columns to character before combining
+    if (!is.null(dmp.sample.sheet) && !is.null(plasma_bam_paths)) {
+      dmp.sample.sheet <- data.frame(lapply(dmp.sample.sheet, as.character), stringsAsFactors = FALSE)
+      plasma_bam_paths <- data.frame(lapply(plasma_bam_paths, as.character), stringsAsFactors = FALSE)
+    }
+    
     sample.sheet <- rbind(
       dmp.sample.sheet,
       plasma_bam_paths,
