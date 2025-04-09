@@ -236,14 +236,16 @@ compile_reads_all <- function(master.ref,
 
     # Validate plasma BAM paths
     print("Validating plasma BAM paths")
-    plasma_bam_paths <- master.ref[cmo_patient_id == x, .(
-      Sample_Barcode = as.character(cmo_sample_id_plasma),
-      duplex_bam = as.character(bam_path_plasma_duplex),
-      simplex_bam = as.character(bam_path_plasma_simplex),
-      cmo_patient_id = as.character(cmo_patient_id),
+    plasma_bam_paths <- data.frame( # Modified to data.frame
+      Sample_Barcode = as.character(master.ref[cmo_patient_id == x, cmo_sample_id_plasma]),
+      duplex_bam = as.character(master.ref[cmo_patient_id == x, bam_path_plasma_duplex]),
+      simplex_bam = as.character(master.ref[cmo_patient_id == x, bam_path_plasma_simplex]),
+      cmo_patient_id = as.character(master.ref[cmo_patient_id == x, cmo_patient_id]),
       Sample_Type = as.character("duplex"),
-      dmp_patient_id = as.character(dmp_patient_id)
-    )]
+      dmp_patient_id = as.character(master.ref[cmo_patient_id == x, dmp_patient_id]),
+      stringsAsFactors = FALSE # Add this line
+    )
+    
     plasma_bam_paths$duplex_bam <- validate_bam_paths(plasma_bam_paths$duplex_bam, "plasma duplex", plasma_bam_paths$Sample_Barcode, is_master_ref = TRUE)
     plasma_bam_paths$simplex_bam <- validate_bam_paths(plasma_bam_paths$simplex_bam, "plasma simplex", plasma_bam_paths$Sample_Barcode, is_master_ref = TRUE)
 
@@ -291,6 +293,7 @@ compile_reads_all <- function(master.ref,
       row.names = F
     )
     print(paste0("Sample sheet written to: ", results.dir, "/", x, "/", x, "_sample_sheet.tsv"))
+
 
 
       # piece together all unique calls -----------------------------------------
