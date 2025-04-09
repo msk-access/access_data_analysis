@@ -74,201 +74,146 @@ compile_reads_all <- function(master.ref,
   # x = unique(master.ref$cmo_sample_id_plasma)[16]
   # x = 'C-YW82CY'
   print("Compiling reads per patient")
-  all.fillout.id <-
-    lapply(unique(master.ref$cmo_patient_id), function(x) {
-      print(x)
-      dir.create(paste0(results.dir, "/", x))
-      dmp_id <-
-        unique(master.ref[cmo_patient_id == x]$dmp_patient_id)
-      # sample sheet with colummns -- TSB, sample type, bam path, treatm --------
-      # need to get DMP tumor, DMP normal, plasma, plasma normal (if there is any), pooled normal
-      # DMP sample sheet
-      if (is.na(dmp_id) | dmp_id == '') {
-        dmp.sample.sheet <- NULL
-      } else {
-        all.dmp.ids.IM <-
-          DMP.key[grepl(paste0(dmp_id, "-(T|N)..-IM."), V1)]$V1
-        all.dmp.ids.IH <-
-          DMP.key[grepl(paste0(dmp_id, "-(T|N)..-IH."), V1)]$V1
-        all.dmp.ids.XS <-
-          access.key[grepl(paste0(dmp_id, "-T..-XS."), V1)]$V1
-        all.dmp.ids.normal.XS <-
-          access.key[grepl(paste0(dmp_id, "-N..-XS."), V1)]$V1
-        all.dmp.ids <- c(all.dmp.ids.IM, all.dmp.ids.IH)
-        all.dmp.bam.ids.IM <-
-          DMP.key[grepl(paste0(dmp_id, "-(T|N)..-IM."), V1)]$V2
-        all.dmp.bam.ids.IH <-
-          DMP.key[grepl(paste0(dmp_id, "-(T|N)..-IH."), V1)]$V2
-        all.dmp.bam.ids.XS <-
-          gsub("-standard|-unfilter|-simplex|-duplex",
-               "",
-               access.key[grepl(paste0(dmp_id, "-T..-XS."), V1)]$V2)
-        all.dmp.bam.ids.normal.XS <-
-          gsub("-standard|-unfilter|-simplex|-duplex",
-               "",
-               access.key[grepl(paste0(dmp_id, "-N..-XS."), V1)]$V2)
-        all.dmp.bam.ids <-
-          c(all.dmp.bam.ids.IM,
-            all.dmp.bam.ids.IH)
-        if (length(all.dmp.ids) == 0) {
-          dmp.sample.sheet <- NULL
-        } else{
-          bam.sub.dir <-
-            unlist(lapply(strsplit(substr(
-              all.dmp.bam.ids, 1, 2
-            ), ""), function(x) {
-              paste0(x, collapse = "/")
-            }))
-          dmp.sample.sheet <- data.frame(
-            Sample_Barcode = all.dmp.ids,
-            standard_bam = paste0(
-              mirror.bam.dir,
-              "/",
-              bam.sub.dir,
-              "/",
-              all.dmp.bam.ids,
-              ".bam"
-            ),
-            duplex_bam = NA,
-            simplex_bam = NA
-          ) %>%
-            mutate(
-              cmo_patient_id = x,
-              Sample_Type = ifelse(
-                grepl("-T", Sample_Barcode),
-                "DMP_Tumor",
-                "DMP_Normal"
-              ),
-              dmp_patient_id = dmp_id
-            )
-        }
-        if (length(all.dmp.ids.XS) == 0) {
-          access.sample.sheet <- NULL
-        } else{
-          access.bam.sub.dir <-
-            unlist(lapply(strsplit(
-              substr(all.dmp.bam.ids.XS, 1, 2), ""
-            ), function(x) {
-              paste0(x, collapse = "/")
-            }))
-          access.sample.sheet <- unique(
-            data.frame(
-              Sample_Barcode = all.dmp.ids.XS,
-              standard_bam = NA,
-              duplex_bam = paste0(
-                mirror.access.bam.dir,
-                "/",
-                access.bam.sub.dir,
-                "/",
-                all.dmp.bam.ids.XS,
-                "-duplex.bam"
-              ),
-              simplex_bam = paste0(
-                mirror.access.bam.dir,
-                "/",
-                access.bam.sub.dir,
-                "/",
-                all.dmp.bam.ids.XS,
-                "-simplex.bam"
-              )
-            ) %>%
-              mutate(
-                cmo_patient_id = x,
-                Sample_Type = ifelse(
-                  grepl("-T", Sample_Barcode),
-                  "duplex",
-                  "unfilterednormal"
-                ),
-                dmp_patient_id = dmp_id
-              )
-          )
-          access.normal.bam.sub.dir <-
-            unlist(lapply(strsplit(
-              substr(all.dmp.bam.ids.normal.XS, 1, 2), ""
-            ), function(x) {
-              paste0(x, collapse = "/")
-            }))
-          access.normal.sample.sheet <- unique(
-            data.frame(
-              Sample_Barcode = all.dmp.ids.normal.XS,
-              standard_bam = paste0(
-                mirror.access.bam.dir,
-                "/",
-                access.normal.bam.sub.dir,
-                "/",
-                all.dmp.bam.ids.normal.XS,
-                "-unfilter.bam"
-              ),
-              duplex_bam = NA,
-              simplex_bam = NA
-            ) %>%
-              mutate(
-                cmo_patient_id = x,
-                Sample_Type = ifelse(
-                  grepl("-N", Sample_Barcode),
-                  "unfilterednormal",
-                  "duplex"
-                ),
-                dmp_patient_id = dmp_id
-              )
-          )
-          access.sample.sheet = bind_rows(access.sample.sheet, access.normal.sample.sheet)
-        }
-        if (!is.null(dmp.sample.sheet) &
-            !is.null(access.sample.sheet)) {
-          print("DMP IMPACT and DMP ACCESS samples are available")
-          dmp.sample.sheet <-
-            bind_rows(dmp.sample.sheet, access.sample.sheet)
+  # Function to validate BAM file paths
+validate_bam_paths <- function(bam_paths, bam_type, sample_ids) {
+  missing_bams <- bam_paths[!file.exists(bam_paths)]
+  if (length(missing_bams) > 0) {
+    warning(paste0(
+      "The following ", bam_type, " BAM files are missing for sample(s): ",
+      paste0(sample_ids[!file.exists(bam_paths)], collapse = ", "), ". These samples will not be analyzed."
+    ))
+  }
+  # Return only valid BAM paths
+  bam_paths[file.exists(bam_paths)]
+}
 
-        } else if (is.null(dmp.sample.sheet) &
-                   !is.null(access.sample.sheet)) {
-          print("DMP IMPACT samples are NOT available and DMP ACCESS samples are available")
-          dmp.sample.sheet <- access.sample.sheet
-        } else if (!is.null(dmp.sample.sheet) &
-                   is.null(access.sample.sheet)) {
-          print("DMP IMPACT samples are available and DMP ACCESS samples are NOT available")
-          dmp.sample.sheet <- dmp.sample.sheet
-        } else{
-          print("No DMP IMPACT samples or DMP ACCESS samples are available")
-          dmp.sample.sheet <- NULL
-        }
-      }
-      # total sample sheet
-      sample.sheet <- master.ref[cmo_patient_id == x,
-                                 # plasma bams -- duplex and simplex bam
-                                 .(
-                                   Sample_Barcode = as.character(cmo_sample_id_plasma),
-                                   standard_bam = NA,
-                                   duplex_bam = bam_path_plasma_duplex,
-                                   simplex_bam = bam_path_plasma_simplex,
-                                   cmo_patient_id,
-                                   Sample_Type = "duplex",
-                                   dmp_patient_id
-                                 )] %>%
-        merge(rbind(unique(master.ref[cmo_patient_id == x &
-                                        paired == 'Paired',
-                                      # buffy coat + DMP bams -- standard bam only
-                                      .(
-                                        Sample_Barcode = as.character(cmo_sample_id_normal),
-                                        standard_bam = bam_path_normal,
-                                        duplex_bam = NA,
-                                        simplex_bam = NA,
-                                        cmo_patient_id,
-                                        Sample_Type = "unfilterednormal",
-                                        dmp_patient_id
-                                      )]),
-                    dmp.sample.sheet), all = T)
-      # catch '' or NA for empty cells for some cmo_sample_id_normal
-      sample.sheet <-
-        sample.sheet[!is.na(Sample_Barcode) |
-                       Sample_Barcode != ""]
-      write.table(
-        sample.sheet,
-        paste0(results.dir, "/", x, "/", x, "_sample_sheet.tsv"),
-        sep = "\t",
-        quote = F,
-        row.names = F
+# Updated section for validating BAM paths
+all.fillout.id <- lapply(unique(master.ref$cmo_patient_id), function(x) {
+  print(x)
+  dir.create(paste0(results.dir, "/", x))
+  dmp_id <- unique(master.ref[cmo_patient_id == x]$dmp_patient_id)
+
+  # DMP sample sheet
+  if (!is.na(dmp_id) & dmp_id != '') {
+    # Get all DMP IDs and BAM IDs
+    all.dmp.ids.IM <- DMP.key[grepl(paste0(dmp_id, "-(T|N)..-IM."), V1)]$V1
+    all.dmp.ids.IH <- DMP.key[grepl(paste0(dmp_id, "-(T|N)..-IH."), V1)]$V1
+    all.dmp.ids <- c(all.dmp.ids.IM, all.dmp.ids.IH)
+
+    all.dmp.bam.ids.IM <- DMP.key[grepl(paste0(dmp_id, "-(T|N)..-IM."), V1)]$V2
+    all.dmp.bam.ids.IH <- DMP.key[grepl(paste0(dmp_id, "-(T|N)..-IH."), V1)]$V2
+    all.dmp.bam.ids <- c(all.dmp.bam.ids.IM, all.dmp.bam.ids.IH)
+
+    # Create standard BAM paths and validate
+    bam.sub.dir <- unlist(lapply(strsplit(substr(all.dmp.bam.ids, 1, 2), ""), function(y) {
+      paste0(y, collapse = "/")
+    }))
+    dmp_bam_paths <- paste0(mirror.bam.dir, "/", bam.sub.dir, "/", all.dmp.bam.ids, ".bam")
+    dmp_bam_paths <- validate_bam_paths(dmp_bam_paths, "DMP", all.dmp.ids)
+
+    if (length(dmp_bam_paths) > 0) {
+      dmp.sample.sheet <- data.frame(
+        Sample_Barcode = all.dmp.ids,
+        standard_bam = dmp_bam_paths,
+        duplex_bam = NA,
+        simplex_bam = NA
+      ) %>%
+        mutate(
+          cmo_patient_id = x,
+          Sample_Type = ifelse(grepl("-T", Sample_Barcode), "DMP_Tumor", "DMP_Normal"),
+          dmp_patient_id = dmp_id
+        )
+    } else {
+      dmp.sample.sheet <- NULL
+    }
+  } else {
+    dmp.sample.sheet <- NULL
+  }
+
+  # ACCESS sample sheet
+  all.dmp.ids.XS <- access.key[grepl(paste0(dmp_id, "-T..-XS."), V1)]$V1
+  all.dmp.ids.normal.XS <- access.key[grepl(paste0(dmp_id, "-N..-XS."), V1)]$V1
+  all.dmp.bam.ids.XS <- gsub("-standard|-unfilter|-simplex|-duplex", "", access.key[grepl(paste0(dmp_id, "-T..-XS."), V1)]$V2)
+  all.dmp.bam.ids.normal.XS <- gsub("-standard|-unfilter|-simplex|-duplex", "", access.key[grepl(paste0(dmp_id, "-N..-XS."), V1)]$V2)
+
+  # Create ACCESS duplex and simplex BAM paths and validate
+  access.bam.sub.dir <- unlist(lapply(strsplit(substr(all.dmp.bam.ids.XS, 1, 2), ""), function(y) {
+    paste0(y, collapse = "/")
+  }))
+  access_duplex_bam_paths <- paste0(mirror.access.bam.dir, "/", access.bam.sub.dir, "/", all.dmp.bam.ids.XS, "-duplex.bam")
+  access_simplex_bam_paths <- paste0(mirror.access.bam.dir, "/", access.bam.sub.dir, "/", all.dmp.bam.ids.XS, "-simplex.bam")
+
+  access_duplex_bam_paths <- validate_bam_paths(access_duplex_bam_paths, "ACCESS duplex", all.dmp.ids.XS)
+  access_simplex_bam_paths <- validate_bam_paths(access_simplex_bam_paths, "ACCESS simplex", all.dmp.ids.XS)
+
+  access.normal.bam.sub.dir <- unlist(lapply(strsplit(substr(all.dmp.bam.ids.normal.XS, 1, 2), ""), function(y) {
+    paste0(y, collapse = "/")
+  }))
+  access_normal_bam_paths <- paste0(mirror.access.bam.dir, "/", access.normal.bam.sub.dir, "/", all.dmp.bam.ids.normal.XS, "-unfilter.bam")
+  access_normal_bam_paths <- validate_bam_paths(access_normal_bam_paths, "ACCESS normal", all.dmp.ids.normal.XS)
+
+  # Create ACCESS sample sheet
+  if (length(c(access_duplex_bam_paths, access_simplex_bam_paths, access_normal_bam_paths)) > 0) {
+    access.sample.sheet <- data.frame(
+      Sample_Barcode = c(all.dmp.ids.XS, all.dmp.ids.normal.XS),
+      standard_bam = c(rep(NA, length(all.dmp.ids.XS)), access_normal_bam_paths),
+      duplex_bam = c(access_duplex_bam_paths, rep(NA, length(all.dmp.ids.normal.XS))),
+      simplex_bam = c(access_simplex_bam_paths, rep(NA, length(all.dmp.ids.normal.XS)))
+    ) %>%
+      mutate(
+        cmo_patient_id = x,
+        Sample_Type = ifelse(grepl("-T", Sample_Barcode), "duplex", "unfilterednormal"),
+        dmp_patient_id = dmp_id
       )
+  } else {
+    access.sample.sheet <- NULL
+  }
+
+  # Combine DMP and ACCESS sample sheets
+  if (!is.null(dmp.sample.sheet) & !is.null(access.sample.sheet)) {
+    print("DMP IMPACT and DMP ACCESS samples are available")
+    dmp.sample.sheet <- bind_rows(dmp.sample.sheet, access.sample.sheet)
+  } else if (is.null(dmp.sample.sheet) & !is.null(access.sample.sheet)) {
+    print("DMP IMPACT samples are NOT available and DMP ACCESS samples are available")
+    dmp.sample.sheet <- access.sample.sheet
+  } else if (!is.null(dmp.sample.sheet) & is.null(access.sample.sheet)) {
+    print("DMP IMPACT samples are available and DMP ACCESS samples are NOT available")
+    dmp.sample.sheet <- dmp.sample.sheet
+  } else {
+    print("No DMP IMPACT samples or DMP ACCESS samples are available")
+    dmp.sample.sheet <- NULL
+  }
+
+  # Validate plasma BAM paths
+  plasma_bam_paths <- master.ref[cmo_patient_id == x, .(
+    Sample_Barcode = as.character(cmo_sample_id_plasma),
+    duplex_bam = bam_path_plasma_duplex,
+    simplex_bam = bam_path_plasma_simplex,
+    cmo_patient_id,
+    Sample_Type = "duplex",
+    dmp_patient_id
+  )]
+  plasma_bam_paths$duplex_bam <- validate_bam_paths(plasma_bam_paths$duplex_bam, "plasma duplex", plasma_bam_paths$Sample_Barcode)
+  plasma_bam_paths$simplex_bam <- validate_bam_paths(plasma_bam_paths$simplex_bam, "plasma simplex", plasma_bam_paths$Sample_Barcode)
+
+  # Combine all sample sheets
+  sample.sheet <- rbind(
+    dmp.sample.sheet,
+    plasma_bam_paths,
+    fill = TRUE
+  )
+
+  # Remove rows with missing BAM paths
+  sample.sheet <- sample.sheet[(!is.na(standard_bam) & standard_bam != "") | (!is.na(duplex_bam) & duplex_bam != "") | (!is.na(simplex_bam) & simplex_bam != "")]
+
+  # Write the sample sheet to a file
+  write.table(
+    sample.sheet,
+    paste0(results.dir, "/", x, "/", x, "_sample_sheet.tsv"),
+    sep = "\t",
+    quote = F,
+    row.names = F
+  )
       # piece together all unique calls -----------------------------------------
       # get duplex calls
       duplex.calls <-
