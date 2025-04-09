@@ -76,7 +76,10 @@ compile_reads_all <- function(master.ref,
   print("Compiling reads per patient")
   # Function to validate BAM file paths
 # Function to validate BAM file paths
+# Function to validate BAM file paths
   validate_bam_paths <- function(bam_paths, bam_type, sample_ids) {
+    print(paste0("Validating BAM paths for type: ", bam_type))
+    print(paste0("Number of BAM paths to validate: ", length(bam_paths)))
     missing_bams <- bam_paths[!file.exists(bam_paths)]
     if (length(missing_bams) > 0) {
       warning(paste0(
@@ -90,29 +93,35 @@ compile_reads_all <- function(master.ref,
 
   # Updated section for validating BAM paths
   all.fillout.id <- lapply(unique(master.ref$cmo_patient_id), function(x) {
-    print(x)
+    print(paste0("Processing cmo_patient_id: ", x))
     dir.create(paste0(results.dir, "/", x))
     dmp_id <- unique(master.ref[cmo_patient_id == x]$dmp_patient_id)
+    print(paste0("DMP ID: ", dmp_id))
 
     # DMP sample sheet
     if (!is.na(dmp_id) & dmp_id != '') {
+      print("Creating DMP sample sheet")
       # Get all DMP IDs and BAM IDs
       all.dmp.ids.IM <- DMP.key[grepl(paste0(dmp_id, "-(T|N)..-IM."), V1)]$V1
       all.dmp.ids.IH <- DMP.key[grepl(paste0(dmp_id, "-(T|N)..-IH."), V1)]$V1
       all.dmp.ids <- c(all.dmp.ids.IM, all.dmp.ids.IH)
+      print(paste0("Number of DMP IDs: ", length(all.dmp.ids)))
 
       all.dmp.bam.ids.IM <- DMP.key[grepl(paste0(dmp_id, "-(T|N)..-IM."), V1)]$V2
       all.dmp.bam.ids.IH <- DMP.key[grepl(paste0(dmp_id, "-(T|N)..-IH."), V1)]$V2
       all.dmp.bam.ids <- c(all.dmp.bam.ids.IM, all.dmp.bam.ids.IH)
+      print(paste0("Number of DMP BAM IDs: ", length(all.dmp.bam.ids)))
 
       # Create standard BAM paths and validate
       bam.sub.dir <- unlist(lapply(strsplit(substr(all.dmp.bam.ids, 1, 2), ""), function(y) {
         paste0(y, collapse = "/")
       }))
       dmp_bam_paths <- paste0(mirror.bam.dir, "/", bam.sub.dir, "/", all.dmp.bam.ids, ".bam")
+      print(paste0("Number of DMP BAM paths: ", length(dmp_bam_paths)))
       dmp_bam_paths <- validate_bam_paths(dmp_bam_paths, "DMP", all.dmp.ids)
 
       if (length(dmp_bam_paths) > 0) {
+        print("Creating DMP sample sheet data frame")
         dmp.sample.sheet <- data.frame(
           Sample_Barcode = all.dmp.ids,
           standard_bam = dmp_bam_paths,
@@ -124,14 +133,18 @@ compile_reads_all <- function(master.ref,
             Sample_Type = ifelse(grepl("-T", Sample_Barcode), "DMP_Tumor", "DMP_Normal"),
             dmp_patient_id = dmp_id
           )
+        print("DMP sample sheet created")
       } else {
+        print("No valid DMP BAM paths found")
         dmp.sample.sheet <- NULL
       }
     } else {
+      print("DMP ID is NA or empty")
       dmp.sample.sheet <- NULL
     }
 
     # ACCESS sample sheet
+    print("Creating ACCESS sample sheet")
     all.dmp.ids.XS <- access.key[grepl(paste0(dmp_id, "-T..-XS."), V1)]$V1
     all.dmp.ids.normal.XS <- access.key[grepl(paste0(dmp_id, "-N..-XS."), V1)]$V1
     all.dmp.bam.ids.XS <- gsub("-standard|-unfilter|-simplex|-duplex", "", access.key[grepl(paste0(dmp_id, "-T..-XS."), V1)]$V2)
@@ -155,6 +168,7 @@ compile_reads_all <- function(master.ref,
 
     # Create ACCESS sample sheet
     if (length(c(access_duplex_bam_paths, access_simplex_bam_paths, access_normal_bam_paths)) > 0) {
+      print("Creating ACCESS sample sheet data frame")
       access.sample.sheet <- data.frame(
         Sample_Barcode = c(all.dmp.ids.XS, all.dmp.ids.normal.XS),
         standard_bam = c(rep(NA, length(all.dmp.ids.XS)), access_normal_bam_paths),
@@ -166,15 +180,19 @@ compile_reads_all <- function(master.ref,
           Sample_Type = ifelse(grepl("-T", Sample_Barcode), "duplex", "unfilterednormal"),
           dmp_patient_id = dmp_id
         )
+      print("ACCESS sample sheet created")
     } else {
+      print("No valid ACCESS BAM paths found")
       access.sample.sheet <- NULL
     }
 
     # Ensure both data frames have the same columns before combining
     if (!is.null(dmp.sample.sheet) && !is.null(access.sample.sheet)) {
+      print("Ensuring both data frames have the same columns")
       # Add missing columns to dmp.sample.sheet
       missing_cols_dmp <- setdiff(names(access.sample.sheet), names(dmp.sample.sheet))
       if (length(missing_cols_dmp) > 0) {
+        print(paste0("Missing columns in dmp.sample.sheet: ", paste0(missing_cols_dmp, collapse = ", ")))
         for (col in missing_cols_dmp) {
           dmp.sample.sheet[[col]] <- NA
         }
@@ -183,6 +201,7 @@ compile_reads_all <- function(master.ref,
       # Add missing columns to access.sample.sheet
       missing_cols_access <- setdiff(names(dmp.sample.sheet), names(access.sample.sheet))
       if (length(missing_cols_access) > 0) {
+        print(paste0("Missing columns in access.sample.sheet: ", paste0(missing_cols_access, collapse = ", ")))
         for (col in missing_cols_access) {
           access.sample.sheet[[col]] <- NA
         }
@@ -192,7 +211,9 @@ compile_reads_all <- function(master.ref,
     # Combine DMP and ACCESS sample sheets
     if (!is.null(dmp.sample.sheet) & !is.null(access.sample.sheet)) {
       print("DMP IMPACT and DMP ACCESS samples are available")
+      print("Combining DMP and ACCESS sample sheets")
       dmp.sample.sheet <- bind_rows(dmp.sample.sheet, access.sample.sheet)
+      print("DMP and ACCESS sample sheets combined")
     } else if (is.null(dmp.sample.sheet) & !is.null(access.sample.sheet)) {
       print("DMP IMPACT samples are NOT available and DMP ACCESS samples are available")
       dmp.sample.sheet <- access.sample.sheet
@@ -205,6 +226,7 @@ compile_reads_all <- function(master.ref,
     }
 
     # Validate plasma BAM paths
+    print("Validating plasma BAM paths")
     plasma_bam_paths <- master.ref[cmo_patient_id == x, .(
       Sample_Barcode = as.character(cmo_sample_id_plasma),
       duplex_bam = bam_path_plasma_duplex,
@@ -217,6 +239,7 @@ compile_reads_all <- function(master.ref,
     plasma_bam_paths$simplex_bam <- validate_bam_paths(plasma_bam_paths$simplex_bam, "plasma simplex", plasma_bam_paths$Sample_Barcode)
 
     # Combine all sample sheets
+    print("Combining all sample sheets")
     sample.sheet <- rbind(
       dmp.sample.sheet,
       plasma_bam_paths,
@@ -224,9 +247,11 @@ compile_reads_all <- function(master.ref,
     )
 
     # Remove rows with missing BAM paths
+    print("Removing rows with missing BAM paths")
     sample.sheet <- sample.sheet[(!is.na(standard_bam) & standard_bam != "") | (!is.na(duplex_bam) & duplex_bam != "") | (!is.na(simplex_bam) & simplex_bam != "")]
 
     # Write the sample sheet to a file
+    print("Writing sample sheet to file")
     write.table(
       sample.sheet,
       paste0(results.dir, "/", x, "/", x, "_sample_sheet.tsv"),
@@ -234,6 +259,8 @@ compile_reads_all <- function(master.ref,
       quote = F,
       row.names = F
     )
+    print(paste0("Sample sheet written to: ", results.dir, "/", x, "/", x, "_sample_sheet.tsv"))
+
       # piece together all unique calls -----------------------------------------
       # get duplex calls
       duplex.calls <-
