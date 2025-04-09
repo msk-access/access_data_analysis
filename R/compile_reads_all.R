@@ -240,12 +240,12 @@ compile_reads_all <- function(master.ref,
     print("Validating plasma BAM paths")
       # Ensure that the columns are explicitly named and cast to character
       plasma_bam_paths <- data.frame(
-        Sample_Barcode = as.character(master.ref[cmo_patient_id == x, cmo_sample_id_plasma]),
-        duplex_bam = as.character(master.ref[cmo_patient_id == x, bam_path_plasma_duplex]),
-        simplex_bam = as.character(master.ref[cmo_patient_id == x, bam_path_plasma_simplex]),
-        cmo_patient_id = as.character(master.ref[cmo_patient_id == x, cmo_patient_id]),
-        Sample_Type = as.character(rep("duplex", .N)),
-        dmp_patient_id = as.character(master.ref[cmo_patient_id == x, dmp_patient_id]),
+        Sample_Barcode = as.character(master.ref[master.ref$cmo_patient_id == x, ]$cmo_sample_id_plasma),
+        duplex_bam = as.character(master.ref[master.ref$cmo_patient_id == x, ]$bam_path_plasma_duplex),
+        simplex_bam = as.character(master.ref[master.ref$cmo_patient_id == x, ]$bam_path_plasma_simplex),
+        cmo_patient_id = as.character(master.ref[master.ref$cmo_patient_id == x, ]$cmo_patient_id),
+        Sample_Type = as.character(rep("duplex", nrow(master.ref[master.ref$cmo_patient_id == x, ]))),
+        dmp_patient_id = as.character(master.ref[master.ref$cmo_patient_id == x, ]$dmp_patient_id),
         stringsAsFactors = FALSE
       )
       
@@ -279,9 +279,13 @@ compile_reads_all <- function(master.ref,
     
     # Convert all columns to character before combining
     if (!is.null(dmp.sample.sheet) && !is.null(plasma_bam_paths)) {
-      dmp.sample.sheet <- data.frame(lapply(dmp.sample.sheet, as.character), stringsAsFactors = FALSE)
-      plasma_bam_paths <- data.frame(lapply(plasma_bam_paths, as.character), stringsAsFactors = FALSE)
-    }
+          dmp.sample.sheet <- data.frame(lapply(dmp.sample.sheet, function(x) {
+              if (is.factor(x)) as.character(x) else x
+          }), stringsAsFactors = FALSE)
+          plasma_bam_paths <- data.frame(lapply(plasma_bam_paths, function(x) {
+              if (is.factor(x)) as.character(x) else x
+          }), stringsAsFactors = FALSE)
+      }
     
     sample.sheet <- rbind(
       dmp.sample.sheet,
