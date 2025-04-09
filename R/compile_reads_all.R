@@ -67,7 +67,7 @@ compile_reads_all <- function(master.ref,
 
   # Pooled normal samples ---------------------------------------------------
   pooled.bams <-
-    list.files(pooled.bam.dir, pattern = "*.bam", full.names = T)
+    list.files(pooled.bam.dir, pattern = "\\.bam$", full.names = T)
 
   # For each patient --------------------------------------------------------
   x <- unique(master.ref$cmo_patient_id)[1]
