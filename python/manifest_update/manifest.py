@@ -89,7 +89,17 @@ def validate_date(date_string):
     raise ValueError("no valid date format found")
 
 
-def generate_paths(row):
+def generate_paths(row, assay_type="XS2"):
+    """
+    Generates file paths for BAM, MAF, CNA, and SV files based on the sample type and assay type.
+
+    Args:
+        row (pd.Series): A row of the DataFrame.
+        assay_type (str): The assay type, either "XS1" or "XS2".
+
+    Returns:
+        pd.Series: A Series containing the generated paths.
+    """
     sample_type = row["Sample Type"]
     cmo_patient_id = row["CMO Patient ID"]
     cmo_sample_name = row["CMO Sample Name"]
@@ -109,12 +119,17 @@ def generate_paths(row):
             }
         )
     else:
+        maf_path = (
+            f"{BASE_PATH_SMALL_VARIANTS}{cmo_patient_id}/{cmo_sample_name}/current/{cmo_sample_name}.DONOR22-TP.combined-variants.vep_keptrmv_taggedHotspots_fillout_filtered.maf"
+            if assay_type == "XS1"
+            else f"{BASE_PATH_SMALL_VARIANTS}{cmo_patient_id}/{cmo_sample_name}/current/{cmo_sample_name}.Donor19F21c2206-TP01.combined-variants.vep_keptrmv_taggedHotspots_fillout_filtered.maf"
+        )
         return pd.Series(
             {
                 "bam_path_normal": None,
                 "bam_path_plasma_duplex": f"{base_bam_path}_cl_aln_srt_MD_IR_FX_BR__aln_srt_IR_FX-duplex.bam",
                 "bam_path_plasma_simplex": f"{base_bam_path}_cl_aln_srt_MD_IR_FX_BR__aln_srt_IR_FX-simplex.bam",
-                "maf_path": f"{BASE_PATH_SMALL_VARIANTS}{cmo_patient_id}/{cmo_sample_name}/current/{cmo_sample_name}.DONOR22-TP.combined-variants.vep_keptrmv_taggedHotspots_fillout_filtered.maf",
+                "maf_path": maf_path,
                 "cna_path": f"{BASE_PATH_COPY_NUMBER_VARIANTS}{cmo_patient_id}/{cmo_sample_name}/current/{cmo_sample_name}_copynumber_segclusp.genes.txt",
                 "sv_path": f"{BASE_PATH_STRUCTURAL_VARIANTS}{cmo_patient_id}/{cmo_sample_name}/current/{cmo_sample_name}_AllAnnotatedSVs.txt",
             }
@@ -179,6 +194,12 @@ def make_manifest(
         "--remove-collection-date",
         help="Remove collection date from the output manifest (PHI).",
     ),
+    assay_type: str = typer.Option(
+        "XS2",
+        "--assay-type",
+        "-a",
+        help="Assay type, either 'XS1' or 'XS2'. Default is 'XS2'.",
+    ),
 ):
     """
     Processes the input manifest file to generate paths for various data types
@@ -188,6 +209,7 @@ def make_manifest(
         input_file (Path): Path to the input manifest file.
         output_prefix (str): Prefix name for the output files.
         remove_collection_date (bool): If True, the collection date column will be removed from the output.
+        assay_type (str): Assay type, either "XS1" or "XS2".
     """
     console.rule("[bold blue]Making Manifest File[/]")
 
@@ -280,6 +302,10 @@ def make_manifest(
 
         # Create the final DataFrame from the processed rows
         t_final_df = pd.DataFrame(processed_rows)
+        # Add the "paired" column
+        t_final_df["paired"] = t_final_df["cmo_sample_id_normal"].apply(
+            lambda x: "Paired" if pd.notna(x) else "Unpaired"
+        )
 
         # Define the desired column order
         column_order = [
@@ -287,6 +313,7 @@ def make_manifest(
             "cmo_sample_id_plasma",
             "cmo_sample_id_normal",
             "bam_path_normal",
+            "paired",
             "sex",
             "collection_date",
             "dmp_patient_id",
