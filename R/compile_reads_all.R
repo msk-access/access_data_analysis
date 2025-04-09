@@ -74,19 +74,30 @@ compile_reads_all <- function(master.ref,
   # x = unique(master.ref$cmo_sample_id_plasma)[16]
   # x = 'C-YW82CY'
   print("Compiling reads per patient")
-  # Function to validate BAM file paths
-  validate_bam_paths <- function(bam_paths, bam_type, sample_ids) {
+
+  # Function to validate BAM file paths and error if they don't exist for master.ref, warn and filter otherwise
+  validate_bam_paths <- function(bam_paths, bam_type, sample_ids, is_master_ref = FALSE) {
     print(paste0("Validating BAM paths for type: ", bam_type))
     print(paste0("Number of BAM paths to validate: ", length(bam_paths)))
     missing_bams <- bam_paths[!file.exists(bam_paths)]
+    
     if (length(missing_bams) > 0) {
-      warning(paste0(
-        "The following ", bam_type, " BAM files are missing for sample(s): ",
-        paste0(sample_ids[!file.exists(bam_paths)], collapse = ", "), ". These samples will not be analyzed."
-      ))
+      if (is_master_ref) {
+        stop(paste0( # Changed warning to stop
+          "The following ", bam_type, " BAM files are missing for sample(s): ",
+          paste0(sample_ids[!file.exists(bam_paths)], collapse = ", "), ". Please check these paths in master.ref."
+        ))
+      } else {
+        warning(paste0(
+          "The following ", bam_type, " BAM files are missing for sample(s): ",
+          paste0(sample_ids[!file.exists(bam_paths)], collapse = ", "), ". These samples will not be analyzed."
+        ))
+        bam_paths <- bam_paths[file.exists(bam_paths)] # Filter out missing BAMs
+      }
     }
-    # Return only valid BAM paths
-    bam_paths[file.exists(bam_paths)]
+    
+    # Return  BAM paths 
+    return(bam_paths)
   }
 
   # Updated section for validating BAM paths
@@ -233,30 +244,30 @@ compile_reads_all <- function(master.ref,
       Sample_Type = "duplex",
       dmp_patient_id
     )]
-    plasma_bam_paths$duplex_bam <- validate_bam_paths(plasma_bam_paths$duplex_bam, "plasma duplex", plasma_bam_paths$Sample_Barcode)
-    plasma_bam_paths$simplex_bam <- validate_bam_paths(plasma_bam_paths$simplex_bam, "plasma simplex", plasma_bam_paths$Sample_Barcode)
+    plasma_bam_paths$duplex_bam <- validate_bam_paths(plasma_bam_paths$duplex_bam, "plasma duplex", plasma_bam_paths$Sample_Barcode, is_master_ref = TRUE)
+    plasma_bam_paths$simplex_bam <- validate_bam_paths(plasma_bam_paths$simplex_bam, "plasma simplex", plasma_bam_paths$Sample_Barcode, is_master_ref = TRUE)
 
-      # Ensure both data frames have the same columns before combining
-      if (!is.null(dmp.sample.sheet) && !is.null(plasma_bam_paths)) {
-        print("Ensuring both data frames have the same columns")
-        # Add missing columns to dmp.sample.sheet
-        missing_cols_dmp <- setdiff(names(plasma_bam_paths), names(dmp.sample.sheet))
-        if (length(missing_cols_dmp) > 0) {
-          print(paste0("Missing columns in dmp.sample.sheet: ", paste0(missing_cols_dmp, collapse = ", ")))
-          for (col in missing_cols_dmp) {
-            dmp.sample.sheet[[col]] <- NA
-          }
-        }
-
-        # Add missing columns to plasma_bam_paths
-        missing_cols_plasma <- setdiff(names(dmp.sample.sheet), names(plasma_bam_paths))
-        if (length(missing_cols_plasma) > 0) {
-          print(paste0("Missing columns in plasma_bam_paths: ", paste0(missing_cols_plasma, collapse = ", ")))
-          for (col in missing_cols_plasma) {
-            plasma_bam_paths[[col]] <- NA
-          }
+    # Ensure both data frames have the same columns before combining
+    if (!is.null(dmp.sample.sheet) && !is.null(plasma_bam_paths)) {
+      print("Ensuring both data frames have the same columns")
+      # Add missing columns to dmp.sample.sheet
+      missing_cols_dmp <- setdiff(names(plasma_bam_paths), names(dmp.sample.sheet))
+      if (length(missing_cols_dmp) > 0) {
+        print(paste0("Missing columns in dmp.sample.sheet: ", paste0(missing_cols_dmp, collapse = ", ")))
+        for (col in missing_cols_dmp) {
+          dmp.sample.sheet[[col]] <- NA
         }
       }
+
+      # Add missing columns to plasma_bam_paths
+      missing_cols_plasma <- setdiff(names(dmp.sample.sheet), names(plasma_bam_paths))
+      if (length(missing_cols_plasma) > 0) {
+        print(paste0("Missing columns in plasma_bam_paths: ", paste0(missing_cols_plasma, collapse = ", ")))
+        for (col in missing_cols_plasma) {
+          plasma_bam_paths[[col]] <- NA
+        }
+      }
+    }
 
     # Combine all sample sheets
     print("Combining all sample sheets")
@@ -267,8 +278,8 @@ compile_reads_all <- function(master.ref,
     )
 
     # Remove rows with missing BAM paths
-    print("Removing rows with missing BAM paths")
-    sample.sheet <- sample.sheet[(!is.na(standard_bam) & standard_bam != "") | (!is.na(duplex_bam) & duplex_bam != "") | (!is.na(simplex_bam) & simplex_bam != "")]
+    #print("Removing rows with missing BAM paths")
+    #sample.sheet <- sample.sheet[(!is.na(standard_bam) & standard_bam != "") | (!is.na(duplex_bam) & duplex_bam != "") | (!is.na(simplex_bam) & simplex_bam != "")]
 
     # Write the sample sheet to a file
     print("Writing sample sheet to file")
