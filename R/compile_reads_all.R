@@ -75,8 +75,6 @@ compile_reads_all <- function(master.ref,
   # x = 'C-YW82CY'
   print("Compiling reads per patient")
   # Function to validate BAM file paths
-# Function to validate BAM file paths
-# Function to validate BAM file paths
   validate_bam_paths <- function(bam_paths, bam_type, sample_ids) {
     print(paste0("Validating BAM paths for type: ", bam_type))
     print(paste0("Number of BAM paths to validate: ", length(bam_paths)))
@@ -238,6 +236,28 @@ compile_reads_all <- function(master.ref,
     plasma_bam_paths$duplex_bam <- validate_bam_paths(plasma_bam_paths$duplex_bam, "plasma duplex", plasma_bam_paths$Sample_Barcode)
     plasma_bam_paths$simplex_bam <- validate_bam_paths(plasma_bam_paths$simplex_bam, "plasma simplex", plasma_bam_paths$Sample_Barcode)
 
+      # Ensure both data frames have the same columns before combining
+      if (!is.null(dmp.sample.sheet) && !is.null(plasma_bam_paths)) {
+        print("Ensuring both data frames have the same columns")
+        # Add missing columns to dmp.sample.sheet
+        missing_cols_dmp <- setdiff(names(plasma_bam_paths), names(dmp.sample.sheet))
+        if (length(missing_cols_dmp) > 0) {
+          print(paste0("Missing columns in dmp.sample.sheet: ", paste0(missing_cols_dmp, collapse = ", ")))
+          for (col in missing_cols_dmp) {
+            dmp.sample.sheet[[col]] <- NA
+          }
+        }
+
+        # Add missing columns to plasma_bam_paths
+        missing_cols_plasma <- setdiff(names(dmp.sample.sheet), names(plasma_bam_paths))
+        if (length(missing_cols_plasma) > 0) {
+          print(paste0("Missing columns in plasma_bam_paths: ", paste0(missing_cols_plasma, collapse = ", ")))
+          for (col in missing_cols_plasma) {
+            plasma_bam_paths[[col]] <- NA
+          }
+        }
+      }
+
     # Combine all sample sheets
     print("Combining all sample sheets")
     sample.sheet <- rbind(
@@ -260,6 +280,7 @@ compile_reads_all <- function(master.ref,
       row.names = F
     )
     print(paste0("Sample sheet written to: ", results.dir, "/", x, "/", x, "_sample_sheet.tsv"))
+
 
       # piece together all unique calls -----------------------------------------
       # get duplex calls
