@@ -132,15 +132,15 @@ compile_reads_all <- function(master.ref,
       if (length(dmp_bam_paths) > 0) {
         print("Creating DMP sample sheet data frame")
         dmp.sample.sheet <- data.frame(
-          Sample_Barcode = all.dmp.ids,
-          standard_bam = dmp_bam_paths,
-          duplex_bam = NA,
-          simplex_bam = NA
+          Sample_Barcode = as.character(all.dmp.ids),
+          standard_bam = as.character(dmp_bam_paths),
+          duplex_bam = as.character(rep(NA, length(all.dmp.ids))),
+          simplex_bam = as.character(rep(NA, length(all.dmp.ids)))
         ) %>%
           mutate(
-            cmo_patient_id = x,
-            Sample_Type = ifelse(grepl("-T", Sample_Barcode), "DMP_Tumor", "DMP_Normal"),
-            dmp_patient_id = dmp_id
+            cmo_patient_id = as.character(x),
+            Sample_Type = as.character(ifelse(grepl("-T", Sample_Barcode), "DMP_Tumor", "DMP_Normal")),
+            dmp_patient_id = as.character(dmp_id)
           )
         print("DMP sample sheet created")
       } else {
@@ -179,15 +179,15 @@ compile_reads_all <- function(master.ref,
     if (length(c(access_duplex_bam_paths, access_simplex_bam_paths, access_normal_bam_paths)) > 0) {
       print("Creating ACCESS sample sheet data frame")
       access.sample.sheet <- data.frame(
-        Sample_Barcode = c(all.dmp.ids.XS, all.dmp.ids.normal.XS),
-        standard_bam = c(rep(NA, length(all.dmp.ids.XS)), access_normal_bam_paths),
-        duplex_bam = c(access_duplex_bam_paths, rep(NA, length(all.dmp.ids.normal.XS))),
-        simplex_bam = c(access_simplex_bam_paths, rep(NA, length(all.dmp.ids.normal.XS)))
+        Sample_Barcode = as.character(c(all.dmp.ids.XS, all.dmp.ids.normal.XS)),
+        standard_bam = as.character(c(rep(NA, length(all.dmp.ids.XS)), access_normal_bam_paths)),
+        duplex_bam = as.character(c(access_duplex_bam_paths, rep(NA, length(all.dmp.ids.normal.XS)))),
+        simplex_bam = as.character(c(access_simplex_bam_paths, rep(NA, length(all.dmp.ids.normal.XS))))
       ) %>%
         mutate(
-          cmo_patient_id = x,
-          Sample_Type = ifelse(grepl("-T", Sample_Barcode), "duplex", "unfilterednormal"),
-          dmp_patient_id = dmp_id
+          cmo_patient_id = as.character(x),
+          Sample_Type = as.character(ifelse(grepl("-T", Sample_Barcode), "duplex", "unfilterednormal")),
+          dmp_patient_id = as.character(dmp_id)
         )
       print("ACCESS sample sheet created")
     } else {
@@ -203,7 +203,7 @@ compile_reads_all <- function(master.ref,
       if (length(missing_cols_dmp) > 0) {
         print(paste0("Missing columns in dmp.sample.sheet: ", paste0(missing_cols_dmp, collapse = ", ")))
         for (col in missing_cols_dmp) {
-          dmp.sample.sheet[[col]] <- NA
+          dmp.sample.sheet[[col]] <- as.character(NA)
         }
       }
 
@@ -212,7 +212,7 @@ compile_reads_all <- function(master.ref,
       if (length(missing_cols_access) > 0) {
         print(paste0("Missing columns in access.sample.sheet: ", paste0(missing_cols_access, collapse = ", ")))
         for (col in missing_cols_access) {
-          access.sample.sheet[[col]] <- NA
+          access.sample.sheet[[col]] <- as.character(NA)
         }
       }
     }
@@ -238,11 +238,11 @@ compile_reads_all <- function(master.ref,
     print("Validating plasma BAM paths")
     plasma_bam_paths <- master.ref[cmo_patient_id == x, .(
       Sample_Barcode = as.character(cmo_sample_id_plasma),
-      duplex_bam = bam_path_plasma_duplex,
-      simplex_bam = bam_path_plasma_simplex,
-      cmo_patient_id,
-      Sample_Type = "duplex",
-      dmp_patient_id
+      duplex_bam = as.character(bam_path_plasma_duplex),
+      simplex_bam = as.character(bam_path_plasma_simplex),
+      cmo_patient_id = as.character(cmo_patient_id),
+      Sample_Type = as.character("duplex"),
+      dmp_patient_id = as.character(dmp_patient_id)
     )]
     plasma_bam_paths$duplex_bam <- validate_bam_paths(plasma_bam_paths$duplex_bam, "plasma duplex", plasma_bam_paths$Sample_Barcode, is_master_ref = TRUE)
     plasma_bam_paths$simplex_bam <- validate_bam_paths(plasma_bam_paths$simplex_bam, "plasma simplex", plasma_bam_paths$Sample_Barcode, is_master_ref = TRUE)
@@ -255,7 +255,7 @@ compile_reads_all <- function(master.ref,
       if (length(missing_cols_dmp) > 0) {
         print(paste0("Missing columns in dmp.sample.sheet: ", paste0(missing_cols_dmp, collapse = ", ")))
         for (col in missing_cols_dmp) {
-          dmp.sample.sheet[[col]] <- NA
+          dmp.sample.sheet[[col]] <- as.character(NA)
         }
       }
 
@@ -264,7 +264,7 @@ compile_reads_all <- function(master.ref,
       if (length(missing_cols_plasma) > 0) {
         print(paste0("Missing columns in plasma_bam_paths: ", paste0(missing_cols_plasma, collapse = ", ")))
         for (col in missing_cols_plasma) {
-          plasma_bam_paths[[col]] <- NA
+          plasma_bam_paths[[col]] <- as.character(NA)
         }
       }
     }
