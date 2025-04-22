@@ -6,7 +6,7 @@
 #' @export
 filter_calls = function(
   master.ref,results.dir,
-  CH.path = '/juno/work/access/production/resources/dmp_signedout_CH/current/signedout_CH.txt',
+  CH.path = '/work/access/production/resources/dmp_signedout_CH/current/signedout_CH.txt',
   criteria = 'stringent'
 ){
   # # test input section -----------------------------------------------------------
@@ -296,7 +296,7 @@ if (!interactive()) {
   parser=ArgumentParser()
   parser$add_argument('-m', '--masterref', type='character', help='File path to master reference file')
   parser$add_argument('-o', '--resultsdir', type='character', help='Output directory')
-  parser$add_argument('-ch', '--chlist', type='character', default = '/juno/work/access/production/resources/dmp_signedout_CH/current/signedout_CH.txt',
+  parser$add_argument('-ch', '--chlist', type='character', default = '/work/access/production/resources/dmp_signedout_CH/current/signedout_CH.txt',
                       help='List of signed out CH calls [default]')
   parser$add_argument('-c', '--criteria', type='character', default = 'stringent',
                       help='Calling criteria [default]')
