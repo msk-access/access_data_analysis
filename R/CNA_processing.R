@@ -77,10 +77,10 @@ CNA_processing = function(
   ) %>%
     mutate(
       CNA = case_when(
-        (fc > 1.5 & Hugo_Symbol %in% selected_genes) ~ 'AMP',
-        (fc < -1.5 & Hugo_Symbol %in% selected_genes) ~ 'HOMDEL',
-        (fc > 1.2 & !is.na(CNA_tumor)) ~ 'AMP',
-        (fc < -1.2 & !is.na(CNA_tumor)) ~ 'HOMDEL',
+        (fc >= 1.5 & Hugo_Symbol %in% selected_genes) ~ 'AMP',
+        (fc <= -1.5 & Hugo_Symbol %in% selected_genes) ~ 'HOMDEL',
+        (fc >= 1.2 & !is.na(CNA_tumor)) ~ 'AMP',
+        (fc <= -1.2 & !is.na(CNA_tumor)) ~ 'HOMDEL',
         TRUE ~ ''
       )
     ) %>%
