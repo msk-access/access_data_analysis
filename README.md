@@ -22,7 +22,7 @@ This gitbook will walk you through:
   * [Intermediate file structure](docs/analysis/intermediate-file-organization.md)
 * [Miscellaneous Utility Scripts](broken-reference)
   * [Convert CSV to MAF](miscellaneous-utility-scripts/convert-csv-to-maf.md)
-  * [Get cbioportal variants](broken-reference)
-  * [Convert dates to days](python/convert\_dates\_to\_days/)
-  * [Run create\_report.R](broken-reference)
+  * [Get cbioportal variants](miscellaneous-utility-scripts/get-cbioportal-variants.md)
+  * [Convert dates to days](python/convert_dates_to_days/)
+  * [Run create\_report.R](run-create_report.r.md)
 

@@ -1,7 +1,7 @@
 # Table of contents
 
 * [Home](README.md)
-* [Github codebase](https://github.com/msk-access/access\_data\_analysis)
+* [Github codebase](https://github.com/msk-access/access_data_analysis)
 
 ## Setup
 
@@ -20,9 +20,18 @@
 * [Create Patient Report](docs/analysis/create-report.md)
 * [Intermediate File Organization](docs/analysis/intermediate-file-organization.md)
 
+***
+
+* [VAF Overview Plot Script](vaf-overview-plot-script.md)
+* [Swimmer Plot Scripts](swimmer-plot-scripts.md)
+* [Run create\_report.R](run-create_report.r.md)
+
 ## Miscellaneous Utility Scripts
 
 * [Convert CSV to MAF](miscellaneous-utility-scripts/convert-csv-to-maf.md)
 * [Get cBioPortal Variants](miscellaneous-utility-scripts/get-cbioportal-variants.md)
-* [Convert dates to days](python/convert\_dates\_to\_days/README.md)
-* [Run create\_report.R](miscellaneous-utility-scripts/run-create\_report.r.md)
+* [Convert dates to days](python/convert_dates_to_days/README.md)
+
+***
+
+* [ACCESS Manifest Update Script](access-manifest-update-script.md)
