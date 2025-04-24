@@ -20,9 +20,12 @@ This gitbook will walk you through:
   * [CNA Processing](docs/analysis/cna-processing.md)
   * [Create Patient Report](docs/analysis/create-report.md)
   * [Intermediate file structure](docs/analysis/intermediate-file-organization.md)
+  * [VAF Overview Plot](vaf-overview-plot-script.md)
+  * [Swimmer Plot](swimmer-plot-scripts.md)
+  * [Create Report](run-create_report.r.md)
 * [Miscellaneous Utility Scripts](broken-reference)
+  * [Compile Reads Input Generation](access-manifest-update-script.md)
   * [Convert CSV to MAF](miscellaneous-utility-scripts/convert-csv-to-maf.md)
   * [Get cbioportal variants](miscellaneous-utility-scripts/get-cbioportal-variants.md)
   * [Convert dates to days](python/convert_dates_to_days/)
-  * [Run create\_report.R](run-create_report.r.md)
 
