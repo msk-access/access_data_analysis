@@ -123,20 +123,26 @@ def get_best_fit_folder(facet_manifest_path):
     facet_manifest_path = Path(facet_manifest_path)
     base_path = facet_manifest_path.parent
     facet_manifest_all = read_manifest(facet_manifest_path)
-    #split date_reviewed in two columns 
-    facet_manifest_all[['date_reviewed', 'time_reviewed']] = facet_manifest_all.date_reviewed.str.split(" ", expand = True)
-    #convert date_reviewed to date
-    facet_manifest_all['date_reviewed'] = pd.to_datetime(facet_manifest_all['date_reviewed'])
-    #get facets_qc == TRUE rows
+    
+    # Split date_reviewed into two columns
+    facet_manifest_all[['date_reviewed', 'time_reviewed']] = facet_manifest_all.date_reviewed.str.split(" ", expand=True)
+    
+    # Convert date_reviewed to datetime, coercing errors to NaT
+    facet_manifest_all['date_reviewed'] = pd.to_datetime(facet_manifest_all['date_reviewed'], errors='coerce')
+    
+    # Filter rows where facets_qc is True
     facet_manifest_true = facet_manifest_all.loc[facet_manifest_all.facets_qc]
-    #get review_status == reviewed_best_fit rows
-    facet_manifest = facet_manifest_true[facet_manifest_true.review_status.str.contains("reviewed_best_fit") == True]
+    
+    # Filter rows where review_status contains "reviewed_best_fit"
+    facet_manifest = facet_manifest_true[facet_manifest_true.review_status.str.contains("reviewed_best_fit", na=False)]
+    
     if facet_manifest.empty:
-            return(base_path.joinpath("default", "*[0-9].ccf.maf")
-        )
-    #sort by date
-    facet_manifest_sort = facet_manifest.sort_values(by='date_reviewed',ascending=False)
-    #take the first row
+        return base_path.joinpath("default", "*[0-9].ccf.maf")
+    
+    # Sort by date_reviewed, ignoring NaT values
+    facet_manifest_sort = facet_manifest.sort_values(by='date_reviewed', ascending=False, na_position='last')
+    
+    # Take the first row
     folder_name = facet_manifest_sort['fit_name'].iloc[0]
     return (
         (base_path.joinpath(folder_name, "*[0-9].ccf.maf"))

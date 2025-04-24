@@ -8,14 +8,14 @@
 compile_reads_all <- function(master.ref,
                           results.dir,
                           project.ID,
-                          pooled.bam.dir = "/juno/work/access/production/resources/msk-access/current/novaseq_curated_duplex_bams_dmp/current/",
-                          fasta.path = "/juno/work/access/production/resources/reference/current/Homo_sapiens_assembly19.fasta",
+                          pooled.bam.dir = "/work/access/production/resources/msk-access/v2.0/novaseq_curated_duplex_bams_dmp/current/",
+                          fasta.path = "/work/access/production/resources/reference/versions/hg19_virus_special/hg19_virus.fasta",
                           genotyper.path = "/work/access/production/resources/tools/GetBaseCountsMultiSample/current/GetBaseCountsMultiSample",
-                          dmp.dir = "/juno/work/access/production/resources/cbioportal/current/msk_solid_heme",
-                          mirror.bam.dir = "/juno/res/dmpcollab/dmpshare/share/irb12_245",
-                          mirror.access.bam.dir = "/juno/res/dmpcollab/dmpshare/share/access_12_245/",
-                          dmp.key.path = "/juno/res/dmpcollab/dmprequest/12-245/key.txt",
-                          access.key.path = "/juno/res/dmpcollab/dmprequest/ACCESS-12-245/key.txt") {
+                          dmp.dir = "/work/access/production/resources/cbioportal/current/msk_solid_heme",
+                          mirror.bam.dir = "/juno/dmp/share/irb12_245",
+                          mirror.access.bam.dir = "/juno/dmp/share/access_12_245/",
+                          dmp.key.path = "/juno/dmp/request/12-245/key.txt",
+                          access.key.path = "/juno/dmp/request/ACCESS-12-245/key.txtt") {
   # # test input section -----------------------------------------------------------
   # master.ref = fread('/juno/work/bergerm1/bergerlab/zhengy1/access_data_analysis/data/example_master_file.csv')
   # results.dir = paste0('/juno/work/bergerm1/MSK-ACCESS/ACCESS-Projects/test_access/access_data_analysis/output_',format(Sys.time(),'%m%d%y'))
@@ -67,7 +67,7 @@ compile_reads_all <- function(master.ref,
 
   # Pooled normal samples ---------------------------------------------------
   pooled.bams <-
-    list.files(pooled.bam.dir, pattern = ".bam", full.names = T)
+    list.files(pooled.bam.dir, pattern = "\\.bam$", full.names = T)
 
   # For each patient --------------------------------------------------------
   x <- unique(master.ref$cmo_patient_id)[1]
@@ -262,6 +262,24 @@ compile_reads_all <- function(master.ref,
       sample.sheet <-
         sample.sheet[!is.na(Sample_Barcode) |
                        Sample_Barcode != ""]
+      # Check for existence of bam files and remove rows if files are missing
+      rows_to_remove <- c()
+      for (i in 1:nrow(sample.sheet)) {
+        bam_files <- c(sample.sheet$standard_bam[i], sample.sheet$duplex_bam[i], sample.sheet$simplex_bam[i])
+        bam_files <- bam_files[!is.na(bam_files) & bam_files != ""]  # remove NAs and empty strings
+
+        for (bam_file in bam_files) {
+          if (!file.exists(bam_file)) {
+            message(paste0("Warning: BAM file does not exist: ", bam_file, ". Removing sample ", sample.sheet$Sample_Barcode[i], " from sample sheet."))
+            rows_to_remove <- c(rows_to_remove, i)
+            break # No need to check other bams for this row
+          }
+        }
+      }
+
+      if (length(rows_to_remove) > 0) {
+        sample.sheet <- sample.sheet[-unique(rows_to_remove),]
+      }
       write.table(
         sample.sheet,
         paste0(results.dir, "/", x, "/", x, "_sample_sheet.tsv"),
@@ -512,7 +530,7 @@ compile_reads_all <- function(master.ref,
           "/",
           x,
           "_all_unique_calls.maf",
-          " -itxt /work/access/production/resources/msk-access/current/regions_of_interest/current/hotspot-list-union-v1-v2_with_TERT.txt ",
+          " -itxt /work/access/production/resources/msk-access/current/regions_of_interest/versions/v1.0/hotspot-list-union-v1-v2_with_TERT.txt ",
           " -o ",
           results.dir,
           "/",
@@ -680,14 +698,14 @@ if (!interactive()) {
     "-pb",
     "--pooledbamdir",
     type = "character",
-    default = "/juno/work/access/production/resources/msk-access/current/novaseq_curated_duplex_bams_dmp/current/",
+    default = "/work/access/production/resources/msk-access/v2.0/novaseq_curated_duplex_bams_dmp/current/",
     help = "Directory for all pooled bams [default]"
   )
   parser$add_argument(
     "-fa",
     "--fastapath",
     type = "character",
-    default = "/juno/work/access/production/resources/reference/current/Homo_sapiens_assembly19.fasta",
+    default = "/work/access/production/resources/reference/versions/hg19_virus_special/hg19_virus.fasta",
     help = "Reference fasta path [default]"
   )
   parser$add_argument(
@@ -701,35 +719,35 @@ if (!interactive()) {
     "-dmp",
     "--dmpdir",
     type = "character",
-    default = "/juno/work/access/production/resources/cbioportal/current/msk_solid_heme",
+    default = "/work/access/production/resources/cbioportal/current/msk_solid_heme",
     help = "Directory of clinical DMP repository [default]"
   )
   parser$add_argument(
     "-mb",
     "--mirrorbamdir",
     type = "character",
-    default = "/juno/res/dmpcollab/dmpshare/share/irb12_245",
+    default = "/juno/dmp/share/irb12_245",
     help = "Mirror BAM file directory [default]"
   )
   parser$add_argument(
     "-mab",
     "--mirroraccessbamdir",
     type = "character",
-    default = "/juno/res/dmpcollab/dmpshare/share/access_12_245",
+    default = "/juno/dmp/share/access_12_245",
     help = "Mirror BAM file directory for MSK-ACCESS [default]"
   )
   parser$add_argument(
     "-dmpk",
     "--dmpkeypath",
     type = "character",
-    default = "/juno/res/dmpcollab/dmprequest/12-245/key.txt",
+    default = "/juno/dmp/request/12-245/key.txt",
     help = "DMP mirror BAM key file [default]"
   )
   parser$add_argument(
     "-dmpak",
     "--dmpaccesskeypath",
     type = "character",
-    default = "/juno/res/dmpcollab/dmprequest/ACCESS-12-245/key.txt",
+    default = "/juno/dmp/request/ACCESS-12-245/key.txt",
     help = "DMP mirror BAM key file for MSK-ACCESS [default]"
   )
   args <- parser$parse_args()
