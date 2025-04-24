@@ -1,108 +1,178 @@
-# ACCESS Manifest Update Script
+# Manifest Update Script
 
-This script processes an ACCESS manifest file to generate paths for various data types and saves the updated manifest in both Excel and CSV formats. It is designed to handle Protected Health Information (PHI) and ensures compliance with privacy regulations.
+## Overview
+
+This Python script processes and updates an ACCESS manifest file by generating paths for various data types (e.g., BAM, MAF, CNA, SV files) and saves the updated manifest in both Excel and CSV formats. It supports both legacy and modern input formats and includes options for handling Protected Health Information (PHI).
 
 ## Features
 
-- Generates paths for BAM, MAF, CNA, and SV files based on the input manifest.
-- Handles both normal and non-normal sample types.
-- Allows removal of the `Collection Date` column to scrub PHI.
-- Outputs the updated manifest in both `.xlsx` and `.csv` formats.
+- **Input Validation**:
+  - Ensures required columns are present in the input manifest.
+  - Validates date formats and handles missing values.
+- **Path Generation**:
+  - Automatically generates paths for BAM, MAF, CNA, and SV files based on sample type and assay type.
+- **PHI Handling**:
+  - Optionally removes collection dates to comply with privacy regulations.
+- **Output**:
+  - Saves the updated manifest in both Excel and CSV formats.
+  - Supports custom output file prefixes.
+- **Legacy Support**:
+  - Handles legacy input file formats with specific path requirements.
 
 ## Requirements
 
-- Python 3.8 or higher
-- Required Python packages:
-  - `pandas`
-  - `typer`
-  - `rich`
-  - `arrow`
-  - `openpyxl` (for Excel file handling)
+### Python Packages
 
-## Installation
+The script requires the following Python packages:
 
-1. Clone the repository:
+- `pandas`
+- `typer`
+- `rich`
+- `arrow`
+- `numpy`
+- `openpyxl` (for Excel file handling)
 
-   ```bash
-   git clone https://github.com/your-repo/access_data_analysis.git
-   cd access_data_analysis/python/manifest_update
-    ```
+Install the required packages using the following command:
 
-2. Create a virtual environment and install dependencies:
-
-   ```bash
-    python3 -m venv venv
-    source venv/bin/activate
-    pip install -r requirements.txt
-    ```
+```bash
+pip install pandas typer rich arrow numpy openpyxl
+```
 
 ## Usage
 
-Run the script using the following command:
-```bash
-python manifest_update.py --input <input_manifest.xlsx> --output <output_prefix> [--remove-collection-date]
-```
-Replace `<input_manifest.xlsx>` with the path to your input manifest file and `<output_prefix>` with the desired prefix for the output files.
-The `--remove-collection-date` flag is optional. If specified, the script will remove the `Collection Date` column from the output manifest.
-### Command Line Arguments
+### Commands
+
+The script provides two main commands:
+
+1. **`make-manifest`**:
+   Processes the input manifest file to generate paths for various data types and saves the updated manifest.
+
+2. **`update-manifest`**:
+   Updates a legacy ACCESS manifest file with specific paths.
+
+### Command-Line Arguments
+
+#### `make-manifest`
+
+| Argument                  | Type       | Description                                                                 | Default Value |
+|---------------------------|------------|-----------------------------------------------------------------------------|---------------|
+| `-i, --input`             | `Path`     | Path to the input manifest file.                                            | None          |
+| `-o, --output`            | `str`      | Prefix name for the output files (without extension).                       | None          |
+| `--remove-collection-date`| `bool`     | Remove collection date from the output manifest (PHI).                      | `False`       |
+| `-a, --assay-type`        | `str`      | Assay type, either `XS1` or `XS2`.                                          | `XS2`         |
+
+#### `update-manifest`
+
+| Argument      | Type       | Description                                                                 | Default Value |
+|---------------|------------|-----------------------------------------------------------------------------|---------------|
+| `-i, --input` | `Path`     | Path to the input manifest file.                                            | None          |
+| `-o, --output`| `str`      | Prefix name for the output files (without extension).                       | None          |
+
+### Example Commands
+
+#### `make-manifest`
 
 ```bash
-python manifest_update.py --help
+python manifest.py make-manifest -i input_manifest.xlsx -o updated_manifest --remove-collection-date -a XS2
 ```
-```plaintext
-Arguments
---input, -i: Path to the input manifest file (required).
---output, -o: Prefix name for the output files (required).
---remove-collection-date: Optional flag to remove the Collection Date column from the output manifest.
---help: Show help message and exit.
-```
-### Example
-This command processes the manifest.xlsx file, removes the Collection Date column, and saves the updated manifest as updated_manifest.xlsx and updated_manifest.csv.
+
+#### `update-manifest`
+
 ```bash
-python manifest_update.py --input manifest.xlsx --output updated_manifest --remove-collection-date
+python manifest.py update-manifest -i legacy_manifest.xlsx -o updated_legacy_manifest
 ```
-## Code Overview
-The script is organized into several functions to handle different tasks:
-- `generate_paths`: Generates file paths for BAM, MAF, CNA, and SV files based on the sample type and other metadata.
-- `create_new_dataframe`: Creates a new DataFrame for normal or non-normal samples. Handles flexible subsetting for non-normal sample types.
-- `scrub_datetime`: Replaces datetime values with None to scrub PHI.
-- `make_manifest`: Main function to process the input manifest and generate the updated manifest files.
 
+## Input File Requirements
 
+### Required Columns
 
-### generate_paths(row)
+The input manifest file must contain the following columns:
 
-Generates file paths for BAM, MAF, CNA, and SV files based on the sample type and other metadata.
+- `CMO Patient ID`
+- `CMO Sample Name`
+- `Sample Type`
 
-### create_new_dataframe(df, sample_type="Normal")
+For legacy input files, the following additional columns are required:
 
-Creates a new DataFrame for normal or non-normal samples. Handles flexible subsetting for non-normal sample types.
+- `cmo_patient_id`
+- `cmo_sample_id_normal`
+- `cmo_sample_id_plasma`
 
-### scrub_datetime(value)
+### Date Format
 
-Replaces datetime values with None to scrub PHI.
+The script supports the following date formats:
 
-### make_manifest
+- `MM/DD/YY`
+- `M/D/YY`
+- `MM/D/YYYY`
+- `YYYY/MM/DD`
+- `YYYY-MM-DD`
 
-Main function to process the input manifest and generate the updated manifest files.
+Invalid or missing dates will raise an error unless the `--remove-collection-date` option is used.
 
-## Output
+## Outputs
 
 The script generates two output files:
 
-* <output_prefix>.xlsx: Updated manifest in Excel format.
-* <output_prefix>.csv: Updated manifest in CSV format.
+1. **Excel File**: `<output_prefix>.xlsx`
+2. **CSV File**: `<output_prefix>.csv`
+
+Both files contain the updated manifest with the following columns:
+
+- `cmo_patient_id`
+- `cmo_sample_id_plasma`
+- `cmo_sample_id_normal`
+- `bam_path_normal`
+- `bam_path_plasma_duplex`
+- `bam_path_plasma_simplex`
+- `maf_path`
+- `cna_path`
+- `sv_path`
+- `paired`
+- `sex`
+- `collection_date`
+- `dmp_patient_id`
+
+## Script Workflow
+
+1. **Input Validation**:
+   - Checks for required columns and missing values.
+   - Validates date formats.
+
+2. **Path Generation**:
+   - Generates paths for BAM, MAF, CNA, and SV files based on sample type and assay type.
+
+3. **DataFrame Creation**:
+   - Creates separate DataFrames for normal and non-normal samples.
+   - Merges the DataFrames to include paired and unpaired samples.
+
+4. **Output**:
+   - Saves the updated manifest in Excel and CSV formats.
 
 ## Error Handling
 
-* The script checks for required columns in the input manifest and raises an error if any are missing.
-* If the Collection Date column is missing and --remove-collection-date is specified, the column is created and filled with None.
+The script includes error handling for the following scenarios:
 
-## License
+- Missing required columns.
+- Missing or invalid date values.
+- File read/write errors.
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+## Example Workflow
 
-## Authors
+1. **Prepare Input Manifest**:
+   Ensure the input manifest file contains the required columns and valid date formats.
 
-* Carmelina Charalambous
-* Ronak Shah (@rhshah)
+2. **Run `make-manifest`**:
+   ```bash
+   python manifest.py make-manifest -i input_manifest.xlsx -o updated_manifest --remove-collection-date -a XS2
+   ```
+
+3. **Check Outputs**:
+   Verify the generated Excel and CSV files in the specified output directory.
+
+## Contact
+
+For questions or issues, please contact:
+
+- **Author**: Carmelina Charalambous, Ronak Shah (@rhshah)
+- **Date**: June 21, 2024
