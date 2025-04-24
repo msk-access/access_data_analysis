@@ -34,4 +34,4 @@
 
 ***
 
-* [ACCESS Manifest Update Script](access-manifest-update-script.md)
+* [Manifest Update Script](manifest-update-script.md)

@@ -4,7 +4,7 @@ description: ACCESS Data Analysis
 
 # Home
 
-Scripts for downstream analysis plotting of ACCESS variant calling pipeline output
+Scripts for downstream analysis and plotting of the ACCESS variant calling pipeline output
 
 This gitbook will walk you through:
 
@@ -24,7 +24,7 @@ This gitbook will walk you through:
   * [Swimmer Plot](swimmer-plot-scripts.md)
   * [Create Report](run-create_report.r.md)
 * [Miscellaneous Utility Scripts](broken-reference)
-  * [Compile Reads Input Generation](access-manifest-update-script.md)
+  * [Compile Reads Input Generation](manifest-update-script.md)
   * [Convert CSV to MAF](miscellaneous-utility-scripts/convert-csv-to-maf.md)
   * [Get cbioportal variants](miscellaneous-utility-scripts/get-cbioportal-variants.md)
   * [Convert dates to days](python/convert_dates_to_days/)
