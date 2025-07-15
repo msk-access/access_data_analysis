@@ -31,15 +31,15 @@ filter_calls = function(
   # inputs ---------------------------------------------------------------
   # DMP.key <- fread(dmp.key.path)
   CH.calls = fread(CH.path)
-  pooled.normal.mafs <-
-    fread(paste0(results.dir,'/pooled/all_all_unique.maf')) %>%
-    mutate(Tumor_Sample_Barcode = paste0(Tumor_Sample_Barcode,'___pooled')) %>%
-    select(Hugo_Symbol,Tumor_Sample_Barcode,Chromosome,Start_Position,End_Position,Variant_Classification,HGVSp_Short,Reference_Allele,Tumor_Seq_Allele2,t_alt_count) %>%
-    group_by(Hugo_Symbol,Chromosome,Start_Position,End_Position,Variant_Classification,Reference_Allele,Tumor_Seq_Allele2) %>%
-    summarise(duplex_support_num = length(which(t_alt_count >= 2))) %>%
-    filter(duplex_support_num > 0,.preserve = T) %>%
-    transmute(Hugo_Symbol, Chromosome=as.character(Chromosome), Start_Position, End_Position, Variant_Classification, Reference_Allele, Tumor_Seq_Allele2, duplex_support_num) %>%
-    data.table()
+#  pooled.normal.mafs <-
+#    fread(paste0(results.dir,'/pooled/all_all_unique.maf')) %>%
+#    mutate(Tumor_Sample_Barcode = paste0(Tumor_Sample_Barcode,'___pooled')) %>%
+#    select(Hugo_Symbol,Tumor_Sample_Barcode,Chromosome,Start_Position,End_Position,Variant_Classification,HGVSp_Short,Reference_Allele,Tumor_Seq_Allele2,t_alt_count) %>%
+#    group_by(Hugo_Symbol,Chromosome,Start_Position,End_Position,Variant_Classification,Reference_Allele,Tumor_Seq_Allele2) %>%
+#    summarise(duplex_support_num = length(which(t_alt_count >= 2))) %>%
+#    filter(duplex_support_num > 0,.preserve = T) %>%
+#    transmute(Hugo_Symbol, Chromosome=as.character(Chromosome), Start_Position, End_Position, Variant_Classification, Reference_Allele, Tumor_Seq_Allele2, duplex_support_num) %>%
+#    data.table()
 
   # for each patient produce the correct results ----------------------------
   # x <- unique(master.ref$cmo_patient_id)[1]
@@ -143,12 +143,12 @@ filter_calls = function(
           merge(
             dmp.maf,
             by = c('Hugo_Symbol','Chromosome','Start_Position','End_Position','Variant_Classification','Reference_Allele','Tumor_Seq_Allele2'),
-            all.x = T) %>%
+            all.x = T)  %>%
           # pooled normal for systemic artifacts
-          merge(
-            pooled.normal.mafs,
-            by = c('Hugo_Symbol','Chromosome','Start_Position','End_Position','Variant_Classification','Reference_Allele','Tumor_Seq_Allele2'),
-            all.x = T) %>%
+#          merge(
+#            pooled.normal.mafs,
+#            by = c('Hugo_Symbol','Chromosome','Start_Position','End_Position','Variant_Classification','Reference_Allele','Tumor_Seq_Allele2'),
+#            all.x = T) %>%
           data.table()
     } else if (nrow(fillouts.dt) > 0){
       fillouts.dt <- fillouts.dt %>%
@@ -160,25 +160,25 @@ filter_calls = function(
         merge(
           hotspot.maf,
           by = c('Hugo_Symbol','Chromosome','Start_Position','End_Position','Variant_Classification','Reference_Allele','Tumor_Seq_Allele2'),
-          all.x = T) %>%
+          all.x = T)  %>%
         # pooled normal for systemic artifacts
-        merge(
-          pooled.normal.mafs,
-          by = c('Hugo_Symbol','Chromosome','Start_Position','End_Position','Variant_Classification','Reference_Allele','Tumor_Seq_Allele2'),
-          all.x = T) %>%
-        mutate(DMP = NA) %>%
+#        merge(
+#          pooled.normal.mafs,
+#          by = c('Hugo_Symbol','Chromosome','Start_Position','End_Position','Variant_Classification','Reference_Allele','Tumor_Seq_Allele2'),
+#          all.x = T) %>%
+#        mutate(DMP = NA) %>%
         data.table()
     } else {
 
       print(paste0("Found no tumor or DMP mutations for ", x, ". Writing an empty data.frame to CSV."))
 
       # if fillouts.dt has no data, then add the needed columns with no data
-      fillouts.dt[,c("DMP", "Hotspot", "duplex_support_num", "call_confidence", "CH") := NA]
+      fillouts.dt[,c("DMP", "Hotspot", "call_confidence", "CH") := NA]
 
       fillouts.dt <- fillouts.dt %>% select(
         Hugo_Symbol,Chromosome,Start_Position,End_Position,
         Variant_Classification,HGVSp_Short,Reference_Allele,Tumor_Seq_Allele2,
-        ExAC_AF,Hotspot,DMP,CH,duplex_support_num,call_confidence,sort(everything()))
+        ExAC_AF,Hotspot,DMP,CH,call_confidence,sort(everything()))
 
       write.csv(
         fillouts.dt,
@@ -189,9 +189,9 @@ filter_calls = function(
     }
 
     # Interesting cases where DMP signed out calls are artifacets
-    if(any(!is.na(fillouts.dt$DMP) & !is.na(fillouts.dt$duplex_support_num))){
-      print(paste0('Look at ',x,' for DMP signed out plasma artifacts...'))
-    }
+#    if(any(!is.na(fillouts.dt$DMP) & !is.na(fillouts.dt$duplex_support_num))){
+#      print(paste0('Look at ',x,' for DMP signed out plasma artifacts...'))
+#    }
 
     # germline filtering for matched and unmatched ----------------------------
     plasma.samples <- sample.sheet[Sample_Type %in% c('duplex')]$column.names
@@ -271,7 +271,7 @@ filter_calls = function(
             all.x = T) %>%
       mutate(CH = ifelse(is.na(CH),'No','Yes')) %>%
       select(Hugo_Symbol,Chromosome,Start_Position,End_Position,Variant_Classification,HGVSp_Short,Reference_Allele,Tumor_Seq_Allele2,
-             ExAC_AF,Hotspot,DMP,CH,duplex_support_num,call_confidence,sort(everything()))
+             ExAC_AF,Hotspot,DMP,CH,call_confidence,sort(everything()))
 
     write.csv(fillouts.dt,paste0(results.dir,'/results_',criteria,'/',x,'_SNV_table.csv'),row.names = F)
   })
