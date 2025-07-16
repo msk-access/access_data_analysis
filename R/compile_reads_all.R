@@ -239,8 +239,8 @@ compile_reads_all <- function(master.ref,
                                  .(
                                    Sample_Barcode = as.character(cmo_sample_id_plasma),
                                    standard_bam = NA,
-                                   duplex_bam = bam_path_plasma_duplex,
-                                   simplex_bam = bam_path_plasma_simplex,
+                                   duplex_bam = normalizePath(bam_path_plasma_duplex),
+                                   simplex_bam = normalizePath(bam_path_plasma_simplex),
                                    cmo_patient_id,
                                    Sample_Type = "duplex",
                                    dmp_patient_id
@@ -250,7 +250,7 @@ compile_reads_all <- function(master.ref,
                                       # buffy coat + DMP bams -- standard bam only
                                       .(
                                         Sample_Barcode = as.character(cmo_sample_id_normal),
-                                        standard_bam = bam_path_normal,
+                                        standard_bam = normalizePath(bam_path_normal),
                                         duplex_bam = NA,
                                         simplex_bam = NA,
                                         cmo_patient_id,
