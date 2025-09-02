@@ -248,7 +248,7 @@ def make_manifest(
         for index, row in new_non_normal_df.iterrows():
             # Find corresponding normal samples for the same patient
             normal_samples = new_normal_df[
-                new_normal_df["cmo_patient_id"] == row["cmo_patient_id"]
+                new_normal_df["cmo_patient_id"] == row["CMO Patient ID"]
             ]
 
             # If normal samples are found, create a new row for each normal sample
