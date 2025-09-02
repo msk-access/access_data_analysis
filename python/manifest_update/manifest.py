@@ -147,8 +147,8 @@ def create_new_dataframe(df, sample_type="Normal"):
     else:
         subset_df = df[df["Sample Type"] != "Normal"].copy()  # Exclude "Normal"
 
-    new_df = pd.DataFrame()
     if not subset_df.empty:  # Check if subset_df is not empty
+        new_df = pd.DataFrame()
         new_df["cmo_patient_id"] = subset_df["CMO Patient ID"]
         new_df["cmo_sample_id_plasma"] = subset_df["CMO Sample Name"]
         new_df["cmo_sample_id_normal"] = subset_df["CMO Sample Name"]
@@ -163,6 +163,11 @@ def create_new_dataframe(df, sample_type="Normal"):
             new_df["maf_path"] = subset_df["maf_path"]
             new_df["cna_path"] = subset_df["cna_path"]
             new_df["sv_path"] = subset_df["sv_path"]
+    else:
+        new_df = pd.DataFrame(columns=["cmo_patient_id", "cmo_sample_id_plasma", "cmo_sample_id_normal",
+                                      "bam_path_normal", "sex", "collection_date", "dmp_patient_id",
+                                      "bam_path_plasma_duplex", "bam_path_plasma_simplex",
+                                      "maf_path", "cna_path", "sv_path"])
 
     return new_df
 
@@ -248,7 +253,7 @@ def make_manifest(
         for index, row in new_non_normal_df.iterrows():
             # Find corresponding normal samples for the same patient
             normal_samples = new_normal_df[
-                new_normal_df["CMO Patient ID"] == row["CMO Patient ID"]
+                new_normal_df["cmo_patient_id"] == row["cmo_patient_id"]
             ]
 
             # If normal samples are found, create a new row for each normal sample
