@@ -129,8 +129,8 @@ compile_reads_all <- function(master.ref,
               all.dmp.bam.ids,
               ".bam"
             ),
-            duplex_bam = NA,
-            simplex_bam = NA
+            duplex_bam = NA_character_,
+            simplex_bam = NA_character_
           ) %>%
             mutate(
               cmo_patient_id = x,
@@ -154,7 +154,7 @@ compile_reads_all <- function(master.ref,
           access.sample.sheet <- unique(
             data.frame(
               Sample_Barcode = all.dmp.ids.XS,
-              standard_bam = NA,
+              standard_bam = NA_character_,
               duplex_bam = paste0(
                 mirror.access.bam.dir,
                 "/",
@@ -199,8 +199,8 @@ compile_reads_all <- function(master.ref,
                 all.dmp.bam.ids.normal.XS,
                 "-unfilter.bam"
               ),
-              duplex_bam = NA,
-              simplex_bam = NA
+              duplex_bam = NA_character_,
+              simplex_bam = NA_character_
             ) %>%
               mutate(
                 cmo_patient_id = x,
@@ -238,7 +238,7 @@ compile_reads_all <- function(master.ref,
                                  # plasma bams -- duplex and simplex bam
                                  .(
                                    Sample_Barcode = as.character(cmo_sample_id_plasma),
-                                   standard_bam = NA,
+                                   standard_bam = NA_character_,
                                    duplex_bam = bam_path_plasma_duplex,
                                    simplex_bam = bam_path_plasma_simplex,
                                    cmo_patient_id,
@@ -250,9 +250,9 @@ compile_reads_all <- function(master.ref,
                                       # buffy coat + DMP bams -- standard bam only
                                       .(
                                         Sample_Barcode = as.character(cmo_sample_id_normal),
-                                        standard_bam = bam_path_normal,
-                                        duplex_bam = NA,
-                                        simplex_bam = NA,
+                                        standard_bam = as.character(bam_path_normal),
+                                        duplex_bam = NA_character_,
+                                        simplex_bam = NA_character_,
                                         cmo_patient_id,
                                         Sample_Type = "unfilterednormal",
                                         dmp_patient_id
@@ -627,9 +627,9 @@ compile_reads_all <- function(master.ref,
     data.frame(
       sample_id = gsub("^.*./|.bam", "", pooled.bams),
       maf = paste0(results.dir, "/pooled/all_all_unique.maf"),
-      standard_bam = pooled.bams,
+      standard_bam = as.character(pooled.bams),
       duplex_bam = "",
-      simplex_bam = ""
+      simplex_bam = NA_character_
     ),
     paste0(results.dir, "/pooled/pooled_metadata.tsv"),
     sep = "\t",
